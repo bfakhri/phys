@@ -19,30 +19,38 @@ int scanMax()
 	int procID = getProcID(); 
 
 	int step = 0; 
-	for(int step=0; !done; step++)
+	for(int step=0; pow(2, step) < maxProcs; step++)
 	{
+		group = pow(2, step); 
 		// Send - if true this proc is embassador
-		if((procID+1)%(pow(2,step)) == 0)
+		if((procID+1)%group) == 0)
 		{
 			// Add check for end right here
-			for(int i=1; i<=(pow(2,step)); i++)
+			for(int i=1; i<=group; i++)
 				send(procID+i, myValue); 
 		}
 		
 		// Receive 
-		if(step == 0 && myID != 0)
+		if(myID != 0)
 		{
-			receive(myID-1, inComingValue); 
-		}
-		else
-		{
-				if
+			if(step == 0)
+			{
+				receive(myID-1, inComingValue); 
+			}
+			else
+			{
+				if((myID%(group*2)) >= group)
+				{
+					receive((myID/group)*group-1, inComingValue);
+				}
+			}
 		}
 					
-
 		// Compare
 		if(inComingValue > myValue)
 			myValue = inComingValue; 
 	}
+	return inComingValue; 
+}
 
 

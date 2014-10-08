@@ -1,3 +1,3 @@
-hello: hello.c
-	mpicc hello.c -o hello -std=c99 
+hello: hello.cpp
+	mpic++ hello.cpp -o hello -std=c99 
 

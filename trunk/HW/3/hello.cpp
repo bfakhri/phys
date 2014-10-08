@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 
 	for(unsigned int t=0; t<timeSteps; t++)
 	{
-		
+	/*	
 		if(nodeRank == 0)//(numNodes-1))
 		{	
 			std::cout <<"Node: "<<nodeRank<<"\tMADE IT TO STEP: "<<t<<std::endl;
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 			}
 			std::cout<<std::endl<<std::endl;
 		}
-		
+	*/	
 		if(numNodes > 1)
 		{
 			// First Node
@@ -342,7 +342,10 @@ int main(int argc, char *argv[])
 		MPI_Reduce((void*)&localSum, (void*)&globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); 
 		if(nodeRank == 0)
 		{
-			std::cout<<"Local Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<std::endl; 
+			std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<std::endl; 
+		}else
+		{
+			std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 
 		}
 	}
 	else

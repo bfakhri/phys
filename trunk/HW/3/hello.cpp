@@ -89,7 +89,8 @@ int main(int argc, char *argv[])
 
 	for(unsigned int t=0; t<timeSteps; t++)
 	{
-		if(nodeRank == (numNodes-1))
+		
+		if(nodeRank == 0)//(numNodes-1))
 		{	
 			std::cout <<"Node: "<<nodeRank<<"\tMADE IT TO STEP: "<<t<<std::endl;
 			for(int r=0; r<rowsPerSection; r++){
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
 			}
 			std::cout<<std::endl<<std::endl;
 		}
-
+		
 		if(numNodes > 1)
 		{
 			// First Node
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
 				// Receive from lower - sets up buffer
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
-				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
+				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendUpReq);
 			
 				// COULD MAKE IT FASTER BY TAKING ITERATIONS THAT INCLUDE THE TOP ROW OUT OF THE LOOP AND 
 				// TAKE INTO ACCOUNT THAT THE CELLS AT THE TOP ARE 0 and thus do not matter to the average
@@ -169,7 +170,7 @@ int main(int argc, char *argv[])
 				// Receive from upper - sets up buffer
 				MPI_Irecv((void*)upperGhostRow, N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 				// Send up
-				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
+				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendDownReq);
 				
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
@@ -202,7 +203,13 @@ int main(int argc, char *argv[])
 
 				// Receive
 				MPI_Wait(sendUpReq, MPI_STATUS_IGNORE);
-				
+				/*
+				// PRINT GHOST ROW
+				std::cout<<"Ghost Row"<<std::endl;
+				for(int i=0; i<N; i++)
+					std::cout<<upperGhostRow[i]<<" ";
+				std::cout<<std::endl;
+				*/
 				// Compute cells that depend on ghost rows
 				// Upper 
 				tempArray[0][0] = 		(upperGhostRow[N-1]+upperGhostRow[0]+upperGhostRow[1]+
@@ -210,7 +217,7 @@ int main(int argc, char *argv[])
 								localArray[1][N-1]+localArray[1][0]+localArray[1][1])/9; 
 				for(unsigned int column =1; column < N-1; column++)
 				{
-					tempArray[rowsPerSection-1][column] = (upperGhostRow[column-1]+upperGhostRow[column]+upperGhostRow[column+1]+
+					tempArray[0][column] = (upperGhostRow[column-1]+upperGhostRow[column]+upperGhostRow[column+1]+
 							                     localArray[0][column-1]+localArray[0][column]+localArray[0][column+1]+
 							                     localArray[1][column-1]+localArray[1][column]+localArray[1][column+1])/9; 
 				}
@@ -219,6 +226,13 @@ int main(int argc, char *argv[])
 						                localArray[1][N-2]+localArray[1][N-1]+localArray[1][0])/9; 
 
 
+				
+				// PRINT Temp Array Row 
+				/*std::cout<<"First row of TempArray"<<std::endl;
+				for(int i=0; i<N; i++)
+					std::cout<<tempArray[0][i]<<" ";
+				std::cout<<std::endl;
+				*/
 				// Copy last rows into local matrix
 				memcpy((void*)localArray[0], tempArray[0], sizeof(double)*N);
 				memcpy((void*)localArray[1], tempArray[1], sizeof(double)*N);
@@ -318,14 +332,17 @@ int main(int argc, char *argv[])
 		double localSum = 0; 
 		double globalSum = 0; 
 		for(unsigned int row=0; row<rowsPerSection; row++)
+		{
 			for(unsigned int column=0; column<N; column++)
 			{
 				localSum += localArray[row][column]; 
 			}
+		}
+		
 		MPI_Reduce((void*)&localSum, (void*)&globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); 
 		if(nodeRank == 0)
 		{
-			std::cout<<"Global Sum: "<<globalSum<<std::endl; 
+			std::cout<<"Local Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<std::endl; 
 		}
 	}
 	else

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <math.h> 
 #include <mpi.h>
-#include <iostream> 
+#include <string.h>
+
+# define PI_CNST 3.14159265358979323846
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +21,7 @@ int main(int argc, char *argv[])
 	{
 		if(argc != 3)
 		{
-			std::cout << "Not enough or too many arguments\nExpecting 2" << std::endl; 
+			printf("Not enough or too many arguments\nExpecting 2");
 			return 1; 
 		}
 	}
@@ -37,10 +39,10 @@ int main(int argc, char *argv[])
 
 
 	// Array to hold the values of cells for nodal subdivision
-	double ** localMatrix = malloc(sizeof(double*)*rowsPerSection);
+	double ** localArray = malloc(sizeof(double*)*rowsPerSection);
 	for(unsigned int i=0; i<rowsPerSection; i++)
 	{
-		localMatrix[i] = malloc(sizeof(double)*N); 
+		localArray[i] = malloc(sizeof(double)*N); 
 	}
 	
 	double ** tempArray = (double**)malloc(sizeof(double*)*rowsPerSection);
@@ -54,21 +56,21 @@ int main(int argc, char *argv[])
 	{
 		for(unsigned int c=0; c<N; c++)
 		{
-			localMatrix[r][c] = 0.5f;
+			localArray[r][c] = 0.5f;
 		}
 	}
 	if(nodeRank == 0)
 	{
 		for(unsigned int c=0; c<N; c++)
 		{
-			localMatrix[0][c] = 0;
+			localArray[0][c] = 0;
 		}
 	}
 	if(nodeRank == (numNodes-1))
 	{
 		for(unsigned int c=0; c<N; c++)
 		{
-			localMatrix[0][c] = SPECIALFUNCTIONOMGOMGOMG();
+			localArray[rowsPerSection-1][c] = 5*sin(PI_CNST*pow((c/N),2)); 
 		}
 	}
 
@@ -76,8 +78,8 @@ int main(int argc, char *argv[])
 	double * lowerGhostRow = (double*)malloc(sizeof(double)*N);
 	double * upperGhostRow = (double*)malloc(sizeof(double)*N);
 
-	MPI_Request * sendDownReq = new MPI_Request;
-	MPI_Request * sendUpReq = new MPI_Request;
+	MPI_Request * sendDownReq = (MPI_Request*)malloc(sizeof(MPI_Request));
+	MPI_Request * sendUpReq = (MPI_Request*)malloc(sizeof(MPI_Request));
 
 	for(unsigned int t=0; t<timeSteps; t++)
 	{
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
 				// Receive from lower - sets up buffer
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
-				MPI_Isend((void*)localMatrix[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
+				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 			
 				// COULD MAKE IT FASTER BY TAKING ITERATIONS THAT INCLUDE THE TOP ROW OUT OF THE LOOP AND 
 				// TAKE INTO ACCOUNT THAT THE CELLS AT THE TOP ARE 0 and thus do not matter to the average
@@ -135,8 +137,8 @@ int main(int argc, char *argv[])
 								lowerGhostRow[N-1]+lowerGhostRow[0]+lowerGhostRow[1])/9; 
 				for(unsigned int column =1; column < N-1; column++)
 				{
-					tempArray[rowPerSection-1][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
-								localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+					tempArray[rowsPerSection-1][column] = (localArray[rowsPerSection-2][column-1]+localArray[rowsPerSection-2][column]+localArray[rowsPerSection-2][column+1]+
+								localArray[rowsPerSection-1][column-1]+localArray[rowsPerSection-1][column]+localArray[rowsPerSection-1][column+1]+
 								lowerGhostRow[column-1]+lowerGhostRow[column]+lowerGhostRow[column+1])/9; 
 				}
 				tempArray[rowsPerSection-1][N-1] = (localArray[rowsPerSection-2][N-2]+localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+
@@ -153,7 +155,7 @@ int main(int argc, char *argv[])
 				// Receive from upper - sets up buffer
 				MPI_Irecv((void*)upperGhostRow, N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 				// Send up
-				MPI_Isend((void*)localMatrix[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
+				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 				
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
@@ -216,9 +218,9 @@ int main(int argc, char *argv[])
 				// Receive from upper - sets up buffer
 				MPI_Irecv((void*)upperGhostRow, N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 				// Send down
-				MPI_Isend((void*)localMatrix[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
+				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send up
-				MPI_Isend((void*)localMatrix[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
+				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 			
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 2; row < rowsPerSection-2; row++)

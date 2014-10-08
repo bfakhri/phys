@@ -91,6 +91,58 @@ int main(int argc, char *argv[])
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
 				MPI_Isend((void*)localMatrix[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
+			
+				// COULD MAKE IT FASTER BY TAKING ITERATIONS THAT INCLUDE THE TOP ROW OUT OF THE LOOP AND 
+				// TAKE INTO ACCOUNT THAT THE CELLS AT THE TOP ARE 0 and thus do not matter to the average
+					
+				// Compute nodes independent of ghost rows
+				for(unsigned int row = 1; row < rowsPerSection-2; row++)
+				{
+					// Left Column 
+					tempArray[row][0] = (localArray[row-1][N-1]+localArray[row-1][0]+localArray[row-1][1]+
+								localArray[row][N-1]+localArray[row][0]+localArray[row][1]+
+								localArray[row+1][N-1]+localArray[row+1][0]+localArray[row+1][1])/9; 
+
+					// Middle rows
+					for(unsigned int column = 1; column < N-1; column++)
+					{	
+						tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
+									localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+									localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+					}	
+					
+					// Right Column
+					tempArray[row][N-1] = (localArray[row-1][N-2]+localArray[row-1][N-1]+localArray[row-1][0]+
+								localArray[row][N-2]+localArray[row][N-1]+localArray[row][0]+
+								localArray[row+1][N-2]+localArray[row+1][N-1]+localArray[row+1][0])/9; 
+
+				}	
+
+				// Copy rows over
+				for(unsigned int row = 0; row < rowsPerSection-1; row++)
+				{
+					
+				}
+				memcpy(tempArray[row], localArray[row], sizeof(double)*N); 	
+				// ////////
+
+				// Receive
+				MPI_Wait(sendDownReq, MPI_STATUS_IGNORE);
+				
+				// Compute cells that depend on ghost rows
+				tempArray[rowsPerSection-1][0] = (localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+localArray[rowsPerSection-2][1]+
+								localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+localArray[rowsPerSection-1][1]+
+								lowerGhostRow[N-1]+lowerGhostRow[0]+lowerGhostRow[1])/9; 
+				for(unsigned int column =1; column < N-1; column++)
+				{
+					tempArray[rowPerSection-1][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
+								localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+								lowerGhostRow[column-1]+lowerGhostRow[column]+lowerGhostRow[column+1])/9; 
+				}
+				tempArray[rowsPerSection-1][N-1] = (localArray[rowsPerSection-2][N-2]+localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+
+								localArray[rowsPerSection-1][N-2]+localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+
+								lowerGhostRow[N-2]+lowerGhostRow[N-1]+lowerGhostRow[0])/9; 
+
 			}
 			else if(nodeRank == (numNodes-1))
 			{
@@ -148,8 +200,6 @@ int main(int argc, char *argv[])
 			// Last Node (rank == numNodes-1)
 			MPI_Wait(&reqs[0], MPI_STATUS_IGNORE);
 		}else if(numNodes > 1){
-			// First node (rank == 0)
-			MPI_Wait(&reqs[1], MPI_STATUS_IGNORE);
 		}else
 		{
 			// CASE FOR ONLY 1 NODE

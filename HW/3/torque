@@ -13,4 +13,4 @@ module load openmpi/1.8.2/gcc/4.8.0
 
 cd /home/bijan/bf-eecs587/HW/3
 pwd
-(mpirun ./hello 20 10) > roughOutput.txt
+(mpirun ./hello 1000 500) > roughOutput.txt

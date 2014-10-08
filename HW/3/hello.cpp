@@ -330,13 +330,13 @@ int main(int argc, char *argv[])
 	if(numNodes > 1)
 	{
 		double localSum = 0; 
-		double globalSum = 0; 
-		for(unsigned int row=0; row<rowsPerSection; row++)
+		double globalSum = 0;
+		unsigned int rowsPerSection = (N)/numNodes;
+		unsigned int remainder = (N)%numNodes;
+		unsigned int offset =  rowsPerSection*(numNodes-remainder) + (rowsPerSection+1)*remainder; 
+		for(unsigned int i=0; i<rowsPerSection; i++)
 		{
-			for(unsigned int column=0; column<N; column++)
-			{
-				localSum += localArray[row][column]; 
-			}
+			localSum += localArray[i][i+offset]; 
 		}
 		
 		MPI_Reduce((void*)&localSum, (void*)&globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); 

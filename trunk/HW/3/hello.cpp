@@ -80,6 +80,10 @@ int main(int argc, char *argv[])
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
+	double timeElapsed = 0;
+	if(nodeRank == 0)
+		timeElapsed = MPI_Wtime();
+
 	// Take out unnecesary ones for top and bottom sections	
 	double * lowerGhostRow = new double[N]; 
 	double * upperGhostRow = new double[N];
@@ -327,26 +331,19 @@ int main(int argc, char *argv[])
 	}
 
 
+	double localSum = 0; 
+	double globalSum = 0;
+	rowsPerSection = (N)/numNodes;
+	remainder = (N)%numNodes;
+	unsigned int offset =  rowsPerSection*(numNodes-remainder) + (rowsPerSection+1)*remainder; 
 	if(numNodes > 1)
 	{
-		double localSum = 0; 
-		double globalSum = 0;
-		unsigned int rowsPerSection = (N)/numNodes;
-		unsigned int remainder = (N)%numNodes;
-		unsigned int offset =  rowsPerSection*(numNodes-remainder) + (rowsPerSection+1)*remainder; 
 		for(unsigned int i=0; i<rowsPerSection; i++)
 		{
 			localSum += localArray[i][i+offset]; 
 		}
 		
 		MPI_Reduce((void*)&localSum, (void*)&globalSum, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD); 
-		if(nodeRank == 0)
-		{
-			std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<std::endl; 
-		}else
-		{
-			std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 
-		}
 	}
 	else
 	{
@@ -356,6 +353,16 @@ int main(int argc, char *argv[])
 
 	
 	MPI_Barrier(MPI_COMM_WORLD);
+	if(nodeRank == 0)
+		timeElapsed = MPI_Wtime();
+
+	if(nodeRank == 0)
+	{
+		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed<<std::endl; 
+	}else
+	{
+		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 
+	}
 
 	MPI_Finalize();    
     	return 0; 

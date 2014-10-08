@@ -1,4 +1,4 @@
-#include <stdio.h> 
+#include <iostream> 
 #include <stdlib.h>
 #include <math.h> 
 #include <mpi.h>
@@ -15,13 +15,11 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD,&numNodes);
 	MPI_Get_processor_name(name, &length); 
 
-	printf("nodeRank: %d\tnumNodes: %d\tProcName: %s\n", nodeRank, numNodes, name); 
-	
 	if(nodeRank == 0)
 	{
 		if(argc != 3)
 		{
-			printf("Not enough or too many arguments\nExpecting 2");
+			std::cout << "Not enough or too many arguments" << std::endl << "Expecting 2" << std::endl;
 			return 1; 
 		}
 	}
@@ -29,6 +27,11 @@ int main(int argc, char *argv[])
 	unsigned int N, timeSteps;
     	N = atoi(argv[1]); 
 	timeSteps = atoi(argv[2]);
+
+	std::cout<<"nodeRank: "<< nodeRank << "\tnumNodes: " << numNodes << "\tNode Name: " << name << std::endl;
+
+	if(nodeRank == 0)
+		std::cout<<"numNodes = "<<numNodes<<"\tN = "<<N<<"\ttimeSteps = "<<timeSteps<<std::endl;
 
 	// Find section sizes	
 	unsigned int rowsPerSection = (N)/numNodes;
@@ -39,17 +42,15 @@ int main(int argc, char *argv[])
 
 
 	// Array to hold the values of cells for nodal subdivision
-	double ** localArray = malloc(sizeof(double*)*rowsPerSection);
+	double ** localArray = new double*[rowsPerSection];
 	for(unsigned int i=0; i<rowsPerSection; i++)
-	{
-		localArray[i] = malloc(sizeof(double)*N); 
-	}
+		localArray[i] = new double[N]; 
+
+	// Array to hold values of next iteration	
+	double ** tempArray = new double*[rowsPerSection];
+	for(unsigned int i=0; i<rowsPerSection; i++)
+		tempArray[i] = new double[N]; 
 	
-	double ** tempArray = (double**)malloc(sizeof(double*)*rowsPerSection);
-	for(unsigned int i=0; i<N; i++)
-	{
-		tempArray[i] = (double*)malloc(sizeof(double)*N);
-	}
 
 	// Fill in the matrix with initial values
 	for(unsigned int r=0; r<rowsPerSection; r++)
@@ -77,16 +78,14 @@ int main(int argc, char *argv[])
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	// Take out unnecesary ones for top and bottom sections	
-	double * lowerGhostRow = (double*)malloc(sizeof(double)*N);
-	double * upperGhostRow = (double*)malloc(sizeof(double)*N);
+	double * lowerGhostRow = new double[N]; 
+	double * upperGhostRow = new double[N];
 
-	MPI_Request * sendDownReq = (MPI_Request*)malloc(sizeof(MPI_Request));
-	MPI_Request * sendUpReq = (MPI_Request*)malloc(sizeof(MPI_Request));
+	MPI_Request * sendDownReq = new MPI_Request;
+	MPI_Request * sendUpReq = new MPI_Request;
 
 	for(unsigned int t=0; t<timeSteps; t++)
-	{
-	
-		// Send
+	{	
 		if(numNodes > 1)
 		{
 			// First Node
@@ -101,7 +100,7 @@ int main(int argc, char *argv[])
 				// TAKE INTO ACCOUNT THAT THE CELLS AT THE TOP ARE 0 and thus do not matter to the average
 					
 				// Compute nodes independent of ghost rows
-				for(unsigned int row = 1; row < rowsPerSection-2; row++)
+				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
 					// Left Column 
 					tempArray[row][0] = (localArray[row-1][N-1]+localArray[row-1][0]+localArray[row-1][1]+
@@ -124,8 +123,7 @@ int main(int argc, char *argv[])
 				}	
 
 				// Copy rows over
-				// Lower
-				for(unsigned int row = 0; row < rowsPerSection-2; row++)
+				for(unsigned int row = 1; row < rowsPerSection-2; row++)
 				{
 					memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);	
 				}

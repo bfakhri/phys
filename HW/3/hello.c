@@ -43,6 +43,12 @@ int main(int argc, char *argv[])
 		localMatrix[i] = malloc(sizeof(double)*N); 
 	}
 	
+	double ** tempArray = (double**)malloc(sizeof(double*)*rowsPerSection);
+	for(unsigned int i=0; i<N; i++)
+	{
+		tempArray[i] = (double*)malloc(sizeof(double)*N);
+	}
+
 	// Fill in the matrix with initial values
 	for(unsigned int r=0; r<rowsPerSection; r++)
 	{
@@ -106,17 +112,55 @@ int main(int argc, char *argv[])
 			}
 		}
 
+
 		// Compute nodes independent of ghost rows
-		for(unsigned int row = 0; row < rowsPerSection; row++)
+		for(unsigned int row = 1; row < rowsPerSection-1; row++)
 		{
-			for(unsigned int column = 0; column < N; column++)
+			for(unsigned int column = 1; column < N-1; column++)
 			{
+				tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
+							localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+							localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+			}	
+			
+			// Wrap Left	- CORRECT THIS TO WRAP AROUND
+			tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
+						localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+						localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+			// Wrap Right    - CORRECT THIS TO WRAP AROUND
+			tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
+						localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
+						localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
 
-				
+		}	
+		
 
-	// Compute
-	// Receive
-	// compute
+		// COPY TEMP ARRAY TO ORIGINAL ARRAY
+		// HERE
+
+		// Receive	
+		// Wait for edge values to come in	
+		if((nodeRank > 0) && (nodeRank < numNodes-1)){
+			// All nodes excluding first and last
+			MPI_Wait(sendUpReq, MPI_STATUS_IGNORE);
+			MPI_Wait(sendDownReq, MPI_STATUS_IGNORE);
+		}else if(nodeRank > 0){
+			// Last Node (rank == numNodes-1)
+			MPI_Wait(&reqs[0], MPI_STATUS_IGNORE);
+		}else if(numNodes > 1){
+			// First node (rank == 0)
+			MPI_Wait(&reqs[1], MPI_STATUS_IGNORE);
+		}else
+		{
+			// CASE FOR ONLY 1 NODE
+			// 
+		}
+	
+		// CALC FOR MISSING ROWS 
+		if(nodeRank
+		for(unsigned int column = 0; column < N; column++)
+		{
+			localArray[1][column] = 
 	
 	}
 

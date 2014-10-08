@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     	N = atoi(argv[1]); 
 	timeSteps = atoi(argv[2]);
 
-	std::cout<<"nodeRank: "<< nodeRank << "\tnumNodes: " << numNodes << "\tNode Name: " << name << std::endl;
+	std::cout<<"Rank: "<< nodeRank << "\tName: " << name << std::endl;
 
 	if(nodeRank == 0)
 		std::cout<<"numNodes = "<<numNodes<<"\tN = "<<N<<"\ttimeSteps = "<<timeSteps<<std::endl;

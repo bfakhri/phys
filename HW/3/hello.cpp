@@ -15,8 +15,6 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD,&numNodes);
 	MPI_Get_processor_name(name, &length); 
 
-	//int gdbDebug = 1;
-	//while(gdbDebug);	
 
 	if(nodeRank == 0)
 	{
@@ -93,18 +91,6 @@ int main(int argc, char *argv[])
 
 	for(unsigned int t=0; t<timeSteps; t++)
 	{
-	/*	
-		if(nodeRank == 0)//(numNodes-1))
-		{	
-			std::cout <<"Node: "<<nodeRank<<"\tMADE IT TO STEP: "<<t<<std::endl;
-			for(int r=0; r<rowsPerSection; r++){
-				for(int i=0; i<N; i++)
-					std::cout<<localArray[r][i]<<" ";
-				std::cout<<std::endl;
-			}
-			std::cout<<std::endl<<std::endl;
-		}
-	*/	
 		if(numNodes > 1)
 		{
 			// First Node
@@ -245,7 +231,7 @@ int main(int argc, char *argv[])
 			else
 			{
 
-				std::cout <<"Node: "<<nodeRank<<"\tMADE IT TO STEP: "<<t<<std::endl;
+				//std::cout <<"Node: "<<nodeRank<<"\tMADE IT TO STEP: "<<t<<std::endl;
 				// Receive from lower - sets up buffer
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendUpReq);
 				// Receive from upper - sets up buffer
@@ -367,15 +353,16 @@ int main(int argc, char *argv[])
 		// Fill in lonely case
 	}
 	
-
+	
+	double timeElapsed2 = 0; 
 	
 	MPI_Barrier(MPI_COMM_WORLD);
 	if(nodeRank == 0)
-		timeElapsed = MPI_Wtime();
+		timeElapsed2 = MPI_Wtime();
 
 	if(nodeRank == 0)
 	{
-		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed<<std::endl; 
+		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed2-timeElapsed<<std::endl; 
 	}else
 	{
 		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 

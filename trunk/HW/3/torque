@@ -3,10 +3,10 @@
 #PBS -A eecs587f14_flux
 #PBS -l qos=flux
 #PBS -q flux
-#PBS -l nodes=2
-#PBS -l walltime=00:01:00
-#PBS -l o=output.txt
-#PBS -l e=errors.txt
+#PBS -l nodes=4
+#PBS -l walltime=00:00:10
+#PBS -e output.txt
+#PBS -o errors.txt
 
 module load gcc/4.8.0
 module load openmpi/1.8.2/gcc/4.8.0

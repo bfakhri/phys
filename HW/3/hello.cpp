@@ -10,6 +10,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+	// Initialize MPI and variables about environment
    	int nodeRank, numNodes, length; 
 	char name[128];  
 	MPI_Init(&argc,&argv);
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD,&numNodes);
 	MPI_Get_processor_name(name, &length); 
 
-
+	// Check for correct number of arguments
 	if(nodeRank == 0)
 	{
 		if(argc != 3)
@@ -31,8 +32,6 @@ int main(int argc, char *argv[])
     	N = atoi(argv[1]); 
 	timeSteps = atoi(argv[2]);
 
-	//cout<<"Rank: "<< nodeRank << "\tName: " << name << endl;
-
 	// For output purposes
 	if(nodeRank == 0)
 		cout<<"numNodes = "<<numNodes<<"\tN = "<<N<<"\ttimeSteps = "<<timeSteps<<endl;
@@ -43,8 +42,6 @@ int main(int argc, char *argv[])
 	if((nodeRank+1) <= remainder)
 		rowsPerSection++;
 	
-
-
 	// Array to hold the values of cells for nodal subdivision
 	double ** localArray = new double*[rowsPerSection];
 	for(unsigned int i=0; i<rowsPerSection; i++)
@@ -84,7 +81,7 @@ int main(int argc, char *argv[])
 	}
 
 	MPI_Barrier(MPI_COMM_WORLD);
-
+	// START TIMING ALGORITHM
 	double timeElapsed = 0;
 	if(nodeRank == 0)
 		timeElapsed = MPI_Wtime();
@@ -112,8 +109,6 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-
-					// Middle rows
 					for(unsigned int column = 0; column < N; column++)
 					{	
 						unsigned int lC;
@@ -138,7 +133,7 @@ int main(int argc, char *argv[])
 					memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);	
 				}
 
-				// Receive
+				// Wait for row to arrive - Receive
 				MPI_Wait(sendDownReq, MPI_STATUS_IGNORE);
 				
 				// Compute cells that depend on ghost rows
@@ -175,7 +170,6 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-					// Middle rows
 					for(unsigned int column = 0; column < N; column++)
 					{	
 						unsigned int lC;
@@ -200,7 +194,7 @@ int main(int argc, char *argv[])
 					memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);	
 				}
 
-				// Receive
+				// Wait for row to arrive - Receive
 				MPI_Wait(sendUpReq, MPI_STATUS_IGNORE);
 				
 				// Compute cells that depend on ghost rows
@@ -244,7 +238,6 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-					// Middle rows
 					for(unsigned int column = 0; column < N; column++)
 					{	
 						unsigned int lC;
@@ -269,9 +262,8 @@ int main(int argc, char *argv[])
 					memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);	
 				}
 
-				// Receive
+				// Wait for the upper ghost row 
 				MPI_Wait(sendDownReq, MPI_STATUS_IGNORE);
-				MPI_Wait(sendUpReq, MPI_STATUS_IGNORE); 
 				
 				// Compute cells that depend on ghost rows
 				// Upper
@@ -293,9 +285,12 @@ int main(int argc, char *argv[])
 								localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 				}
 
+				// Wait for the lower ghost row
+				MPI_Wait(sendUpReq, MPI_STATUS_IGNORE); 
+				
+
 				// Compute cells that depend on ghost rows
 				// Lower
-
 				for(unsigned int column =1; column < N-1; column++)
 				{
 					unsigned int lC;
@@ -348,17 +343,6 @@ int main(int argc, char *argv[])
 			// Copy rows back into original matrix
 			for(unsigned int row = 1; row < rowsPerSection-1; row++)	
 				memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);
-
-			/*
-			for(int i=0; i<N; i++)
-			{
-				for(int j=0; j<N; j++)
-				{
-					cout << localArray[i][j] << "  ";
-				}
-				cout << endl;
-			}
-			*/
 		}
 	}
 
@@ -406,6 +390,7 @@ int main(int argc, char *argv[])
 	double timeElapsed2 = 0; 
 	
 	MPI_Barrier(MPI_COMM_WORLD);
+	// END TIMING OF ALGORITHM
 	if(nodeRank == 0)
 		timeElapsed2 = MPI_Wtime();
 

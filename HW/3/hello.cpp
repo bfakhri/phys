@@ -335,7 +335,24 @@ int main(int argc, char *argv[])
 	double globalSum = 0;
 	rowsPerSection = (N)/numNodes;
 	remainder = (N)%numNodes;
-	unsigned int offset =  rowsPerSection*(numNodes-remainder) + (rowsPerSection+1)*remainder; 
+	unsigned int offset = 0; 
+	
+	if(remainder != 0)
+	{
+		if(nodeRank > remainder)
+		{
+			offset += (remainder)*(rowsPerSection+1)+(nodeRank-remainder)*rowsPerSection; 
+		}
+		else
+		{
+			offset += nodeRank*rowsPerSection; 
+		}
+	}
+	else
+	{
+		offset += nodeRank*rowsPerSection; 
+	}
+
 	if(numNodes > 1)
 	{
 		for(unsigned int i=0; i<rowsPerSection; i++)
@@ -351,14 +368,14 @@ int main(int argc, char *argv[])
 	}
 	
 
-	double timeElapsed2 = 0; 
+	
 	MPI_Barrier(MPI_COMM_WORLD);
 	if(nodeRank == 0)
-		timeElapsed2 = MPI_Wtime();
+		timeElapsed = MPI_Wtime();
 
 	if(nodeRank == 0)
 	{
-		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed2-timeElapsed<<std::endl; 
+		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed<<std::endl; 
 	}else
 	{
 		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 

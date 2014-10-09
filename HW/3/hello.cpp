@@ -351,14 +351,14 @@ int main(int argc, char *argv[])
 	}
 	
 
-	
+	double timeElapsed2 = 0; 
 	MPI_Barrier(MPI_COMM_WORLD);
 	if(nodeRank == 0)
-		timeElapsed = MPI_Wtime();
+		timeElapsed2 = MPI_Wtime();
 
 	if(nodeRank == 0)
 	{
-		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed<<std::endl; 
+		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed2-timeElapsed<<std::endl; 
 	}else
 	{
 		std::cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << std::endl; 

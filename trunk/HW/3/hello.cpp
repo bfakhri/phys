@@ -3,8 +3,46 @@
 #include <math.h> 
 #include <mpi.h>
 #include <string.h>
+#include <queue>
 
 # define PI_CNST 3.14159265358979323846
+using namespace std;
+
+int updateCells(double** matrix, unsigned int totalRows, unsigned int totalColumns, unsigned int startRow, unsigned int endRow)
+{
+	queue<double> tempQ;
+	unsigned int popperR = 0; 
+	for(unsigned int r = startRow; r <= endRow; r++)
+	{
+		for(unsigned int c = 0; c < totalColumns; c++)
+		{
+			unsigned int cM = c % totalColumns; 
+			tempQ.push(	(matrix[r-1][cM]+matrix[r][cM]+matrix[r+1][cM]+
+					 matrix[r-1][cM]+matrix[r][cM]+matrix[r+1][cM]+
+					 matrix[r-1][cM]+matrix[r][cM]+matrix[r+1][cM])/9);
+		}
+
+		if(r - popperR >= 2)
+		{
+			for(unsigned int i = 0; i < totalColumns; i++)
+			{
+				matrix[popperR][i] = tempQ.pop(); 
+			}
+			popperR++; 
+		}
+	}
+	while(!tempQ.empty())
+	{
+		for(unsigned int i = 0; i < ; i++)
+		{
+			matrix[popperR][i] = tempQ.pop(); 
+		}
+		popperR++; 
+	}	
+}
+
+
+
 
 int main(int argc, char *argv[])
 {

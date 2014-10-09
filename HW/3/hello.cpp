@@ -31,8 +31,9 @@ int main(int argc, char *argv[])
     	N = atoi(argv[1]); 
 	timeSteps = atoi(argv[2]);
 
-	cout<<"Rank: "<< nodeRank << "\tName: " << name << endl;
+	//cout<<"Rank: "<< nodeRank << "\tName: " << name << endl;
 
+	// For output purposes
 	if(nodeRank == 0)
 		cout<<"numNodes = "<<numNodes<<"\tN = "<<N<<"\ttimeSteps = "<<timeSteps<<endl;
 
@@ -63,6 +64,8 @@ int main(int argc, char *argv[])
 			localArray[r][c] = 0.5f;
 		}
 	}
+
+	// Fill in top row
 	if(nodeRank == 0)
 	{
 		for(unsigned int c=0; c<N; c++)
@@ -70,6 +73,8 @@ int main(int argc, char *argv[])
 			localArray[0][c] = 0;
 		}
 	}
+	
+	// Fill in bottom row
 	if(nodeRank == (numNodes-1))
 	{
 		for(unsigned int c=0; c<N; c++)
@@ -102,10 +107,7 @@ int main(int argc, char *argv[])
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
 				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendUpReq);
-			
-				// COULD MAKE IT FASTER BY TAKING ITERATIONS THAT INCLUDE THE TOP ROW OUT OF THE LOOP AND 
-				// TAKE INTO ACCOUNT THAT THE CELLS AT THE TOP ARE 0 and thus do not matter to the average
-					
+				
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
@@ -325,6 +327,7 @@ int main(int argc, char *argv[])
 	}
 
 
+	// Compute verification sum
 	double localSum = 0; 
 	double globalSum = 0;
 	rowsPerSection = (N)/numNodes;

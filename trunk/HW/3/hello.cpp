@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
 
 	MPI_Request * sendDownReq = new MPI_Request;
 	MPI_Request * sendUpReq = new MPI_Request;
+	MPI_Request * bogusReq = new MPI_Request;
 
 	for(unsigned int t=0; t<timeSteps; t++)
 	{
@@ -106,7 +107,7 @@ int main(int argc, char *argv[])
 				// Receive from lower - sets up buffer
 				MPI_Irecv((void*)lowerGhostRow, N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
-				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendUpReq);
+				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, bogusReq);
 				
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
@@ -164,7 +165,7 @@ int main(int argc, char *argv[])
 				// Receive from upper - sets up buffer
 				MPI_Irecv((void*)upperGhostRow, N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
 				// Send up
-				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendDownReq);
+				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, bogusReq);
 				
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
@@ -228,9 +229,9 @@ int main(int argc, char *argv[])
 				// Receive from upper - sets up buffer
 				MPI_Irecv((void*)upperGhostRow, N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendDownReq);
 				// Send down
-				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, sendDownReq);
+				MPI_Isend((void*)localArray[rowsPerSection-1], N, MPI_DOUBLE, nodeRank+1, t, MPI_COMM_WORLD, bogusReq);
 				// Send up
-				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, sendUpReq);
+				MPI_Isend((void*)localArray[0], N, MPI_DOUBLE, nodeRank-1, t, MPI_COMM_WORLD, bogusReq);
 			
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
@@ -312,9 +313,19 @@ int main(int argc, char *argv[])
 			{
 				for(unsigned int column = 0; column < N; column++)
 				{
-					tempArray[row][column] = (localArray[row-1][(column-1)%N]+localArray[row-1][column%N]+localArray[row-1][(column+1)%N]+
-								localArray[row][(column-1)%N]+localArray[row][(column)%N]+localArray[row][(column+1)%N]+
-								localArray[row+1][(column-1)%N]+localArray[row+1][(column)%N]+localArray[row+1][(column+1)%N])/9; 
+					unsigned int lC;
+					if(((int)column-1) < 0)
+						lC = N-1; 
+					else
+						lC = column-1;
+					unsigned int rC; 
+					if(((int)column+1) >= N)
+						rC = 0; 
+					else
+						rC = column+1;
+					tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+								localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 				}
 			}
 			
@@ -322,7 +333,16 @@ int main(int argc, char *argv[])
 			for(unsigned int row = 1; row < rowsPerSection-1; row++)	
 				memcpy((void*)localArray[row], (void*)tempArray[row], sizeof(double)*N);
 
-
+			/*
+			for(int i=0; i<N; i++)
+			{
+				for(int j=0; j<N; j++)
+				{
+					cout << localArray[i][j] << "  ";
+				}
+				cout << endl;
+			}
+			*/
 		}
 	}
 
@@ -330,7 +350,7 @@ int main(int argc, char *argv[])
 	// Compute verification sum
 	double localSum = 0; 
 	double globalSum = 0;
-	rowsPerSection = (N)/numNodes;
+	unsigned int rps = (N)/numNodes;
 	remainder = (N)%numNodes;
 	unsigned int offset = 0; 
 	
@@ -338,16 +358,16 @@ int main(int argc, char *argv[])
 	{
 		if(nodeRank > remainder)
 		{
-			offset += (remainder)*(rowsPerSection+1)+(nodeRank-remainder)*rowsPerSection; 
+			offset += (remainder)*(rps+1)+(nodeRank-remainder)*rps; 
 		}
 		else
 		{
-			offset += nodeRank*rowsPerSection; 
+			offset += nodeRank*rps; 
 		}
 	}
 	else
 	{
-		offset += nodeRank*rowsPerSection; 
+		offset += nodeRank*rps; 
 	}
 
 	if(numNodes > 1)
@@ -376,10 +396,26 @@ int main(int argc, char *argv[])
 	if(nodeRank == 0)
 	{
 		cout<<"Rank: " << nodeRank << "\tLocal Sum: " << localSum << "\tGlobal Sum: "<<globalSum<<"\tTime Elapsed: "<<timeElapsed2-timeElapsed<<endl; 
-	}else
-	{
-		cout<<"Rank: " << nodeRank << "\tGloball Sum: " << globalSum << endl; 
 	}
+
+
+
+	// Take out unnecesary ones for top and bottom sections	
+	for(unsigned int r = 0; r<rowsPerSection; r++)
+	{
+		delete[] localArray[r];
+		delete[] tempArray[r];
+	}
+
+	delete[] localArray;
+	delete[] tempArray;
+
+	delete[] lowerGhostRow; 
+	delete[] upperGhostRow;
+
+	delete sendDownReq;
+	delete sendUpReq;
+	delete bogusReq; 
 
 	MPI_Finalize();    
     	return 0; 

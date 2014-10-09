@@ -112,24 +112,24 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-					// Left Column 
-					tempArray[row][0] = (localArray[row-1][N-1]+localArray[row-1][0]+localArray[row-1][1]+
-								localArray[row][N-1]+localArray[row][0]+localArray[row][1]+
-								localArray[row+1][N-1]+localArray[row+1][0]+localArray[row+1][1])/9; 
 
 					// Middle rows
-					for(unsigned int column = 1; column < N-1; column++)
+					for(unsigned int column = 0; column < N; column++)
 					{	
-						tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
-									localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
-									localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+						unsigned int lC;
+						if(((int)column-1) < 0)
+							lC = N-1; 
+						else
+							lC = column-1;
+						unsigned int rC; 
+						if(((int)column+1) >= N)
+							rC = 0; 
+						else
+							rC = column+1;
+						tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+									localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+									localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 					}	
-					
-					// Right Column
-					tempArray[row][N-1] = (localArray[row-1][N-2]+localArray[row-1][N-1]+localArray[row-1][0]+
-								localArray[row][N-2]+localArray[row][N-1]+localArray[row][0]+
-								localArray[row+1][N-2]+localArray[row+1][N-1]+localArray[row+1][0])/9; 
-
 				}	
 
 				// Copy rows over
@@ -142,18 +142,23 @@ int main(int argc, char *argv[])
 				MPI_Wait(sendDownReq, MPI_STATUS_IGNORE);
 				
 				// Compute cells that depend on ghost rows
-				tempArray[rowsPerSection-1][0] = (localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+localArray[rowsPerSection-2][1]+
-								localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+localArray[rowsPerSection-1][1]+
-								lowerGhostRow[N-1]+lowerGhostRow[0]+lowerGhostRow[1])/9; 
-				for(unsigned int column =1; column < N-1; column++)
+				for(unsigned int column = 0; column < N; column++)
 				{
-					tempArray[rowsPerSection-1][column] = (localArray[rowsPerSection-2][column-1]+localArray[rowsPerSection-2][column]+localArray[rowsPerSection-2][column+1]+
-								localArray[rowsPerSection-1][column-1]+localArray[rowsPerSection-1][column]+localArray[rowsPerSection-1][column+1]+
-								lowerGhostRow[column-1]+lowerGhostRow[column]+lowerGhostRow[column+1])/9; 
+					unsigned int lC;
+					if(((int)column-1) < 0)
+						lC = N-1; 
+					else
+						lC = column-1;
+					unsigned int rC; 
+					if(((int)column+1) >= N)
+						rC = 0; 
+					else
+						rC = column+1;
+					unsigned int row = rowsPerSection-1;
+					tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+								lowerGhostRow[lC]+lowerGhostRow[column]+lowerGhostRow[rC])/9; 
 				}
-				tempArray[rowsPerSection-1][N-1] = (localArray[rowsPerSection-2][N-2]+localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+
-								localArray[rowsPerSection-1][N-2]+localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+
-								lowerGhostRow[N-2]+lowerGhostRow[N-1]+lowerGhostRow[0])/9; 
 				
 				// Copy last rows into local matrix
 				memcpy((void*)localArray[rowsPerSection-2], tempArray[rowsPerSection-2], sizeof(double)*N);
@@ -170,24 +175,23 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-					// Left Column 
-					tempArray[row][0] = (localArray[row-1][N-1]+localArray[row-1][0]+localArray[row-1][1]+
-								localArray[row][N-1]+localArray[row][0]+localArray[row][1]+
-								localArray[row+1][N-1]+localArray[row+1][0]+localArray[row+1][1])/9; 
-
 					// Middle rows
-					for(unsigned int column = 1; column < N-1; column++)
+					for(unsigned int column = 0; column < N; column++)
 					{	
-						tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
-									localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
-									localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+						unsigned int lC;
+						if(((int)column-1) < 0)
+							lC = N-1; 
+						else
+							lC = column-1;
+						unsigned int rC; 
+						if(((int)column+1) >= N)
+							rC = 0; 
+						else
+							rC = column+1;
+						tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+									localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+									localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 					}	
-					
-					// Right Column
-					tempArray[row][N-1] = (localArray[row-1][N-2]+localArray[row-1][N-1]+localArray[row-1][0]+
-								localArray[row][N-2]+localArray[row][N-1]+localArray[row][0]+
-								localArray[row+1][N-2]+localArray[row+1][N-1]+localArray[row+1][0])/9; 
-
 				}	
 
 				// Copy rows over
@@ -201,20 +205,24 @@ int main(int argc, char *argv[])
 				
 				// Compute cells that depend on ghost rows
 				// Upper 
-				tempArray[0][0] = 		(upperGhostRow[N-1]+upperGhostRow[0]+upperGhostRow[1]+
-								localArray[0][N-1]+localArray[0][0]+localArray[0][1]+
-								localArray[1][N-1]+localArray[1][0]+localArray[1][1])/9; 
 				for(unsigned int column =1; column < N-1; column++)
 				{
-					tempArray[0][column] = (upperGhostRow[column-1]+upperGhostRow[column]+upperGhostRow[column+1]+
-							                     localArray[0][column-1]+localArray[0][column]+localArray[0][column+1]+
-							                     localArray[1][column-1]+localArray[1][column]+localArray[1][column+1])/9; 
+					unsigned int lC;
+					if(((int)column-1) < 0)
+						lC = N-1; 
+					else
+						lC = column-1;
+					unsigned int rC; 
+					if(((int)column+1) >= N)
+						rC = 0; 
+					else
+						rC = column+1;
+					
+					unsigned int row = 0;
+					tempArray[row][column] = (upperGhostRow[lC]+upperGhostRow[column]+upperGhostRow[rC]+
+								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+								localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 				}
-				tempArray[0][N-1] =		(upperGhostRow[N-2]+upperGhostRow[N-1]+upperGhostRow[0]+     
-						                localArray[0][N-2]+localArray[0][N-1]+localArray[0][0]+
-						                localArray[1][N-2]+localArray[1][N-1]+localArray[1][0])/9; 
-
-
 				
 				// Copy last rows into local matrix
 				memcpy((void*)localArray[0], tempArray[0], sizeof(double)*N);
@@ -236,24 +244,23 @@ int main(int argc, char *argv[])
 				// Compute nodes independent of ghost rows
 				for(unsigned int row = 1; row < rowsPerSection-1; row++)
 				{
-					// Left Column 
-					tempArray[row][0] = (localArray[row-1][N-1]+localArray[row-1][0]+localArray[row-1][1]+
-								localArray[row][N-1]+localArray[row][0]+localArray[row][1]+
-								localArray[row+1][N-1]+localArray[row+1][0]+localArray[row+1][1])/9; 
-
 					// Middle rows
-					for(unsigned int column = 1; column < N-1; column++)
+					for(unsigned int column = 0; column < N; column++)
 					{	
-						tempArray[row][column] = (localArray[row-1][column-1]+localArray[row-1][column]+localArray[row-1][column+1]+
-									localArray[row][column-1]+localArray[row][column]+localArray[row][column+1]+
-									localArray[row+1][column-1]+localArray[row+1][column]+localArray[row+1][column+1])/9; 
+						unsigned int lC;
+						if(((int)column-1) < 0)
+							lC = N-1; 
+						else
+							lC = column-1;
+						unsigned int rC; 
+						if(((int)column+1) >= N)
+							rC = 0; 
+						else
+							rC = column+1;
+						tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+									localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+									localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 					}	
-					
-					// Right Column
-					tempArray[row][N-1] = (localArray[row-1][N-2]+localArray[row-1][N-1]+localArray[row-1][0]+
-								localArray[row][N-2]+localArray[row][N-1]+localArray[row][0]+
-								localArray[row+1][N-2]+localArray[row+1][N-1]+localArray[row+1][0])/9; 
-
 				}	
 
 				// Copy rows over
@@ -268,35 +275,44 @@ int main(int argc, char *argv[])
 				
 				// Compute cells that depend on ghost rows
 				// Upper
-				tempArray[0][0] = 		(upperGhostRow[N-1]+upperGhostRow[0]+upperGhostRow[1]+
-								localArray[0][N-1]+localArray[0][0]+localArray[0][1]+
-								localArray[1][N-1]+localArray[1][0]+localArray[1][1])/9; 
 				for(unsigned int column =1; column < N-1; column++)
 				{
-					tempArray[0][column] = (upperGhostRow[column-1]+upperGhostRow[column]+upperGhostRow[column+1]+
-							                     localArray[0][column-1]+localArray[0][column]+localArray[0][column+1]+
-							                     localArray[1][column-1]+localArray[1][column]+localArray[1][column+1])/9; 
+					unsigned int lC;
+					if(((int)column-1) < 0)
+						lC = N-1; 
+					else
+						lC = column-1;
+					unsigned int rC; 
+					if(((int)column+1) >= N)
+						rC = 0; 
+					else
+						rC = column+1;
+					unsigned int row = 0; 
+					tempArray[row][column] = (upperGhostRow[lC]+upperGhostRow[column]+upperGhostRow[rC]+
+								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+								localArray[row+1][lC]+localArray[row+1][column]+localArray[row+1][rC])/9; 
 				}
-				tempArray[0][N-1] =		(upperGhostRow[N-2]+upperGhostRow[N-1]+upperGhostRow[0]+     
-						                localArray[0][N-2]+localArray[0][N-1]+localArray[0][0]+
-						                localArray[1][N-2]+localArray[1][N-1]+localArray[1][0])/9; 
-
 
 				// Compute cells that depend on ghost rows
 				// Lower
-				tempArray[rowsPerSection-1][0] = (localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+localArray[rowsPerSection-2][1]+
-								localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+localArray[rowsPerSection-1][1]+
-								lowerGhostRow[N-1]+lowerGhostRow[0]+lowerGhostRow[1])/9; 
 
 				for(unsigned int column =1; column < N-1; column++)
 				{
-					tempArray[rowsPerSection-1][column] = (localArray[rowsPerSection-2][column-1]+localArray[rowsPerSection-2][column]+localArray[rowsPerSection-2][column+1]+
-								localArray[rowsPerSection-1][column-1]+localArray[rowsPerSection-1][column]+localArray[rowsPerSection-1][column+1]+
-								lowerGhostRow[column-1]+lowerGhostRow[column]+lowerGhostRow[column+1])/9; 
+					unsigned int lC;
+					if(((int)column-1) < 0)
+						lC = N-1; 
+					else
+						lC = column-1;
+					unsigned int rC; 
+					if(((int)column+1) >= N)
+						rC = 0; 
+					else
+						rC = column+1;
+					unsigned int row = 0; 
+					tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
+								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
+								lowerGhostRow[lC]+lowerGhostRow[column]+lowerGhostRow[rC])/9; 
 				}
-				tempArray[rowsPerSection-1][N-1] = (localArray[rowsPerSection-2][N-2]+localArray[rowsPerSection-2][N-1]+localArray[rowsPerSection-2][0]+
-								localArray[rowsPerSection-1][N-2]+localArray[rowsPerSection-1][N-1]+localArray[rowsPerSection-1][0]+
-								lowerGhostRow[N-2]+lowerGhostRow[N-1]+lowerGhostRow[0])/9; 
 				// Copy last rows into local matrix
 				memcpy((void*)localArray[0], tempArray[0], sizeof(double)*N);
 				memcpy((void*)localArray[1], tempArray[1], sizeof(double)*N);

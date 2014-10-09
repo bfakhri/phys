@@ -308,7 +308,7 @@ int main(int argc, char *argv[])
 						rC = 0; 
 					else
 						rC = column+1;
-					unsigned int row = 0; 
+					unsigned int row = rowsPerSection-1; 
 					tempArray[row][column] = (localArray[row-1][lC]+localArray[row-1][column]+localArray[row-1][rC]+
 								localArray[row][lC]+localArray[row][column]+localArray[row][rC]+
 								lowerGhostRow[lC]+lowerGhostRow[column]+lowerGhostRow[rC])/9; 

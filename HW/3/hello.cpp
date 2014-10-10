@@ -1,3 +1,8 @@
+// Bijan Fakhri
+// EECS 587 
+// Assignment 3
+// MPI Exercise
+
 #include <mpi.h>
 #include <string.h>
 #include <iostream> 

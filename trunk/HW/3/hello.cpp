@@ -1,8 +1,8 @@
+#include <mpi.h>
+#include <string.h>
 #include <iostream> 
 #include <stdlib.h>
 #include <math.h> 
-#include <mpi.h>
-#include <string.h>
 
 # define PI_CNST 3.14159265358979323846
 using namespace std;

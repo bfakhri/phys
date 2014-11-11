@@ -21,7 +21,7 @@ double f(double x)
 	for(unsigned int i = 100; i >= 1; --i)
 	{
 		double innerSum = 0; 
-		for(unsigned int j = i; j >= i; --j)
+		for(unsigned int j = i; j >= 1; --j)
 		{
 			innerSum += pow((x + j), -3.1);
 		}
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	double input = 0; 
 	input = atoi(argv[1]); 
 	// This is just to test f
-	printf("f(%f) = %f", input, f(input)); 
+	printf("f(%2.0f) = %1.13f\n\n", input, f(input)); 
 	printf("Num Procs: %d\n\n", omp_get_num_procs()); 
 	
 	omp_set_num_threads(omp_get_num_procs()); 

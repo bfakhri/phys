@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 #define START_A 1
-#define END_B 1000
-#define epsilon 0.000000000001 // 10^-12
+#define END_B 100
+#define epsilon 0.000001 // 10^-6
 #define slope 12
 
 using namespace std; 

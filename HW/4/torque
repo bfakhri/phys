@@ -9,4 +9,4 @@ module load openmpi/1.4.3-intel
 cd $PBS_OWORKDIR
 make
 export OMP_NUM_THREADS = 8
-(time ./alexandrian 850) 2> timeResults.txt 1> alexNumbers.txt
+(time ./alexandrian) 2> timeResults.txt 1> alexNumbers.txt

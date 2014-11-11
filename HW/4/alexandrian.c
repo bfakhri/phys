@@ -15,7 +15,7 @@
 using namespace std; 
 
 // NOTE - POSSIBLY SPEED THIS UP BY SPLITTING ITERATIONS
-double mathFunction(double x)
+double f(double x)
 {
 	double outerSum = 0; 
 	for(unsigned int i = 100; i >= 1; --i)
@@ -35,10 +35,14 @@ double mathFunction(double x)
 
 double GLOB_MAX = 0; 
 
-int main(int argc, char *argv[]) {
-
+int main(int argc, char *argv[]) 
+{
+	double input = 0; 
+	input = atoi(argv[1]); 
+	// This is just to test f
+	printf("f(%f) = %f", input, f(input)); 
 	printf("Num Procs: %d\n\n", omp_get_num_procs()); 
-
+	
 	omp_set_num_threads(omp_get_num_procs()); 
 	omp_get_thread_num(); 
 	return 0; 

@@ -1,3 +1,7 @@
+// Tentative questions: 
+// In email, when describing f(x), the 3rd line is "z = x". Why isn't it z = 0? 
+//
+
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>

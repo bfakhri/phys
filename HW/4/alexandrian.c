@@ -82,7 +82,9 @@ int main(int argc, char *argv[])
 	// This is just to test f
 	printf("f(%2.0f) = %1.13f\n\n", input, f(input)); 
 	printf("Num Procs: %d\n\n", omp_get_num_procs()); 
-	printf("My ThreadNum: %d\n\n", omp_get_thread_num()); 
-	
+	#pragma omp parallel
+	{
+		printf("My ThreadNum: %d\n\n", omp_get_thread_num()); 
+	}
 	return 0; 
 }

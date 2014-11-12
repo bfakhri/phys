@@ -11,11 +11,13 @@
 #define END_B 100
 #define epsilon 0.000001 // 10^-6
 #define slope 12
-#define WORK_BUFF_SIZE 100
+#define GLOBAL_WORK_BUFF_SIZE 100
+#define LOCAL_WORK_BUFF_SIZE 100
 
 using namespace std; 
 
-// NOTE - POSSIBLY SPEED THIS UP BY SPLITTING ITERATIONS
+// NOTE - POSSIBLY SPEED THIS UP BY 
+// CALLING IT USING OMP STRUCTURES
 double f(double x)
 {
 	double outerSum = 0; 
@@ -81,10 +83,87 @@ int main(int argc, char *argv[])
 	input = atoi(argv[1]); 
 	// This is just to test f
 	printf("f(%2.0f) = %1.13f\n\n", input, f(input)); 
+	
+	// Output to make ensure OMP is working correctly on machine
 	printf("Num Procs: %d\n\n", omp_get_num_procs()); 
+
+	// START OF PARALLEL CODE
 	#pragma omp parallel
 	{
-		printf("My ThreadNum: %d\n\n", omp_get_thread_num()); 
+		double LOCAL_C_Arr[LOCAL_WORK_BUFF_SIZE];
+		double LOCAL_D_Arr[LOCAL_WORK_BUFF_SIZE];
+		int bufferCount = 0; 
+
+		double localMax = 0; 
+
+		do
+		{
+			// Check to see if we need work from above
+			if(localEmpty)
+			{
+				bufferCount++;
+				bufferPop(&LOCAL_C_Arr[bufferCount], &LOCAL_D_Arr[bufferCount]);				
+			}
+			// Update the local Max
+			// REMEMBER TO INCLUDE EPSILON
+			if(GLOB_MAX > localMax)
+				localMax = GLOB_MAX;
+			bool isChanged = false; 
+			if(localMax < f(LOCAL_C_Arr[bufferCount]))
+			{
+				localMax = f(LOCAL_C_Arr[bufferCount]);
+				isChanged = true; 
+			}
+			if(localMax < f(LOCAL_D_Arr[bufferCount]))
+			{
+				localMax = f(LOCAL_D_Arr[bufferCount]);
+				isChanged = true; 
+			}
+
+			if(isChanged)
+			{
+				// We have a new max so we have to pursue this interval
+				
+			}
+			else
+			{
+				// We don't have a new max, throw away this interval
+				// Check if it is possible to have larger value inside using slope 
+				if(*possible*)
+				{
+					// Add new intervals to the buffer
+					// Add to buffer
+					if(localBufferFull)
+					{
+						// Add to global buffer
+					}
+					else
+					{
+						// Add to local buffer
+					}
+
+					// throw away current interval
+				
+				}
+				// Throw away interval
+				else
+				{
+
+				}
+			}
+			// REMEMBER TO USE EPSILON
+			// SAFEGUARD THIS WITH MUTEX
+			if(localMax > GLOB_Max)
+			{
+				GLOB_Max = localMax;
+			}
+	
+		}
+		// Keep going while the local buffer isn't empty OR the global buffer isn't empty
+		while(*localNotEmpty* || *globalNotEmpty*); 
+		
+
+		printf("My ThreadNum: %d\n\n", myNum); 
 	}
 	return 0; 
 }

@@ -11,7 +11,7 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 100 
+#define END_B 10 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
@@ -144,24 +144,31 @@ inline bool validInterval(double cu, double c, double d)
 bool shrinkInterval(double currentMax, double * c, double * d)
 {
 	// Save the original values
+	double C = *c; 
+	double D = *d; 
 	
 	// Shrink from the left side
-	while(validInterval(currentMax, *c, *d))
+	while(validInterval(currentMax, C, D))
 	{
-		*d = (*d - *c)/2 + *c; 
+		//printf("stuck"); 
+		D = (D - C)/2 + C; 
 	}
-	*c = *d; 
-	double retC = *d; 
+
+	//printf("\nNOT STUCK\n"); 	
+	*c = D;
+	C = D; 
+	D = *d; 	
 
 	// Shrink from the right side
-	while(validInterval(currentMax, *c, *d))
+	while(validInterval(currentMax, C, D))
 	{
-		*c = (*d - *c)/2 + *c; 
+		C = (D - C)/2 + C; 
 	}
 
-	*d = *c; 
-	*c = retC; 
-
+	*d = C; 
+	//*c = retC; 
+	
+	//printf("Getting Out"); 
 	// THIS SHOULD CHECK IF FAILED OR NOT, SOMEHOW? 
 	return true; 
 }
@@ -247,13 +254,13 @@ int main()
 	do
 	{
 		// FOR DEBUGGING
-		/*debugCount++; 
+		debugCount++; 
 		if(debugCount == 1000)
 		{
 			printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
 			printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 			debugCount = 0; 
-		}*/
+		}
 		
 		//int wait = 0;
 		//cin >> wait; 
@@ -292,6 +299,6 @@ int main()
 		}
 	}while(local_status != STATUS_EMPTY); 
 
-	printf("LocalMax = %2.30f", local_max); 
+	printf("LocalMax = %2.30f\n", local_max); 
 	return 0; 	 
 }

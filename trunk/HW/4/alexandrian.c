@@ -37,8 +37,8 @@ double f(double x)
 
 
 double GLOB_MAX = 0; 
-double GLOB_C_Arr[WORK_BUFF_SIZE];
-double GLOB_D_Arr[WORK_BUFF_SIZE];
+double GLOB_C_Arr[GLOBAL_WORK_BUFF_SIZE];
+double GLOB_D_Arr[GLOBAL_WORK_BUFF_SIZE];
 bool GLOB_BuffFull = false;	// Signals whether work buffer is full
 
 // Maybe hide these variable better? 
@@ -53,7 +53,7 @@ void bufferPush(double c, double d)
 {
 	GLOB_C_Arr[buffTail] = c; 
 	GLOB_D_Arr[buffTail] = d; 
-	buffTail = (buffTail+1)%WORK_BUFF_SIZE; 
+	buffTail = (buffTail+1)%GLOBAL_WORK_BUFF_SIZE; 
 	if(buffHead == buffTail)
 	{
 		// Buffer is now full
@@ -65,7 +65,7 @@ void bufferPop(double* c, double* d)
 {
 	*c = GLOB_C_Arr[buffHead];
 	*d = GLOB_D_Arr[buffHead];
-	buffHead = (buffHead-1)%WORK_BUFF_SIZE; 
+	buffHead = (buffHead-1)%GLOBAL_WORK_BUFF_SIZE; 
 
 	// THIS IS NOT THE RIGHT INDICATOR FOR EMPTINESS
 	if(buffHead == buffTail)
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 		do
 		{
 			// Check to see if we need work from above
-			if(localEmpty)
+			if(bufferCount == 0)
 			{
 				bufferCount++;
 				bufferPop(&LOCAL_C_Arr[bufferCount], &LOCAL_D_Arr[bufferCount]);				
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 			{
 				// We don't have a new max, throw away this interval
 				// Check if it is possible to have larger value inside using slope 
-				if(*possible*)
+				if()
 				{
 					// Add new intervals to the buffer
 					// Add to buffer

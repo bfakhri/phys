@@ -16,7 +16,7 @@
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 10
-#define LOCAL_BUFF_SIZE 10000
+#define LOCAL_BUFF_SIZE 100000
 
 #define STATUS_EMPTY -1
 #define STATUS_MID 0
@@ -51,7 +51,7 @@ double f(double x)
 */
 
 // Local Circular Queue
-inline bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_FULL)
 	{
@@ -72,7 +72,7 @@ inline bool local_qWork(double c, double d, double * buffer, int * head, int * t
 	}
 }
 
-inline bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
 	{
@@ -94,7 +94,7 @@ inline bool local_deqWork(double * c, double * d, double * buffer, int * head, i
 }
 
 // Gives front value but does not pop it off the queue
-inline bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
 	{
@@ -110,7 +110,7 @@ inline bool local_peek(double * c, double * d, double * buffer, int * head, int 
 }
 
 // Returns true only if max changed
-inline bool local_setMax(double * currentMax, double fc, double fd)
+bool local_setMax(double * currentMax, double fc, double fd)
 {
 	if(*currentMax + EPSILON < fc)
 		*currentMax = fc;
@@ -124,7 +124,7 @@ inline bool local_setMax(double * currentMax, double fc, double fd)
 
 // Returns true only if it is possible to get a higher value in this interval
 
-inline bool validInterval(double currentMax, double c, double d)
+bool validInterval(double currentMax, double c, double d)
 {
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
@@ -140,8 +140,34 @@ inline bool validInterval(double cu, double c, double d)
 }
 */
 
+// Attempts to rid itself of a piece of the interval handed to it
+bool shrinkInterval(double currentMax, double * c, double * d)
+{
+	// Save the original values
+	
+	// Shrink from the left side
+	while(validInterval(currentMax, *c, *d))
+	{
+		*d = (*d - *c)/2 + *c; 
+	}
+	*c = *d; 
+	double retC = *d; 
+
+	// Shrink from the right side
+	while(validInterval(currentMax, *c, *d))
+	{
+		*c = (*d - *c)/2 + *c; 
+	}
+
+	*d = *c; 
+	*c = retC; 
+
+	// THIS SHOULD CHECK IF FAILED OR NOT, SOMEHOW? 
+	return true; 
+}
+
 // Returns space left in buffer 
-inline int spaceLeft(int bufferSize, int head, int tail, int status)
+int spaceLeft(int bufferSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
 		return bufferSize;

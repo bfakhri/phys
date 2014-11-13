@@ -85,10 +85,32 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 	}
 }
 
+// Returns true only if max changed
+bool local_setMax(double * currentMax, double fc, double fd)
+{
+	if(*currentMax + EPSILON < fc)
+		*currentMax = fc;
+	else if(*currentMax + EPSILON < fd)
+		*currentMax = fd; 
+	else 
+		return false; 
+
+	return true; 
+}
+
+// Returns true only if it is possible to get a higher value in this interval
+bool validInterval(double currenMax, double c, double d)
+{
+	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
+		return true; 
+	else
+		return false;
+}
 
 int main()
 {
 	// Init local variables
+	double local_max = 0; 
 	double local_buffer[LOCAL_BUFF_SIZE]; 
 	double local_c = 0;
 	double local_d = 0; 
@@ -96,8 +118,26 @@ int main()
 	int local_tail = 0; 
 	int local_status = STATUS_EMPTY; 
 
+	// Add init interval to queue
+	local_qWork(START_A, END_B, local_buffer, &local_head, &local_tail, &local_status);
+
+
 	do
 	{
+		// Get work from queue
+		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
+
+		// Maybe reorganize to change max first? 
+		// Check if possible larger
+		if(validInterval(currentMax, local_c, local_d))
+		{
+			// Maybe set max somewhere else for higher efficiency? 
+			// Use the boolean output maybe? 
+			local_setMax(*local_max, f(local_c), f(local_d)); 
+			// Determine whether all of these are necessary 
+			local_qWork(local_c, local
+				
+		}
 		
 	}while(stat != STATUS_EMPTY); 
 

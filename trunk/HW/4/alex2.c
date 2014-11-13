@@ -11,12 +11,12 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 2 
+#define END_B 10 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 10
-#define LOCAL_BUFF_SIZE 10000
+#define LOCAL_BUFF_SIZE 100
 
 #define STATUS_EMPTY -1
 #define STATUS_MID 0
@@ -93,6 +93,22 @@ inline bool local_deqWork(double * c, double * d, double * buffer, int * head, i
 	}
 }
 
+// Gives front value but does not pop it off the queue
+inline bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+{
+	if(*status == STATUS_EMPTY)
+	{
+		return false;
+	}
+	else
+	{
+		// Add to circular buffer
+		*c = buffer[*head];
+		*d = buffer[*head+1]; 
+		return true; 
+	}
+}
+
 // Returns true only if max changed
 inline bool local_setMax(double * currentMax, double fc, double fd)
 {
@@ -152,7 +168,7 @@ double intervalLeft(double originalSize, double * buffer, int bufferSize, int he
 		head = (head+2)%bufferSize;
 	}while(head != tail);
 	
-	return runSum/originalSize; 
+	return 100*runSum/originalSize; 
 }
 
 // Returns the average size of the subintervals in the buffer
@@ -206,7 +222,7 @@ int main()
 	{
 		// FOR DEBUGGING
 		debugCount++; 
-		if(debugCount == 1)
+		if(debugCount == 1000)
 		{
 			printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
 			printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));

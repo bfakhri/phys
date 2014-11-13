@@ -11,10 +11,11 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 5 
+#define END_B 2 
 #define EPSILON 0.000001 // 10^-6
+//#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
-#define GLOBAL_BUFF_SIZE 10000
+#define GLOBAL_BUFF_SIZE 10
 #define LOCAL_BUFF_SIZE 10000
 
 #define STATUS_EMPTY -1
@@ -41,6 +42,13 @@ double f(double x)
 	return outerSum; 
 }
 
+// DEBUGGING
+/*
+double f(double x)
+{
+	return 1;
+}
+*/
 
 // Local Circular Queue
 inline bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
@@ -99,12 +107,37 @@ inline bool local_setMax(double * currentMax, double fc, double fd)
 }
 
 // Returns true only if it is possible to get a higher value in this interval
+
 inline bool validInterval(double currentMax, double c, double d)
 {
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
 	else
 		return false;
+}
+
+// FOR DEBUGGING ONLY
+/*
+inline bool validInterval(double cu, double c, double d)
+{
+	return true; 
+}
+*/
+
+// Returns space left in buffer 
+inline int spaceLeft(int bufferSize, int head, int tail, int status)
+{
+	if(status == STATUS_EMPTY)
+		return bufferSize;
+	else if(status == STATUS_FULL)
+		return 0; 
+	else
+	{
+		if(tail > head)
+			return bufferSize - (tail - head); 
+		else
+			return bufferSize - ((bufferSize - head) + tail); 		
+	}
 }
 
 // Returns the amount of the remaining interval represented in the buffer 
@@ -173,15 +206,15 @@ int main()
 	{
 		// FOR DEBUGGING
 		debugCount++; 
-		if(debugCount == 1000)
+		if(debugCount == 1)
 		{
 			printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
-			printf("Status: %d\tCapLeft: %d\tCurrentMax: %2.19f\tPercentLeft: %f\tAvgSubIntSize: %1.10f\n", local_status, local_tail%LOCAL_BUFF_SIZE - local_head%LOCAL_BUFF_SIZE, local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
+			printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 			debugCount = 0; 
 		}
 		
-		//int wait = 0;
-		//cin >> wait; 
+		int wait = 0;
+		cin >> wait; 
 		
 		// Get work from queue
 		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
@@ -196,7 +229,7 @@ int main()
 			// Determine whether all of these are necessary 
 			// Can only add subintervals if there is room for both
 				// Else you have to add the original interval back and not the subintervals
-			if((local_head%LOCAL_BUFF_SIZE) - (local_tail%LOCAL_BUFF_SIZE) == 2)
+			if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
 			{
 				// Debugging
 				//printf("Requeued\n"); 

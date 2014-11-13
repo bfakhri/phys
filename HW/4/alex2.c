@@ -1,7 +1,7 @@
 // Tentative questions: 
 // In email, when describing f(x), the 3rd line is "z = x". Why isn't it z = 0? 
 // Try setting number of threads to 1.5X number of procs to do hyperthreading? 
-
+// ARE COMPILER OPTIMIZATIONS ALLOWED!?!?!? -O3? 
 
 
 #include <stdio.h>

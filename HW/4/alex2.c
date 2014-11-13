@@ -16,7 +16,7 @@
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 10
-#define LOCAL_BUFF_SIZE 100
+#define LOCAL_BUFF_SIZE 10000
 
 #define STATUS_EMPTY -1
 #define STATUS_MID 0

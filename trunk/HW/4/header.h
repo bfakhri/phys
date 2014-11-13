@@ -1,3 +1,6 @@
+#ifndef HEADER_H
+#define HEADER_H
+
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>
@@ -11,6 +14,7 @@
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 10
 #define LOCAL_BUFF_SIZE 10000
+#define DEBUG_FREQ 1000
 
 #define STATUS_EMPTY -1
 #define STATUS_MID 0
@@ -35,7 +39,7 @@ bool local_setMax(double * currentMax, double fc, double fd);
 bool validInterval(double currentMax, double c, double d);
 
 // Attempts to rid itself of a piece of the interval handed to it
-bool shrinkInterval(double currentMax, double * c, double * d);
+bool shrinkInterval(double * currentMax, double * c, double * d);
 
 // Returns space left in buffer 
 int spaceLeft(int bufferSize, int head, int tail, int status);
@@ -52,3 +56,5 @@ double averageSubintervalSize(double * buffer, int bufferSize, int head, int tai
 // Prints the intervals in the buffer
 // FOR DEBUGGING ONLY
 void printBuff(double * buffer, int bufferSize, int head, int tail, int count);
+
+#endif

@@ -18,15 +18,7 @@ double f(double x)
 	return outerSum; 
 }
 
-// DEBUGGING
-/*
-double f(double x)
-{
-	return 1;
-}
-*/
-
-// Local Circular Queue
+// Local Circular Queue 
 bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_FULL)
@@ -48,6 +40,32 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 	}
 }
 
+
+// Stack instead of queue
+// TESTING THIS OUT
+/*
+bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+{
+	if(*status == STATUS_FULL)
+	{
+		return false;
+	}
+	else
+	{
+		// Add to stack 
+		buffer[*head] = c;
+		buffer[*head+1] = d; 
+		*head += 2;
+		if(*head >= LOCAL_BUFF_SIZE)
+			*status = STATUS_FULL;
+		else
+			*status = STATUS_MID;
+
+		return true; 
+	}
+}
+*/
+
 bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
@@ -56,7 +74,7 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 	}
 	else
 	{
-		// Add to circular buffer
+		// Get from circular buffer
 		*c = buffer[*head];
 		*d = buffer[*head+1]; 
 		*head = (*head+2)%LOCAL_BUFF_SIZE;  
@@ -68,6 +86,28 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 		return true; 
 	}
 }
+
+/* STack instead of queue
+bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+{
+	if(*status == STATUS_EMPTY)
+	{
+		return false;
+	}
+	else
+	{
+		// Get from stack
+		*head -= 2; 
+		*c = buffer[*head];
+		*d = buffer[*head+1]; 
+		if(*head <= 0)
+			*status = STATUS_EMPTY;
+		else
+			*status = STATUS_MID; 
+
+		return true; 
+	}
+}*/
 
 // Gives front value but does not pop it off the queue
 bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
@@ -99,7 +139,6 @@ bool local_setMax(double * currentMax, double fc, double fd)
 }
 
 // Returns true only if it is possible to get a higher value in this interval
-
 bool validInterval(double currentMax, double c, double d)
 {
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
@@ -108,23 +147,35 @@ bool validInterval(double currentMax, double c, double d)
 		return false;
 }
 
-// FOR DEBUGGING ONLY
-/*
-inline bool validInterval(double cu, double c, double d)
+// Does same this as validInterval() but also updates the max
+bool validIntervalAndMax(double * currentMax, double c, double d)
 {
-	return true; 
+	double fC = f(c); 
+	double fD = f(d); 
+	if(local_setMax(currentMax, fC, fD))
+	{
+		return true; 
+	}
+	else
+	{
+		if(((fC + fD + SLOPE*(d - c))/2) > (*currentMax + EPSILON))
+			return true; 
+		else
+			return false;
+	}
 }
-*/
+
+
 
 // Attempts to rid itself of a piece of the interval handed to it
-bool shrinkInterval(double currentMax, double * c, double * d)
+bool shrinkInterval(double * currentMax, double * c, double * d)
 {
 	// Save the original values
 	double C = *c; 
 	double D = *d; 
 	
 	// Shrink from the left side
-	while(validInterval(currentMax, C, D))
+	while(validIntervalAndMax(currentMax, C, D))
 	{
 		//printf("stuck"); 
 		D = (D - C)/2 + C; 
@@ -136,7 +187,7 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	D = *d; 	
 
 	// Shrink from the right side
-	while(validInterval(currentMax, C, D))
+	while(validIntervalAndMax(currentMax, C, D))
 	{
 		C = (D - C)/2 + C; 
 	}
@@ -164,6 +215,20 @@ int spaceLeft(int bufferSize, int head, int tail, int status)
 			return bufferSize - ((bufferSize - head) + tail); 		
 	}
 }
+
+// THIS VERSION ONLY WORKS WITH STACK VERSION OF q/deqWork
+/*int spaceLeft(int bufferSize, int head, int tail, int status)
+{
+	if(status == STATUS_EMPTY)
+		return bufferSize;
+	else if(status == STATUS_FULL)
+		return 0; 
+	else
+	{
+		return (LOCAL_BUFF_SIZE-(head - 2));
+	}
+}*/
+
 
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage

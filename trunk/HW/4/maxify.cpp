@@ -28,15 +28,15 @@ int main()
 	{
 		// FOR DEBUGGING
 		debugCount++; 
-		if(debugCount == 1000)
+		if(debugCount == DEBUG_FREQ)
 		{
 			printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
 			printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 			debugCount = 0; 
 		}
 		
-		//int wait = 0;
-		//cin >> wait; 
+		int wait = 0;
+		cin >> wait; 
 		
 		// Get work from queue
 		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
@@ -57,17 +57,14 @@ int main()
 				//printf("Requeued\n"); 
 				// Queue the original subinterval
 				//printf("Interval Before Shrink: [%f, %f]\n", local_c, local_d);
-				shrinkInterval(local_max, &local_c, &local_d);
+				shrinkInterval(&local_max, &local_c, &local_d);
 				//printf("Interval After Shrink:  [%f, %f]\n", local_c, local_d);
 				local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 			}
 			else
 			{
-				//if((local_d-local_c) > EPSILON)
-					local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
-			
-				//if((local_d-local_c) > EPSILON)
-					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
+				local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
+				local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
 			}
 		}
 	}while(local_status != STATUS_EMPTY); 

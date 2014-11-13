@@ -11,11 +11,11 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 100 
+#define END_B 5 
 #define EPSILON 0.000001 // 10^-6
 #define SLOPE 12
-#define GLOBAL_BUFF_SIZE 100000
-#define LOCAL_BUFF_SIZE 100000
+#define GLOBAL_BUFF_SIZE 10000
+#define LOCAL_BUFF_SIZE 10000
 
 #define STATUS_EMPTY -1
 #define STATUS_MID 0
@@ -43,7 +43,7 @@ double f(double x)
 
 
 // Local Circular Queue
-bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+inline bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_FULL)
 	{
@@ -64,7 +64,7 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 	}
 }
 
-bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+inline bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
 	{
@@ -86,7 +86,7 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 }
 
 // Returns true only if max changed
-bool local_setMax(double * currentMax, double fc, double fd)
+inline bool local_setMax(double * currentMax, double fc, double fd)
 {
 	if(*currentMax + EPSILON < fc)
 		*currentMax = fc;
@@ -99,7 +99,7 @@ bool local_setMax(double * currentMax, double fc, double fd)
 }
 
 // Returns true only if it is possible to get a higher value in this interval
-bool validInterval(double currentMax, double c, double d)
+inline bool validInterval(double currentMax, double c, double d)
 {
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
@@ -109,6 +109,7 @@ bool validInterval(double currentMax, double c, double d)
 
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage
+// FOR DEBUGGING
 double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail)
 {
 	double runSum = 0; 
@@ -175,12 +176,12 @@ int main()
 		if(debugCount == 1000)
 		{
 			printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
-			printf("Status: %d\tCapLeft: %d\tCurrentMax: %2.19f\tPercentLeft: %f\tAvgSubIntSize: %1.10f\n", local_status, local_tail - local_head, local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
+			printf("Status: %d\tCapLeft: %d\tCurrentMax: %2.19f\tPercentLeft: %f\tAvgSubIntSize: %1.10f\n", local_status, local_tail%LOCAL_BUFF_SIZE - local_head%LOCAL_BUFF_SIZE, local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 			debugCount = 0; 
 		}
 		
-		int wait = 0;
-		cin >> wait; 
+		//int wait = 0;
+		//cin >> wait; 
 		
 		// Get work from queue
 		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
@@ -198,16 +199,16 @@ int main()
 			if((local_head%LOCAL_BUFF_SIZE) - (local_tail%LOCAL_BUFF_SIZE) == 2)
 			{
 				// Debugging
-				printf("Requeued\n"); 
+				//printf("Requeued\n"); 
 				// Queue the original subinterval
 				local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 			}
 			else
 			{
-				if((local_d-local_c) > EPSILON)
+				//if((local_d-local_c) > EPSILON)
 					local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
 			
-				if((local_d-local_c) > EPSILON)
+				//if((local_d-local_c) > EPSILON)
 					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
 			}
 		}

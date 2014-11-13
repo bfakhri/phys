@@ -1,3 +1,3 @@
-alexandrian: alexandrian.c
-	g++ alexandrian.c -o alexandrian -fopenmp 
+alexandrian: alex2.c
+	g++ alex2.c -o alexandrian -fopenmp 
 

@@ -229,8 +229,8 @@ int main()
 			debugCount = 0; 
 		}
 		
-		int wait = 0;
-		cin >> wait; 
+		//int wait = 0;
+		//cin >> wait; 
 		
 		// Get work from queue
 		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);

@@ -10,12 +10,6 @@ using namespace std;
 
 int main()
 {
-	// Global Stuff
-	global_buffer[GLOBAL_BUFF_SIZE]; 
-	global_head = 0; 
-	global_tail = 0; 
-	global_status = STATUS_EMPTY; 
-
 	// Set number of threads
 	// TRY HYPERTHREADING? 
 	int numThreads = omp_get_num_procs(); 	
@@ -24,6 +18,16 @@ int main()
 	// Vars to be used  
 	double intervalSpan = END_B - START_A;
 	double chunkSize = intervalSpan/numThreads;
+	
+
+	// Global Stuff
+	double global_buffer[GLOBAL_BUFF_SIZE]; 
+	double global_head = 0; 
+	double global_tail = 0; 
+	double global_status = STATUS_EMPTY; 
+	bool global_doneArray = new bool[numThreads]; 
+	for(int i=0; i<numThreads; i++)
+		global_doneArray[i] = false; 
 
 
 	#pragma omp parallel 
@@ -57,8 +61,16 @@ int main()
 			int wait = 0;
 			cin >> wait; 
 			
-			// Get work from queue
-			local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
+			// Get work from a queue
+			if(local_status != STATUS_EMPTY)
+				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
+			else
+			{
+				bool res = global_deqWork(&local_c, &local_d);
+				if(!res)
+					break;
+			}
+				
 
 			// Maybe reorganize to change max first? 
 			// Check if possible larger
@@ -71,7 +83,6 @@ int main()
 				// Can only add subintervals if there is room for both
 					// Else you have to add the original interval back and not the subintervals
 				
-				// IF EMPTY GET SOME WORK FROM GLOBAL BUFF
 				// IF FULL SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 				if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
 				{

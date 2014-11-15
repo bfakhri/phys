@@ -35,7 +35,6 @@ bool local_peek(double * c, double * d, double * buffer, int * head, int * tail,
 bool local_setMax(double * currentMax, double fc, double fd);
 
 // Returns true only if it is possible to get a higher value in this interval
-
 bool validInterval(double currentMax, double c, double d);
 
 // Attempts to rid itself of a piece of the interval handed to it
@@ -43,6 +42,9 @@ bool shrinkInterval(double * currentMax, double * c, double * d);
 
 // Returns space left in buffer 
 int spaceLeft(int bufferSize, int head, int tail, int status);
+
+// Returns true if all processors are done 
+bool allDone(bool * doneArr, int size);
 
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage

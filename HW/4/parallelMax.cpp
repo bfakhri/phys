@@ -63,11 +63,15 @@ int main()
 			
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
+			{
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
+				global_doneArray[local_threadNum] = false; 
+			}
 			else
 			{
+				global_doneArray[local_threadNum] = true; 
 				bool res = global_deqWork(&local_c, &local_d);
-				if(!res)
+				if()
 					break;
 			}
 				
@@ -90,9 +94,22 @@ int main()
 					//printf("Requeued\n"); 
 					// Queue the original subinterval
 					//printf("Interval Before Shrink: [%f, %f]\n", local_c, local_d);
-					shrinkInterval(&local_max, &local_c, &local_d);
+					if(global_status == STATUS_FULL)
+					{
+						shrinkInterval(&local_max, &local_c, &local_d);
+						local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
+					}
+					else 
+					{
+						if(global_q2Work())
+						else
+						{
+							shrinkInterval(&local_max, &local_c, &local_d);
+							local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
+						}
+							
+					}
 					//printf("Interval After Shrink:  [%f, %f]\n", local_c, local_d);
-					local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 				}
 				else
 				{
@@ -100,7 +117,7 @@ int main()
 					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
 				}
 			}
-		}while((local_status != STATUS_EMPTY) || (global_status != EMPTY)); 
+		}while((local_status != STATUS_EMPTY) || (global_status != EMPTY) || !allDone(global_doneArray, numThreads)); 
 	} // END PARALLEL 
 
 	printf("LocalMax = %2.30f\n", local_max); 

@@ -229,6 +229,17 @@ int spaceLeft(int bufferSize, int head, int tail, int status)
 	}
 }*/
 
+// Returns true if all processors are done
+bool allDone(bool * doneArr, int size)
+{
+	for(int i=0; i<size; i++)
+	{
+		if(!allDone[i])
+			return false;
+	}
+	
+	return true; 
+}
 
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage

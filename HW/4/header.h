@@ -28,6 +28,11 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 
 bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status);
 
+// Global Circular Queue
+bool global_qWork(double c, double d, double * buffer, int * head, int * tail, int * status);
+
+bool global_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status);
+
 // Gives front value but does not pop it off the queue
 bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status);
 

@@ -8,11 +8,11 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 5 
+#define END_B 10 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
-#define GLOBAL_BUFF_SIZE 10
+#define GLOBAL_BUFF_SIZE 1000
 #define LOCAL_BUFF_SIZE 10000
 #define DEBUG_FREQ 1000
 
@@ -61,7 +61,7 @@ bool global_setMax(double fc, double fd);
 bool validInterval(double currentMax, double c, double d);
 
 // Attempts to rid itself of a piece of the interval handed to it
-bool shrinkInterval(double * currentMax, double * c, double * d);
+bool shrinkInterval(double currentMax, double * c, double * d);
 
 // Returns space left in buffer 
 int spaceLeft(int bufferSize, int head, int tail, int status);

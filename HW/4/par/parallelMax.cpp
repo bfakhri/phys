@@ -20,16 +20,9 @@ int main()
 	double chunkSize = intervalSpan/numThreads;
 	
 
-	// Global Stuff
-	double global_max = 0; 
-	double global_buffer[GLOBAL_BUFF_SIZE]; 
-	int global_head = 0; 
-	int global_tail = 0; 
-	int global_status = STATUS_EMPTY; 
 	bool * global_doneArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false; 
-
 
 	#pragma omp parallel 
 	{
@@ -59,8 +52,8 @@ int main()
 				debugCount = 0; 
 			}
 			
-			int wait = 0;
-			cin >> wait; 
+			//int wait = 0;
+			//cin >> wait; 
 			
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
@@ -74,7 +67,7 @@ int main()
 				global_doneArray[local_threadNum] = true; 
 				while(!allDone(global_doneArray, numThreads))
 				{
-					res = global_deqWork(&local_c, &local_d, global_buffer, &global_head, &global_tail, &global_status);
+					res = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
 					if(res)
 						break;
 				}
@@ -85,11 +78,11 @@ int main()
 
 			// Maybe reorganize to change max first? 
 			// Check if possible larger
-			if(validInterval(local_max, local_c, local_d))
+			if(validInterval(global_max, local_c, local_d))
 			{
 				// Maybe set max somewhere else for higher efficiency? 
-				// Use the boolean output maybe? 
-				local_setMax(&local_max, f(local_c), f(local_d)); 
+				// Use the boolean output maybe?  
+				global_setMax(f(local_c), f(local_d)); 
 				// Determine whether all of these are necessary 
 				// Can only add subintervals if there is room for both
 					// Else you have to add the original interval back and not the subintervals

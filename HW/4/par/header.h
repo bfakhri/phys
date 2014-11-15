@@ -8,7 +8,7 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 10 
+#define END_B 2 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
@@ -17,9 +17,9 @@
 #define DEBUG_FREQ 1000
 
 // For status of buffers
-#define STATUS_EMPTY -1
-#define STATUS_MID 0
-#define STATUS_FULL 1
+#define STATUS_EMPTY 0
+#define STATUS_MID 1
+#define STATUS_FULL 2
 
 // For global buffer 
 #define FUN_DEQUEUE 0

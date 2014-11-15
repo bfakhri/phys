@@ -54,76 +54,78 @@ int main()
 			{
 				//printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
 				printf("Global Buff Space Left: %d\n", spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status));
-				printf("tNum: %d\tStatus: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
+				printf("tNum: %d\tStatus: %d\tSpaceLeft: %d\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 				debugCount = 0; 
 			}
-				
+			
+			bool cont = false;	
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
 			{
 				// Local buffer still has work so we get some from there
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 				global_doneArray[local_threadNum] = false; 
+				cont = true; 
 			}
 			else
 			{
-				// Need work so request some from global buffer
-				bool res = false; 
-				//global_doneArray[local_threadNum] = true; 
-				while(!allDone(global_doneArray, numThreads) && !res)
+				// Need work so request some from global buffer 
+				global_doneArray[local_threadNum] = true; 
+				while(!allDone(global_doneArray, numThreads) && !cont)
 				{
-					res = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
-					if(!res)
-						sleep(1); 
-				}
-				if(!res)
-				{
-					printf("Thread %d is done", local_threadNum); 
-					break; 
+					cont = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
+					//if(!cont)
+					//	sleep(1); 
 				}
 			}
-				
-			// Check if possible larger
-			if(validInterval(global_max, local_c, local_d))
-			{
-				global_setMax(f(local_c), f(local_d)); 
-				
-				// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
-				// Two intervals will not fit in local buffer
-				if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
+			if(cont)
+			{	
+				// Check if possible larger
+				if(validInterval(global_max, local_c, local_d))
 				{
-					// Global buffer is full too - so we shrink the current interval instead of splitting it
-					if(global_status == STATUS_FULL)
+					global_setMax(f(local_c), f(local_d)); 
+					
+					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
+
+					// Two intervals will not fit in local buffer
+					if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
 					{
-						// NEED TO FIX THIS FUNCTION BELOW
-						shrinkInterval(global_max, &local_c, &local_d);
-						// Queue up shrunken interval back into local buffer
-						local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
-					}
-					else 
-					{
-						double pC = local_c;
-						double pD = ((local_d-local_c)/2)+local_c;
-						double pC2 = ((local_d-local_c)/2)+local_c;
-						double pD2 = local_d; 
-						if(!global_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
+						// Global buffer is full too - so we shrink the current interval instead of splitting it
+						if(global_status == STATUS_FULL)
 						{
+							// NEED TO FIX THIS FUNCTION BELOW
 							shrinkInterval(global_max, &local_c, &local_d);
+							// Queue up shrunken interval back into local buffer
 							local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 						}
-							
+						else 
+						{
+							double pC = local_c;
+							double pD = ((local_d-local_c)/2)+local_c;
+							double pC2 = ((local_d-local_c)/2)+local_c;
+							double pD2 = local_d; 
+							if(!global_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
+							{
+								shrinkInterval(global_max, &local_c, &local_d);
+								local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
+							}
+								
+						}
 					}
-				}
-				else
-				{
-					local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
-					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
+					else
+					{
+						local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
+						local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
+					}
 				}
 			}
 		}while((local_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
 		
-		printf("Thread %d is shutting down\n", local_threadNum); 
+		printf("Thread %d is shutting down\n", local_threadNum);
+		printf("GlobalMax = %2.30f\n", global_max); 
+		for(int i=0; i<1; i++)
+			break;
 	} // END PARALLEL 
 
 	printf("GlobalMax = %2.30f\n", global_max); 

@@ -186,7 +186,6 @@ bool global_setMax(double fc, double fd)
 	bool ret = true; 
 	#pragma omp critical
 	{
-		double global_max = 0; 
 		if(global_max + EPSILON < fc)
 		{
 			global_max = fc; 
@@ -233,14 +232,14 @@ bool validIntervalAndMax(double * currentMax, double c, double d)
 
 
 // Attempts to rid itself of a piece of the interval handed to it
-bool shrinkInterval(double * currentMax, double * c, double * d)
+bool shrinkInterval(double currentMax, double * c, double * d)
 {
 	// Save the original values
 	double C = *c; 
 	double D = *d; 
 	
 	// Shrink from the left side
-	while(validIntervalAndMax(currentMax, C, D))
+	while(validInterval(currentMax, C, D))
 	{
 		//printf("stuck"); 
 		D = (D - C)/2 + C; 
@@ -252,7 +251,7 @@ bool shrinkInterval(double * currentMax, double * c, double * d)
 	D = *d; 	
 
 	// Shrink from the right side
-	while(validIntervalAndMax(currentMax, C, D))
+	while(validInterval(currentMax, C, D))
 	{
 		C = (D - C)/2 + C; 
 	}

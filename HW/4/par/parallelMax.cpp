@@ -2,6 +2,9 @@
 // In email, when describing f(x), the 3rd line is "z = x". Why isn't it z = 0? 
 // Try setting number of threads to 1.5X number of procs to do hyperthreading? 
 // ARE COMPILER OPTIMIZATIONS ALLOWED!?!?!? -O3? 
+// Change order by which elements are added to global buffer 
+// 	try to take elements from the from of queue rather than those that would have been 
+//	added to the back. 
 
 #include "header.h"
 
@@ -18,8 +21,10 @@ int main()
 	// Vars to be used  
 	double intervalSpan = END_B - START_A;
 	double chunkSize = intervalSpan/numThreads;
-	
 
+	printf("Number of threads: %d\n\n", numThreads); 	
+
+	global_initBuffer(); 
 	bool * global_doneArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false; 
@@ -47,71 +52,68 @@ int main()
 			debugCount++; 
 			if(debugCount == DEBUG_FREQ)
 			{
-				printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
-				printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
+				//printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
+				printf("Global Buff Space Left: %d\n", spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status));
+				printf("tNum: %d\tStatus: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 				debugCount = 0; 
 			}
-			
-			//int wait = 0;
-			//cin >> wait; 
-			
+				
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
 			{
+				// Local buffer still has work so we get some from there
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 				global_doneArray[local_threadNum] = false; 
 			}
 			else
 			{
-				bool res; 
-				global_doneArray[local_threadNum] = true; 
-				while(!allDone(global_doneArray, numThreads))
+				// Need work so request some from global buffer
+				bool res = false; 
+				//global_doneArray[local_threadNum] = true; 
+				while(!allDone(global_doneArray, numThreads) && !res)
 				{
 					res = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
-					if(res)
-						break;
+					if(!res)
+						sleep(1); 
 				}
 				if(!res)
+				{
+					printf("Thread %d is done", local_threadNum); 
 					break; 
+				}
 			}
 				
-
-			// Maybe reorganize to change max first? 
 			// Check if possible larger
 			if(validInterval(global_max, local_c, local_d))
 			{
-				// Maybe set max somewhere else for higher efficiency? 
-				// Use the boolean output maybe?  
 				global_setMax(f(local_c), f(local_d)); 
-				// Determine whether all of these are necessary 
-				// Can only add subintervals if there is room for both
-					// Else you have to add the original interval back and not the subintervals
 				
-				// IF FULL SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
+				// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
+
+				// Two intervals will not fit in local buffer
 				if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
 				{
-					// Debugging
-					//printf("Requeued\n"); 
-					// Queue the original subinterval
-					//printf("Interval Before Shrink: [%f, %f]\n", local_c, local_d);
+					// Global buffer is full too - so we shrink the current interval instead of splitting it
 					if(global_status == STATUS_FULL)
 					{
-						shrinkInterval(&local_max, &local_c, &local_d);
+						// NEED TO FIX THIS FUNCTION BELOW
+						shrinkInterval(global_max, &local_c, &local_d);
+						// Queue up shrunken interval back into local buffer
 						local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 					}
 					else 
 					{
-						// Need function that will queue two items or none here
-						//if(global_q2Work())
-						//if(false)
-						//else
+						double pC = local_c;
+						double pD = ((local_d-local_c)/2)+local_c;
+						double pC2 = ((local_d-local_c)/2)+local_c;
+						double pD2 = local_d; 
+						if(!global_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
 						{
-							shrinkInterval(&local_max, &local_c, &local_d);
+							shrinkInterval(global_max, &local_c, &local_d);
 							local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
 						}
 							
 					}
-					//printf("Interval After Shrink:  [%f, %f]\n", local_c, local_d);
 				}
 				else
 				{
@@ -119,9 +121,11 @@ int main()
 					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
 				}
 			}
-		}while((local_status != STATUS_EMPTY) || (global_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
+		}while((local_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
+		
+		printf("Thread %d is shutting down\n", local_threadNum); 
 	} // END PARALLEL 
 
-	printf("LocalMax = %2.30f\n", global_max); 
+	printf("GlobalMax = %2.30f\n", global_max); 
 	return 0; 	 
 }

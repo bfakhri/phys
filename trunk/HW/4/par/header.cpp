@@ -1,5 +1,23 @@
 #include "header.h"
 
+
+// Global Stuff
+double global_max; 
+double * global_buffer;
+int global_head; 
+int global_tail; 
+int global_status; 
+
+void global_initBuffer()
+{
+	global_max = 0;  
+	global_buffer = new double[GLOBAL_BUFF_SIZE]; 
+	global_head = 0; 
+	global_tail = 0; 
+	global_status = STATUS_EMPTY; 
+
+}
+
 // Function we want to find the maximum of
 double f(double x)
 {
@@ -61,72 +79,78 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 	}
 }
 
-/* STack instead of queue
-bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
-{
-	if(*status == STATUS_EMPTY)
-	{
-		return false;
-	}
-	else
-	{
-		// Get from stack
-		*head -= 2; 
-		*c = buffer[*head];
-		*d = buffer[*head+1]; 
-		if(*head <= 0)
-			*status = STATUS_EMPTY;
-		else
-			*status = STATUS_MID; 
-
-		return true; 
-	}
-}*/
 
 // Global Circular Queue 
-bool global_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+bool global_safeWorkBuffer(int function, double * c, double * d, double c2, double d2)
 {
-	// NEED THREAD PROTECTION HERE
-	if(*status == STATUS_FULL)
+	bool ret = true; 
+	#pragma omp critical
 	{
-		return false;
-	}
-	else
-	{
-		// Add to circular buffer
-		buffer[*tail] = c;
-		buffer[*tail+1] = d; 
-		*tail = (*tail+2)%LOCAL_BUFF_SIZE;  
-		if(*tail == *head)
-			*status = STATUS_FULL;
-		else
-			*status = STATUS_MID; 
+		// Dequeue function
+		if(function == FUN_DEQUEUE)
+		{
+			if(global_status == STATUS_EMPTY)
+				ret = false;
+			else
+			{
+				// Get from circular buffer
+				*c = global_buffer[global_head];
+				*d = global_buffer[global_head+1]; 
+				global_head = (global_head+2)%LOCAL_BUFF_SIZE;  
+				if(global_tail == global_head)
+					global_status = STATUS_EMPTY;
+				else
+					global_status = STATUS_MID; 
+			
+			}
 
-		return true; 
-	}
+		}
+		// Insert into buffer
+		else
+		{
+			if(global_status == STATUS_FULL)
+			{
+				ret = false;
+			}
+			else
+			{
+				// Check if inserting two intervals
+				if(function == FUN_DOUBLE_Q)
+				{
+					if(spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status) >= 4)
+					{
+						// Insert both intervals
+						global_buffer[global_tail] = *c;
+						global_buffer[global_tail+1] = *d; 
+						global_buffer[global_tail+2] = c2;
+						global_buffer[global_tail+3] = d2; 
+						global_tail = (global_tail+4)%LOCAL_BUFF_SIZE;  
+					}
+					else
+					{
+						// Cannot insert both succesfully so NONE will be inserted
+						ret = false; 
+					}
+				}
+				else
+				{
+					// Already checked to make sure it is not full so insert
+					global_buffer[global_tail] = *c;
+					global_buffer[global_tail+1] = *d; 
+					global_tail = (global_tail+2)%LOCAL_BUFF_SIZE;  
+				}
+				// Add to circular buffer
+				if(global_tail == global_head)
+					global_status = STATUS_FULL;
+				else
+					global_status = STATUS_MID; 
+			}
+		}
+	} // End Critical Section
+	
+	return ret; 
 }
 
-bool global_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
-{
-	// NEED THREAD PROTECTION EHERERERERERER
-	if(*status == STATUS_EMPTY)
-	{
-		return false;
-	}
-	else
-	{
-		// Get from circular buffer
-		*c = buffer[*head];
-		*d = buffer[*head+1]; 
-		*head = (*head+2)%LOCAL_BUFF_SIZE;  
-		if(*tail == *head)
-			*status = STATUS_EMPTY;
-		else
-			*status = STATUS_MID; 
-
-		return true; 
-	}
-}
 // Gives front value but does not pop it off the queue
 bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
@@ -154,6 +178,29 @@ bool local_setMax(double * currentMax, double fc, double fd)
 		return false; 
 
 	return true; 
+}
+
+// Returns true only if max changed
+bool global_setMax(double fc, double fd)
+{
+	bool ret = true; 
+	#pragma omp critical
+	{
+		double global_max = 0; 
+		if(global_max + EPSILON < fc)
+		{
+			global_max = fc; 
+		}
+		else if(global_max + EPSILON < fd)
+		{
+			global_max = fd; 
+		}
+		else
+		{ 
+			ret = false; 
+		}
+	}
+	return ret; 
 }
 
 // Returns true only if it is possible to get a higher value in this interval

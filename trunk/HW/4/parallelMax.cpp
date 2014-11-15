@@ -21,11 +21,12 @@ int main()
 	
 
 	// Global Stuff
+	double global_max = 0; 
 	double global_buffer[GLOBAL_BUFF_SIZE]; 
-	double global_head = 0; 
-	double global_tail = 0; 
-	double global_status = STATUS_EMPTY; 
-	bool global_doneArray = new bool[numThreads]; 
+	int global_head = 0; 
+	int global_tail = 0; 
+	int global_status = STATUS_EMPTY; 
+	bool * global_doneArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false; 
 
@@ -69,10 +70,16 @@ int main()
 			}
 			else
 			{
+				bool res; 
 				global_doneArray[local_threadNum] = true; 
-				bool res = global_deqWork(&local_c, &local_d);
-				if()
-					break;
+				while(!allDone(global_doneArray, numThreads))
+				{
+					res = global_deqWork(&local_c, &local_d, global_buffer, &global_head, &global_tail, &global_status);
+					if(res)
+						break;
+				}
+				if(!res)
+					break; 
 			}
 				
 
@@ -101,8 +108,10 @@ int main()
 					}
 					else 
 					{
-						if(global_q2Work())
-						else
+						// Need function that will queue two items or none here
+						//if(global_q2Work())
+						//if(false)
+						//else
 						{
 							shrinkInterval(&local_max, &local_c, &local_d);
 							local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
@@ -117,9 +126,9 @@ int main()
 					local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
 				}
 			}
-		}while((local_status != STATUS_EMPTY) || (global_status != EMPTY) || !allDone(global_doneArray, numThreads)); 
+		}while((local_status != STATUS_EMPTY) || (global_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
 	} // END PARALLEL 
 
-	printf("LocalMax = %2.30f\n", local_max); 
+	printf("LocalMax = %2.30f\n", global_max); 
 	return 0; 	 
 }

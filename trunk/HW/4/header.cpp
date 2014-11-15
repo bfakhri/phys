@@ -40,32 +40,6 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 	}
 }
 
-
-// Stack instead of queue
-// TESTING THIS OUT
-/*
-bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
-{
-	if(*status == STATUS_FULL)
-	{
-		return false;
-	}
-	else
-	{
-		// Add to stack 
-		buffer[*head] = c;
-		buffer[*head+1] = d; 
-		*head += 2;
-		if(*head >= LOCAL_BUFF_SIZE)
-			*status = STATUS_FULL;
-		else
-			*status = STATUS_MID;
-
-		return true; 
-	}
-}
-*/
-
 bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
@@ -109,6 +83,50 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 	}
 }*/
 
+// Global Circular Queue 
+bool global_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+{
+	// NEED THREAD PROTECTION HERE
+	if(*status == STATUS_FULL)
+	{
+		return false;
+	}
+	else
+	{
+		// Add to circular buffer
+		buffer[*tail] = c;
+		buffer[*tail+1] = d; 
+		*tail = (*tail+2)%LOCAL_BUFF_SIZE;  
+		if(*tail == *head)
+			*status = STATUS_FULL;
+		else
+			*status = STATUS_MID; 
+
+		return true; 
+	}
+}
+
+bool global_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+{
+	// NEED THREAD PROTECTION EHERERERERERER
+	if(*status == STATUS_EMPTY)
+	{
+		return false;
+	}
+	else
+	{
+		// Get from circular buffer
+		*c = buffer[*head];
+		*d = buffer[*head+1]; 
+		*head = (*head+2)%LOCAL_BUFF_SIZE;  
+		if(*tail == *head)
+			*status = STATUS_EMPTY;
+		else
+			*status = STATUS_MID; 
+
+		return true; 
+	}
+}
 // Gives front value but does not pop it off the queue
 bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
@@ -234,7 +252,7 @@ bool allDone(bool * doneArr, int size)
 {
 	for(int i=0; i<size; i++)
 	{
-		if(!allDone[i])
+		if(!doneArr[i])
 			return false;
 	}
 	

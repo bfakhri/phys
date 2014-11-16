@@ -27,8 +27,19 @@ int main()
 	global_initBuffer(); 
 	bool * global_doneArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
-		global_doneArray[i] = false; 
+		global_doneArray[i] = false;
 
+	// FOR DEBUGGING
+	/*double cccc = 1; 
+	double dddd = 10;
+	global_safeWorkBuffer(FUN_SINGLE_Q,  &cccc, &dddd, 0, 0); 
+	for(int i=0; i<numThreads; i++)
+	{
+		cccc = i*chunkSize + START_A;
+		dddd = (i+1)*chunkSize + START_A; 
+		global_safeWorkBuffer(FUN_SINGLE_Q,  &cccc, &dddd, 0, 0); 
+	}
+	*/
 	#pragma omp parallel 
 	{
 		// Init local variables
@@ -77,6 +88,8 @@ int main()
 					//if(!cont)
 					//	sleep(1); 
 				}
+				if(cont)
+					global_doneArray[local_threadNum] = false; 
 			}
 
 			if(cont)
@@ -120,12 +133,17 @@ int main()
 					}
 				}
 			}
+			else
+			{
+				break;
+			}
 		}while((local_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
 		
 		printf("Thread %d is shutting down\n", local_threadNum);
-		printf("GlobalMax = %2.30f\n", global_max); 
-		for(int i=0; i<1; i++)
-			break;
+		global_doneArray[local_threadNum] = true;
+		for(int i=0; i<numThreads; i++)
+			printf("\tThread %d has status: %s", i, global_doneArray[i] ? "true" : "false"); 
+		printf("\nGlobalMax = %2.30f\n", global_max); 
 	} // END PARALLEL 
 
 	printf("GlobalMax = %2.30f\n", global_max); 

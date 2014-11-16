@@ -308,32 +308,41 @@ bool allDone(bool * doneArr, int size)
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage
 // FOR DEBUGGING
-double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail)
+double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail, int status)
 {
-	double runSum = 0; 
-	do
+	if(status == STATUS_EMPTY)
+		return 0; 
+	else 
 	{
-		runSum += (buffer[head+1] - buffer[head]);
-		head = (head+2)%bufferSize;
-	}while(head != tail);
-	
-	return 100*runSum/originalSize; 
+		double runSum = 0; 
+		do
+		{
+			runSum += (buffer[head+1] - buffer[head]);
+			head = (head+2)%bufferSize;
+		}while(head != tail);
+		
+		return 100*runSum/originalSize; 
+	}
 }
 
 // Returns the average size of the subintervals in the buffer
 // FOR DEBUGGING ONLY
-double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail)
+double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail, int status)
 {
-	double runSum = 0;
-	int itemCount = 0;  
-	do
+	if(status == STATUS_EMPTY)
+		return 0; 
+	else
 	{
-		runSum += (buffer[head+1] - buffer[head]);
-		head = (head+2)%bufferSize;
-		itemCount++; 
-	}while(head != tail);
-	
-	return runSum/itemCount; 
+		double runSum = 0;
+		int itemCount = 0;  
+		do
+		{
+			runSum += (buffer[head+1] - buffer[head]);
+			head = (head+2)%bufferSize;
+			itemCount++; 
+		}while(head != tail);
+		return runSum/(itemCount); 
+	}
 }
 
 // Prints the intervals in the buffer

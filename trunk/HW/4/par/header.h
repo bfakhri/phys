@@ -8,7 +8,7 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 100 
+#define END_B 100
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
@@ -72,11 +72,11 @@ bool allDone(bool * doneArr, int size);
 // Returns the amount of the remaining interval represented in the buffer 
 // as a percentage
 // FOR DEBUGGING
-double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail);
+double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail, int status);
 
 // Returns the average size of the subintervals in the buffer
 // FOR DEBUGGING ONLY
-double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail);
+double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail, int status);
 
 // Prints the intervals in the buffer
 // FOR DEBUGGING ONLY

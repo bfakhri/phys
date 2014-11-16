@@ -34,10 +34,11 @@ int main()
 			printf("Status: %d\tSpaceLeft: %d\tCurMax: %2.8f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), local_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail));
 			debugCount = 0; 
 		}
-		
+	
+		/*	
 		int wait = 0;
 		cin >> wait; 
-		
+		*/
 		// Get work from queue
 		local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 

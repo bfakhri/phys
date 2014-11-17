@@ -10,12 +10,12 @@
 
 using namespace std; 
 
-
 int main()
 {
 	// Set number of threads
 	// TRY HYPERTHREADING? 
 	int numThreads = omp_get_num_procs(); 	
+	//int numThreads = 2;
 	omp_set_num_threads(numThreads);
 
 	// Vars to be used  
@@ -29,8 +29,7 @@ int main()
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false;
 	
-	int local_status = STATUS_EMPTY; 
-	#pragma omp parallel private(local_status) 
+	#pragma omp parallel 
 	{
 		// Init local variables
 		//double local_max = 0; 
@@ -39,7 +38,7 @@ int main()
 		double local_d = 0; 
 		int local_head = 0; 
 		int local_tail = 0; 
-		local_status = STATUS_EMPTY; 
+		int local_status = STATUS_EMPTY; 
 	
 		// Add init interval to queue
 		int local_threadNum = omp_get_thread_num(); 
@@ -50,7 +49,7 @@ int main()
 		
 		int debugCount = 0; 
 
-		bool lContinue = true; 
+		bool lContinue = true;
 		while(lContinue)	
 		{
 			// FOR DEBUGGING
@@ -71,13 +70,12 @@ int main()
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 				global_doneArray[local_threadNum] = false; 
 				cont = true; 
-			
-				// DEBUGGING
-				//if(local_threadNum == 0 && local_status == STATUS_EMPTY)
-				//	spinWait(); 
 			}
+			
 			else
 			{
+				//if(local_threadNum == 0)
+				//	spinWait(); 
 				// Need work so request some from global buffer 
 				global_doneArray[local_threadNum] = true; 
 				while(!allDone(global_doneArray, numThreads) && !cont)
@@ -86,25 +84,13 @@ int main()
 					{
 						cont = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
 					}
-					//if(!cont) printf("spinning\n"); 
-					//if(!cont)
-					//	sleep(1); 
 				}
-				/*
-				if(local_threadNum == 1)
-				{
-					printf("\n--------------------\n");
-					printf("\nXXXXXXXXXXXXXXXXXXXX\n");  
-					if(cont)
-						printf("Cont is: true\n"); 
-					else
-						printf("Cont is: false\n"); 
-				}
-				*/
 				if(cont)
+				{
 					global_doneArray[local_threadNum] = false; 
+				}
 			}
-
+		
 			if(cont)
 			{	
 				// Check if possible larger
@@ -148,14 +134,22 @@ int main()
 			}
 			else
 			{
-				printf("Ending thread %d\n", local_threadNum); 
-				lContinue = false; 
-				//break;
+				//printf("Ending thread %d\n", local_threadNum); 
+				//lContinue = false; 
+				break;
 			}
 		}
 		
+		global_doneArray[local_threadNum] = true; 	
+		/*
+		printf("Waiting for thread %d to finish waiting", local_threadNum); 
+		sleep(local_threadNum); 
+		printf("Thread %d is finished waiting", local_threadNum); 
+		*/
+		
 	} // END PARALLEL 
 
+	delete[] global_doneArray;
 	printf("GlobalMax = %2.30f\n", global_max); 
 	return 0; 	 
 }

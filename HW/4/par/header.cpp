@@ -359,3 +359,9 @@ void printBuff(double * buffer, int bufferSize, int head, int tail, int count)
 	
 	printf("\n");  
 }
+
+// FOR DEBUGGING
+void spinWait()
+{
+	while(1);
+}

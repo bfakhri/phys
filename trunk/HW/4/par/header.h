@@ -13,7 +13,7 @@
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 1000
-#define LOCAL_BUFF_SIZE 10000
+#define LOCAL_BUFF_SIZE 1000
 #define DEBUG_FREQ 1000
 
 // For status of buffers

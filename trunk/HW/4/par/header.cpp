@@ -39,6 +39,13 @@ double f(double x)
 // Local Circular Queue 
 bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
 {
+	if((*tail < 0) || ((*tail + 1) > (LOCAL_BUFF_SIZE -1)))
+	{
+		while(1)
+		{ 
+			printf(" OUTOUTOUTOUT");
+		}
+	}
 	if(*status == STATUS_FULL)
 	{
 		return false;
@@ -60,6 +67,13 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 
 bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
+	if((*head < 0) || ((*head + 1) > (LOCAL_BUFF_SIZE -1)))
+	{
+		while(1)
+		{ 
+			printf(" OUTOUTOUTOUT");
+		}
+	}
 	if(*status == STATUS_EMPTY)
 	{
 		return false;
@@ -96,7 +110,7 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 				// Get from circular buffer
 				*c = global_buffer[global_head];
 				*d = global_buffer[global_head+1]; 
-				global_head = (global_head+2)%LOCAL_BUFF_SIZE;  
+				global_head = (global_head+2)%GLOBAL_BUFF_SIZE;  
 				if(global_tail == global_head)
 					global_status = STATUS_EMPTY;
 				else
@@ -124,7 +138,7 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 						global_buffer[global_tail+1] = *d; 
 						global_buffer[global_tail+2] = c2;
 						global_buffer[global_tail+3] = d2; 
-						global_tail = (global_tail+4)%LOCAL_BUFF_SIZE;  
+						global_tail = (global_tail+4)%GLOBAL_BUFF_SIZE;  
 					}
 					else
 					{
@@ -137,7 +151,7 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 					// Already checked to make sure it is not full so insert
 					global_buffer[global_tail] = *c;
 					global_buffer[global_tail+1] = *d; 
-					global_tail = (global_tail+2)%LOCAL_BUFF_SIZE;  
+					global_tail = (global_tail+2)%GLOBAL_BUFF_SIZE;  
 				}
 				// Add to circular buffer
 				if(global_tail == global_head)
@@ -205,6 +219,8 @@ bool global_setMax(double fc, double fd)
 // Returns true only if it is possible to get a higher value in this interval
 bool validInterval(double currentMax, double c, double d)
 {
+	if((d - c) < EPSILON)
+		return false; 
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
 	else

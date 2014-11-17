@@ -29,17 +29,18 @@ int main()
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false;
 	
-	#pragma omp parallel 
+	int local_status = STATUS_EMPTY; 
+	#pragma omp parallel private(local_status) 
 	{
 		// Init local variables
-		double local_max = 0; 
+		//double local_max = 0; 
 		double local_buffer[LOCAL_BUFF_SIZE]; 
 		double local_c = 0;
 		double local_d = 0; 
 		int local_head = 0; 
 		int local_tail = 0; 
-		int local_status = STATUS_EMPTY; 
-
+		local_status = STATUS_EMPTY; 
+	
 		// Add init interval to queue
 		int local_threadNum = omp_get_thread_num(); 
 		local_qWork(local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A, local_buffer, &local_head, &local_tail, &local_status);
@@ -48,10 +49,10 @@ int main()
 		printf("Thread %d: [%f, %f]\n", local_threadNum, local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A); 
 		
 		int debugCount = 0; 
-		
-		do
+
+		bool lContinue = true; 
+		while(lContinue)	
 		{
-			
 			// FOR DEBUGGING
 			debugCount++; 
 			if(debugCount == DEBUG_FREQ)
@@ -70,6 +71,10 @@ int main()
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 				global_doneArray[local_threadNum] = false; 
 				cont = true; 
+			
+				// DEBUGGING
+				//if(local_threadNum == 0 && local_status == STATUS_EMPTY)
+				//	spinWait(); 
 			}
 			else
 			{
@@ -77,10 +82,25 @@ int main()
 				global_doneArray[local_threadNum] = true; 
 				while(!allDone(global_doneArray, numThreads) && !cont)
 				{
-					cont = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
+					if(global_status != STATUS_EMPTY)
+					{
+						cont = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
+					}
+					//if(!cont) printf("spinning\n"); 
 					//if(!cont)
 					//	sleep(1); 
 				}
+				/*
+				if(local_threadNum == 1)
+				{
+					printf("\n--------------------\n");
+					printf("\nXXXXXXXXXXXXXXXXXXXX\n");  
+					if(cont)
+						printf("Cont is: true\n"); 
+					else
+						printf("Cont is: false\n"); 
+				}
+				*/
 				if(cont)
 					global_doneArray[local_threadNum] = false; 
 			}
@@ -128,15 +148,12 @@ int main()
 			}
 			else
 			{
-				break;
+				printf("Ending thread %d\n", local_threadNum); 
+				lContinue = false; 
+				//break;
 			}
-		}while((local_status != STATUS_EMPTY) || !allDone(global_doneArray, numThreads)); 
+		}
 		
-		printf("Thread %d is shutting down\n", local_threadNum);
-		global_doneArray[local_threadNum] = true;
-		for(int i=0; i<numThreads; i++)
-			printf("\tThread %d has status: %s", i, global_doneArray[i] ? "true" : "false"); 
-		printf("\nGlobalMax = %2.30f\n", global_max); 
 	} // END PARALLEL 
 
 	printf("GlobalMax = %2.30f\n", global_max); 

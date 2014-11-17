@@ -8,13 +8,13 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 100
+#define END_B 2
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
 #define GLOBAL_BUFF_SIZE 1000
 #define LOCAL_BUFF_SIZE 10000
-#define DEBUG_FREQ 1000
+#define DEBUG_FREQ 1
 
 // For status of buffers
 #define STATUS_EMPTY 0
@@ -81,5 +81,8 @@ double averageSubintervalSize(double * buffer, int bufferSize, int head, int tai
 // Prints the intervals in the buffer
 // FOR DEBUGGING ONLY
 void printBuff(double * buffer, int bufferSize, int head, int tail, int count);
+
+// FOR DEBUGGING
+void spinWait();
 
 #endif

@@ -1,31 +1,31 @@
 #ifndef AUXFUNCTS_H
 #define AUXFUNCTS_H
 
-#include <stdio.h>
-#include <math.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <iostream>
+#include <stdio.h>
+#include <math.h>
 
-#define START_A 1 
-#define END_B 100
-#define EPSILON 0.000001 // 10^-6
-//#define EPSILON 0.0	// FOR DEBUGGING
-#define SLOPE 12
-#define MGR_BUFF_SIZE 10000
-#define WKR_BUFF_SIZE 10000
-#define DEBUG_FREQ 1000
+// Global Constants
+extern const double START_A;
+extern const double END_B;
+extern const double EPSILON;
+//extern const double EPSILON;
+extern const double SLOPE;
+extern const int MGR_BUFF_SIZE;
+extern const int WKR_BUFF_SIZE;
+extern const int DEBUG_FREQ;
 
 // For curState of circalQueues
-#define STATUS_EMPTY 0
-#define STATUS_MID 1
-#define STATUS_FULL 2
+extern const int STATUS_EMPTY;
+extern const int STATUS_MID; 
+extern const int STATUS_FULL; 
 
 // For global circalQueue 
-#define FUN_DEQUEUE 0
-#define FUN_SINGLE_Q 1
-#define FUN_DOUBLE_Q 2
-
+extern const int FUN_DEQUEUE; 
+extern const int FUN_SINGLE_Q;
+extern const int FUN_DOUBLE_Q; 
 
 // Global Stuff
 extern bool manager_allWorking; 

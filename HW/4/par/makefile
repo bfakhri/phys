@@ -1,2 +1,2 @@
-alexandrian: parallelMax.cpp header.cpp header.h
-	g++ parallelMax.cpp -o alexandrian header.cpp -fopenmp -g 
+assignment5: makefile pMaxFinder.cpp auxFuncts.cpp auxFuncts.h
+	g++ pMaxFinder.cpp -o assignment5.exec auxFuncts.cpp -fopenmp  

@@ -1,25 +1,14 @@
-#include "header.h"
+#include "auxFuncts.h"
 
 
 // Global Stuff
+bool global_allWorking; 
 double global_max; 
 double global_buffer[GLOBAL_BUFF_SIZE];
 int global_head; 
 int global_tail; 
 int global_status; 
 
-/*
-void global_initBuffer()
-{
-	global_max = 0;  
-	global_buffer = new double[GLOBAL_BUFF_SIZE]; 
-	global_head = 0; 
-	global_tail = 0; 
-	global_status = STATUS_EMPTY; 
-
-}
-*/
-// Function we want to find the maximum of
 double f(double x)
 {
 	double outerSum = 0; 
@@ -37,16 +26,8 @@ double f(double x)
 	return outerSum; 
 }
 
-// Local Circular Queue 
 bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
 {
-	if((*tail < 0) || ((*tail + 1) > (LOCAL_BUFF_SIZE -1)))
-	{
-		while(1)
-		{ 
-			printf(" OUTOUTOUTOUT");
-		}
-	}
 	if(*status == STATUS_FULL)
 	{
 		return false;
@@ -68,13 +49,6 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 
 bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
-	if((*head < 0) || ((*head + 1) > (LOCAL_BUFF_SIZE -1)))
-	{
-		while(1)
-		{ 
-			printf(" OUTOUTOUTOUT");
-		}
-	}
 	if(*status == STATUS_EMPTY)
 	{
 		return false;
@@ -95,7 +69,6 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 }
 
 
-// Global Circular Queue 
 bool global_safeWorkBuffer(int function, double * c, double * d, double c2, double d2)
 {
 	bool ret = true; 
@@ -166,7 +139,6 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 	return ret; 
 }
 
-// Gives front value but does not pop it off the queue
 bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
@@ -182,12 +154,11 @@ bool local_peek(double * c, double * d, double * buffer, int * head, int * tail,
 	}
 }
 
-// Returns true only if max changed
 bool local_setMax(double * currentMax, double fc, double fd)
 {
 	if(*currentMax + EPSILON < fc)
 		*currentMax = fc;
-	else if(*currentMax + EPSILON < fd)
+	if(*currentMax + EPSILON < fd)
 		*currentMax = fd; 
 	else 
 		return false; 
@@ -195,7 +166,6 @@ bool local_setMax(double * currentMax, double fc, double fd)
 	return true; 
 }
 
-// Returns true only if max changed
 bool global_setMax(double fc, double fd)
 {
 	bool ret = true; 
@@ -217,10 +187,9 @@ bool global_setMax(double fc, double fd)
 	return ret; 
 }
 
-// Returns true only if it is possible to get a higher value in this interval
 bool validInterval(double currentMax, double c, double d)
 {
-	if((d - c) < EPSILON)
+	if((SLOPE*(d - c)) < EPSILON)
 		return false; 
 	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
@@ -228,7 +197,6 @@ bool validInterval(double currentMax, double c, double d)
 		return false;
 }
 
-// Does same this as validInterval() but also updates the max
 bool validIntervalAndMax(double * currentMax, double c, double d)
 {
 	double fC = f(c); 
@@ -248,7 +216,6 @@ bool validIntervalAndMax(double * currentMax, double c, double d)
 
 
 
-// Attempts to rid itself of a piece of the interval handed to it
 bool shrinkInterval(double currentMax, double * c, double * d)
 {
 	// Save the original values
@@ -258,11 +225,9 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	// Shrink from the left side
 	while(validInterval(currentMax, C, D))
 	{
-		//printf("stuck"); 
 		D = (D - C)/2 + C; 
 	}
 
-	//printf("\nNOT STUCK\n"); 	
 	*c = D;
 	C = D; 
 	D = *d; 	
@@ -274,14 +239,10 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	}
 
 	*d = C; 
-	//*c = retC; 
 	
-	//printf("Getting Out"); 
-	// THIS SHOULD CHECK IF FAILED OR NOT, SOMEHOW? 
 	return true; 
 }
 
-// Returns space left in buffer 
 int spaceLeft(int bufferSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
@@ -310,21 +271,36 @@ int spaceLeft(int bufferSize, int head, int tail, int status)
 	}
 }*/
 
-// Returns true if all processors are done
 bool allDone(bool * doneArr, int size)
 {
+	// Count how many threads are done
+	int doneCount = 0; 
 	for(int i=0; i<size; i++)
 	{
-		if(!doneArr[i])
-			return false;
+		if(doneArr[i])
+			doneCount++; 
 	}
 	
-	return true; 
+	// All threads are still working
+	if(doneCount == 0)
+	{
+		global_allWorking = true; 
+		return false;
+	}
+	// No threads are still working
+	else if(doneCount >= size)
+	{
+		global_allWorking = false; 
+		return true; 
+	}
+	// Some but not all threads are still working
+	else
+	{
+		global_allWorking = false; 
+		return false; 
+	}
 }
 
-// Returns the amount of the remaining interval represented in the buffer 
-// as a percentage
-// FOR DEBUGGING
 double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
@@ -342,8 +318,6 @@ double intervalLeft(double originalSize, double * buffer, int bufferSize, int he
 	}
 }
 
-// Returns the average size of the subintervals in the buffer
-// FOR DEBUGGING ONLY
 double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
@@ -362,8 +336,6 @@ double averageSubintervalSize(double * buffer, int bufferSize, int head, int tai
 	}
 }
 
-// Prints the intervals in the buffer
-// FOR DEBUGGING ONLY
 void printBuff(double * buffer, int bufferSize, int head, int tail, int count)
 {
 	int iterCount = 0;  
@@ -377,8 +349,10 @@ void printBuff(double * buffer, int bufferSize, int head, int tail, int count)
 	printf("\n");  
 }
 
-// FOR DEBUGGING
 void spinWait()
 {
 	while(1);
 }
+
+// For diagnostic output
+void printDiagOutput(int * d, int local_head, int local_tail, int local_status, int local_threadNum, double * local_buffer);

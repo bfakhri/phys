@@ -27,7 +27,7 @@ double mathFun(double x)
 	return outside; 
 }
 
-bool worker_qWork(double c, double d, double * circalQueue, int * head, int * tail, int * curState)
+bool worker_qWork(double c, double d, double * circalQueue, int * front, int * back, int * curState)
 {
 	if(*curState == STATUS_FULL)
 	{
@@ -36,10 +36,10 @@ bool worker_qWork(double c, double d, double * circalQueue, int * head, int * ta
 	else
 	{
 		// Add to circular circalQueue
-		circalQueue[*tail] = c;
-		circalQueue[*tail+1] = d; 
-		*tail = (*tail+2)%LOCAL_BUFF_SIZE;  
-		if(*tail == *head)
+		circalQueue[*back] = c;
+		circalQueue[*back+1] = d; 
+		*back = (*back+2)%LOCAL_BUFF_SIZE;  
+		if(*back == *front)
 			*curState = STATUS_FULL;
 		else
 			*curState = STATUS_MID; 
@@ -48,7 +48,7 @@ bool worker_qWork(double c, double d, double * circalQueue, int * head, int * ta
 	}
 }
 
-bool worker_deqWork(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState)
+bool worker_deqWork(double * c, double * d, double * circalQueue, int * front, int * back, int * curState)
 {
 	if(*curState == STATUS_EMPTY)
 	{
@@ -57,10 +57,10 @@ bool worker_deqWork(double * c, double * d, double * circalQueue, int * head, in
 	else
 	{
 		// Get from circular circalQueue
-		*c = circalQueue[*head];
-		*d = circalQueue[*head+1]; 
-		*head = (*head+2)%LOCAL_BUFF_SIZE;  
-		if(*tail == *head)
+		*c = circalQueue[*front];
+		*d = circalQueue[*front+1]; 
+		*front = (*front+2)%LOCAL_BUFF_SIZE;  
+		if(*back == *front)
 			*curState = STATUS_EMPTY;
 		else
 			*curState = STATUS_MID; 
@@ -140,7 +140,7 @@ bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, dou
 	return ret; 
 }
 
-bool worker_peek(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState)
+bool worker_peek(double * c, double * d, double * circalQueue, int * front, int * back, int * curState)
 {
 	if(*curState == STATUS_EMPTY)
 	{
@@ -149,8 +149,8 @@ bool worker_peek(double * c, double * d, double * circalQueue, int * head, int *
 	else
 	{
 		// Add to circular circalQueue
-		*c = circalQueue[*head];
-		*d = circalQueue[*head+1]; 
+		*c = circalQueue[*front];
+		*d = circalQueue[*front+1]; 
 		return true; 
 	}
 }
@@ -244,7 +244,7 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	return true; 
 }
 
-int spaceLeft(int circalQueueSize, int head, int tail, int curState)
+int spaceLeft(int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
@@ -252,15 +252,15 @@ int spaceLeft(int circalQueueSize, int head, int tail, int curState)
 		return 0; 
 	else
 	{
-		if(tail > head)
-			return circalQueueSize - (tail - head); 
+		if(back > front)
+			return circalQueueSize - (back - front); 
 		else
-			return circalQueueSize - ((circalQueueSize - head) + tail); 		
+			return circalQueueSize - ((circalQueueSize - front) + back); 		
 	}
 }
 
 // THIS VERSION ONLY WORKS WITH STACK VERSION OF q/deqWork
-/*int spaceLeft(int circalQueueSize, int head, int tail, int curState)
+/*int spaceLeft(int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
@@ -268,7 +268,7 @@ int spaceLeft(int circalQueueSize, int head, int tail, int curState)
 		return 0; 
 	else
 	{
-		return (LOCAL_BUFF_SIZE-(head - 2));
+		return (LOCAL_BUFF_SIZE-(front - 2));
 	}
 }*/
 
@@ -302,7 +302,7 @@ bool allDone(bool * doneArr, int size)
 	}
 }
 
-double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int head, int tail, int curState)
+double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return 0; 
@@ -311,15 +311,15 @@ double intervalLeft(double originalSize, double * circalQueue, int circalQueueSi
 		double runSum = 0; 
 		do
 		{
-			runSum += (circalQueue[head+1] - circalQueue[head]);
-			head = (head+2)%circalQueueSize;
-		}while(head != tail);
+			runSum += (circalQueue[front+1] - circalQueue[front]);
+			front = (front+2)%circalQueueSize;
+		}while(front != back);
 		
 		return 100*runSum/originalSize; 
 	}
 }
 
-double averageSubintervalSize(double * circalQueue, int circalQueueSize, int head, int tail, int curState)
+double averageSubintervalSize(double * circalQueue, int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return 0; 
@@ -329,23 +329,23 @@ double averageSubintervalSize(double * circalQueue, int circalQueueSize, int hea
 		int itemCount = 0;  
 		do
 		{
-			runSum += (circalQueue[head+1] - circalQueue[head]);
-			head = (head+2)%circalQueueSize;
+			runSum += (circalQueue[front+1] - circalQueue[front]);
+			front = (front+2)%circalQueueSize;
 			itemCount++; 
-		}while(head != tail);
+		}while(front != back);
 		return runSum/(itemCount); 
 	}
 }
 
-void printBuff(double * circalQueue, int circalQueueSize, int head, int tail, int count)
+void printBuff(double * circalQueue, int circalQueueSize, int front, int back, int count)
 {
 	int iterCount = 0;  
 	do
 	{
-		printf("[%f, %f]\t", circalQueue[head], circalQueue[head+1]);
-		head = (head+2)%circalQueueSize;
+		printf("[%f, %f]\t", circalQueue[front], circalQueue[front+1]);
+		front = (front+2)%circalQueueSize;
 		iterCount++; 
-	}while(head != tail && iterCount < count);
+	}while(front != back && iterCount < count);
 	
 	printf("\n");  
 }

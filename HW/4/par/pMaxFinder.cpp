@@ -24,43 +24,47 @@ int main(int argc, char * argv[])
 	double intervalSpan = END_B - START_A;
 	double chunkSize = intervalSpan/numThreads;
 
-	printf("\nUser Max Threads: %d\tProgram Max Threads: %d\tOMP Max Threads: %d\n", MAX_THREADS, numThreads, omp_get_max_threads()); 	
-	
-	// Initializing global indicators
+	// Initializing manager queue indicators
 	manager_allWorking = true; 
 	manager_curMaxVal = 0;  
 	manager_front = 0; 
 	manager_back = 0; 
 	manager_buffState = STATUS_EMPTY; 
 
-	// This array determines when ALL threads are finished
+	// Init worker indicators 
+	int worker_front = 0; 
+	int worker_back = 0; 
+	int worker_buffState = STATUS_EMPTY; 
+
+	printf("\nUser Max Threads: %d\tProgram Max Threads: %d\tOMP Max Threads: %d\n", MAX_THREADS, numThreads, omp_get_max_threads()); 		
+
 	manager_dArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
 		manager_dArray[i] = false;
 
 	// For timing purposes
-	double startTime = omp_get_wtime();	
-	#pragma omp parallel 
+	double t0 = omp_get_wtime();	
+
+	// Make each thread have an individual copy of those variables
+	#pragma omp parallel firstprivate(worker_front, worker_back, worker_buffState) 
 	{
-		// Init local variables
+		// Init worker resources
 		double worker_circalQueue[WKR_BUFF_SIZE]; 
 		double worker_c = 0;
 		double worker_d = 0; 
-		int worker_front = 0; 
-		int worker_back = 0; 
-		int worker_buffState = STATUS_EMPTY; 
 	
 		// Add first interval to queue
 		int worker_threadNum = omp_get_thread_num(); 
 		worker_qWork(worker_threadNum*chunkSize+START_A, (worker_threadNum+1)*chunkSize+START_A, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);
 		
+		// For debugging
 		int debugCount = 0; 
-
 	
+		// Repeats until done
 		while(1)	
 		{
 			// For debugging
-			printDiagOutput(&debugCount, worker_front, worker_back, worker_buffState, worker_threadNum, worker_circalQueue);
+			//printDiagOutput(&debugCount, worker_front, worker_back, worker_buffState, worker_threadNum, worker_circalQueue);
 
 			bool keepGoing = false;	
 			// Get work from a queue
@@ -74,7 +78,7 @@ int main(int argc, char * argv[])
 			else
 			{
 				manager_dArray[worker_threadNum] = true; 
-				while(!allDone(manager_dArray, numThreads))
+				while(!readyToLeave(manager_dArray, numThreads))
 				{
 					if(manager_buffState != STATUS_EMPTY)
 					{
@@ -90,29 +94,32 @@ int main(int argc, char * argv[])
 					manager_dArray[worker_threadNum] = true; 	
 			}
 		
-			if(keepGoing)
-			{	
+			if(!keepGoing)
+			{
+				// Done, leave loop
+				break;	
+			}
+			else
+			{
 				// Check if possible larger
-				if(validInterval(manager_curMaxVal, worker_c, worker_d))
+				if(promisingInterval(manager_curMaxVal, worker_c, worker_d))
 				{
 					manager_setMax(mathFun(worker_c), mathFun(worker_d)); 
 					
-					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
-					// Two intervals will not fit in local circalQueue
-					int worker_locSpaceLeft = spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState);
-					int worker_globSpaceLeft = spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState);
+					// Two intervals will not fit in worker queue
+					int worker_locSpaceLeft = currentCapacity(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState);
+					int worker_globSpaceLeft = currentCapacity(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState);
 					//if(worker_locSpaceLeft == 2 || !manager_allWorking ||((worker_globSpaceLeft > MGR_BUFF_SIZE/10) && (worker_locSpaceLeft < WKR_BUFF_SIZE/10)))
 					//if(worker_locSpaceLeft == 2 || ((worker_globSpaceLeft > MGR_BUFF_SIZE/2)))
-					//if(spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2 || spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) > MGR_BUFF_SIZE/2)
-					if(spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2)
+					//if(currentCapacity(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2 || currentCapacity(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) > MGR_BUFF_SIZE/2)
+					if(currentCapacity(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2)
 					{
-						// Global circalQueue is full too - so we shrink the current interval instead of splitting it
+						// if manger queue is full too - so we cut down the current interval instead of splitting it
 						if(manager_buffState == STATUS_FULL)
 						{
-							// NEED TO FIX THIS FUNCTION BELOW
-							shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
-							// Queue up shrunken interval back into local circalQueue
+							cutInterval(manager_curMaxVal, &worker_c, &worker_d);
+							// Queue up shrunken interval back into worker queue
 							worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 						}
 						else 
@@ -123,7 +130,7 @@ int main(int argc, char * argv[])
 							// but to make progress we shrink it
 							if(!manager_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
 							{
-								shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
+								cutInterval(manager_curMaxVal, &worker_c, &worker_d);
 								worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 							}
 								
@@ -136,8 +143,8 @@ int main(int argc, char * argv[])
 					}
 				}
 	
-				// Throws some to the global if necessary
-				if(!manager_allWorking && spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) < WKR_BUFF_SIZE/2)
+				// Throws some to the manager if necessary
+				if(!manager_allWorking && currentCapacity(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) < WKR_BUFF_SIZE/2)
 				{
 					for(int i=0; i<3; i++)
 					{
@@ -147,24 +154,19 @@ int main(int argc, char * argv[])
 						{
 							if(!manager_safeWorkBuffer(FUN_SINGLE_Q, &tempC, &tempD, 0, 0))
 							{
-								shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
+								cutInterval(manager_curMaxVal, &worker_c, &worker_d);
 								worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 							}
 						}
 					}
 				}
 			}
-			else
-			{
-				// Leave loop because we're done
-				break; 
-			}
 		}
 		
 	} // END PARALLEL 
-	double endTime = omp_get_wtime(); 
+	double t1 = omp_get_wtime(); 
 
 	delete[] manager_dArray;
-	printf("GlobalMax = %2.30f in %f seconds\n\n", manager_curMaxVal, endTime - startTime); 
+	printf("GlobalMax = %2.30f in %f seconds\n\n", manager_curMaxVal, t1 - t0); 
 	return 0; 	 
 }

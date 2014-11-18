@@ -27,126 +27,126 @@ int main(int argc, char * argv[])
 	printf("\nUser Max Threads: %d\tProgram Max Threads: %d\tOMP Max Threads: %d\n", MAX_THREADS, numThreads, omp_get_max_threads()); 	
 	
 	// Initializing global indicators
-	global_allWorking = true; 
-	global_curMaxVal = 0;  
-	global_front = 0; 
-	global_back = 0; 
-	global_buffState = STATUS_EMPTY; 
+	manager_allWorking = true; 
+	manager_curMaxVal = 0;  
+	manager_front = 0; 
+	manager_back = 0; 
+	manager_buffState = STATUS_EMPTY; 
 
 	// This array determines when ALL threads are finished
-	global_dArray = new bool[numThreads]; 
+	manager_dArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
-		global_dArray[i] = false;
+		manager_dArray[i] = false;
 
 	// For timing purposes
 	double startTime = omp_get_wtime();	
 	#pragma omp parallel 
 	{
 		// Init local variables
-		double local_circalQueue[LOCAL_BUFF_SIZE]; 
-		double local_c = 0;
-		double local_d = 0; 
-		int local_front = 0; 
-		int local_back = 0; 
-		int local_buffState = STATUS_EMPTY; 
+		double worker_circalQueue[LOCAL_BUFF_SIZE]; 
+		double worker_c = 0;
+		double worker_d = 0; 
+		int worker_front = 0; 
+		int worker_back = 0; 
+		int worker_buffState = STATUS_EMPTY; 
 	
 		// Add first interval to queue
-		int local_threadNum = omp_get_thread_num(); 
-		local_qWork(local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A, local_circalQueue, &local_front, &local_back, &local_buffState);
+		int worker_threadNum = omp_get_thread_num(); 
+		worker_qWork(worker_threadNum*chunkSize+START_A, (worker_threadNum+1)*chunkSize+START_A, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);
 		
 		int debugCount = 0; 
 
-		bool lContinue = true;
-		while(lContinue)	
+	
+		while(1)	
 		{
 			// For debugging
-			printDiagOutput(&debugCount, local_front, local_back, local_buffState, local_threadNum, local_circalQueue);
+			printDiagOutput(&debugCount, worker_front, worker_back, worker_buffState, worker_threadNum, worker_circalQueue);
 
 			bool keepGoing = false;	
 			// Get work from a queue
-			if(local_buffState != STATUS_EMPTY)
+			if(worker_buffState != STATUS_EMPTY)
 			{
 				// Local circalQueue still has work so we get some from there
-				local_deqWork(&local_c, &local_d, local_circalQueue, &local_front, &local_back, &local_buffState);
-				global_dArray[local_threadNum] = false; 
+				worker_deqWork(&worker_c, &worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);
+				manager_dArray[worker_threadNum] = false; 
 				keepGoing = true; 
 			}
 			
 			else
 			{
-				global_dArray[local_threadNum] = true; 
-				while(!allDone(global_dArray, numThreads) && !keepGoing)
+				manager_dArray[worker_threadNum] = true; 
+				while(!allDone(manager_dArray, numThreads) && !keepGoing)
 				{
-					if(global_buffState != STATUS_EMPTY)
+					if(manager_buffState != STATUS_EMPTY)
 					{
-						keepGoing = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
+						keepGoing = manager_safeWorkBuffer(FUN_DEQUEUE, &worker_c, &worker_d, 0, 0);
 					}
 				}
 				if(keepGoing)
-					global_dArray[local_threadNum] = false; 
+					manager_dArray[worker_threadNum] = false; 
 				else
-					global_dArray[local_threadNum] = true; 	
+					manager_dArray[worker_threadNum] = true; 	
 			}
 		
 			if(keepGoing)
 			{	
 				// Check if possible larger
-				if(validInterval(global_curMaxVal, local_c, local_d))
+				if(validInterval(manager_curMaxVal, worker_c, worker_d))
 				{
-					global_setMax(mathFun(local_c), mathFun(local_d)); 
+					manager_setMax(mathFun(worker_c), mathFun(worker_d)); 
 					
 					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
 					// Two intervals will not fit in local circalQueue
-					int local_locSpaceLeft = spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState);
-					int local_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState);
-					//if(local_locSpaceLeft == 2 || !global_allWorking ||((local_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (local_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
-					//if(local_locSpaceLeft == 2 || ((local_globSpaceLeft > GLOBAL_BUFF_SIZE/2)))
-					//if(spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState) > GLOBAL_BUFF_SIZE/2)
-					if(spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState) == 2)
+					int worker_locSpaceLeft = spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState);
+					int worker_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState);
+					//if(worker_locSpaceLeft == 2 || !manager_allWorking ||((worker_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (worker_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
+					//if(worker_locSpaceLeft == 2 || ((worker_globSpaceLeft > GLOBAL_BUFF_SIZE/2)))
+					//if(spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState) > GLOBAL_BUFF_SIZE/2)
+					if(spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2)
 					{
 						// Global circalQueue is full too - so we shrink the current interval instead of splitting it
-						if(global_buffState == STATUS_FULL)
+						if(manager_buffState == STATUS_FULL)
 						{
 							// NEED TO FIX THIS FUNCTION BELOW
-							shrinkInterval(global_curMaxVal, &local_c, &local_d);
+							shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
 							// Queue up shrunken interval back into local circalQueue
-							local_qWork(local_c, local_d, local_circalQueue, &local_front, &local_back, &local_buffState); 
+							worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 						}
 						else 
 						{
-							double pC = local_c;
-							double pD = ((local_d-local_c)/2)+local_c;
-							double pC2 = ((local_d-local_c)/2)+local_c;
-							double pD2 = local_d; 
-							if(!global_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
+							double pC = worker_c;
+							double pD = ((worker_d-worker_c)/2)+worker_c;
+							double pC2 = ((worker_d-worker_c)/2)+worker_c;
+							double pD2 = worker_d; 
+							if(!manager_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
 							{
-								shrinkInterval(global_curMaxVal, &local_c, &local_d);
-								local_qWork(local_c, local_d, local_circalQueue, &local_front, &local_back, &local_buffState); 
+								shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
+								worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 							}
 								
 						}
 					}
 					else
 					{
-						local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_circalQueue, &local_front, &local_back, &local_buffState);
-						local_qWork(((local_d-local_c)/2)+local_c, local_d, local_circalQueue, &local_front, &local_back, &local_buffState);	
+						worker_qWork(worker_c, ((worker_d-worker_c)/2)+worker_c, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);
+						worker_qWork(((worker_d-worker_c)/2)+worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);	
 					}
 				}
 	
 				// Throws some to the global if necessary
-				if(!global_allWorking && spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState) < LOCAL_BUFF_SIZE/2)
+				if(!manager_allWorking && spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) < LOCAL_BUFF_SIZE/2)
 				{
 					for(int i=0; i<3; i++)
 					{
 						double tempC;
 						double tempD; 
-						if(local_deqWork(&tempC, &tempD, local_circalQueue, &local_front, &local_back, &local_buffState))
+						if(worker_deqWork(&tempC, &tempD, worker_circalQueue, &worker_front, &worker_back, &worker_buffState))
 						{
-							if(!global_safeWorkBuffer(FUN_SINGLE_Q, &tempC, &tempD, 0, 0))
+							if(!manager_safeWorkBuffer(FUN_SINGLE_Q, &tempC, &tempD, 0, 0))
 							{
-								shrinkInterval(global_curMaxVal, &local_c, &local_d);
-								local_qWork(local_c, local_d, local_circalQueue, &local_front, &local_back, &local_buffState); 
+								shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
+								worker_qWork(worker_c, worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState); 
 							}
 						}
 					}
@@ -154,14 +154,14 @@ int main(int argc, char * argv[])
 			}
 			else
 			{
-				lContinue = false; 
+				break; 
 			}
 		}
 		
 	} // END PARALLEL 
 	double endTime = omp_get_wtime(); 
 
-	delete[] global_dArray;
-	printf("GlobalMax = %2.30f in %f seconds\n\n", global_curMaxVal, endTime - startTime); 
+	delete[] manager_dArray;
+	printf("GlobalMax = %2.30f in %f seconds\n\n", manager_curMaxVal, endTime - startTime); 
 	return 0; 	 
 }

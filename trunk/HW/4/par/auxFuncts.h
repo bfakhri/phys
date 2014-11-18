@@ -1,5 +1,5 @@
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef AUXFUNCTS_H
+#define AUXFUNCTS_H
 
 #include <stdio.h>
 #include <math.h>
@@ -7,13 +7,13 @@
 #include <stdlib.h>
 #include <iostream>
 
-#define START_A 1
-#define END_B 5 
+#define START_A 1 
+#define END_B 20 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
-#define GLOBAL_BUFF_SIZE 1000
-#define LOCAL_BUFF_SIZE 1000
+#define GLOBAL_BUFF_SIZE 10000
+#define LOCAL_BUFF_SIZE 10000
 #define DEBUG_FREQ 1000
 
 // For status of buffers
@@ -28,14 +28,12 @@
 
 
 // Global Stuff
+extern bool global_allWorking; 
 extern double global_max; 
 extern double global_buffer[];
 extern int global_head; 
 extern int global_tail; 
 extern int global_status; 
-
-// Initializes the global variables needed for the buffer
-void global_initBuffer();
 
 // Function we want to find the maximum of
 double f(double x);
@@ -84,5 +82,7 @@ void printBuff(double * buffer, int bufferSize, int head, int tail, int count);
 
 // FOR DEBUGGING
 void spinWait();
+
+void printDiagOutput(int * d, int local_head, int local_tail, int local_status, int local_threadNum, double * local_buffer);
 
 #endif

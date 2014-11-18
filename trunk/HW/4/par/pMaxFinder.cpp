@@ -6,8 +6,8 @@
 // 	try to take elements from the from of queue rather than those that would have been 
 //	added to the back. 
 
-#include "header.h"
-
+#include "auxFuncts.h"
+	
 using namespace std; 
 
 int main(int argc, char * argv[])
@@ -33,7 +33,8 @@ int main(int argc, char * argv[])
 
 	printf("\nUser Max Threads: %d\tProgram Max Threads: %d\tOMP Max Threads: %d\n", MAX_THREADS, numThreads, omp_get_max_threads()); 	
 	
-	// Initializing the global buffer
+	// Initializing global indicators
+	global_allWorking = true; 
 	global_max = 0;  
 	global_head = 0; 
 	global_tail = 0; 
@@ -59,27 +60,15 @@ int main(int argc, char * argv[])
 		// Add first interval to queue
 		int local_threadNum = omp_get_thread_num(); 
 		local_qWork(local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A, local_buffer, &local_head, &local_tail, &local_status);
-
-		// Print each thread's interval
-		//printf("Thread %d: [%f, %f]\n", local_threadNum, local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A); 
 		
 		int debugCount = 0; 
 
 		bool lContinue = true;
 		while(lContinue)	
 		{
-			/*
-			// FOR DEBUGGING
-			debugCount++; 
-			if(debugCount == DEBUG_FREQ)
-			{
-				//printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
-				printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status));
-				printf("tNum: %d\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status));
-				debugCount = 0; 
-			}
-			*/
-	
+			// For debugging
+			printDiagOutput(&debugCount, local_head, local_tail, local_status, local_threadNum, local_buffer);
+
 			bool cont = false;	
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)

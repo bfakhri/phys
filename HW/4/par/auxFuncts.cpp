@@ -1,5 +1,25 @@
 #include "auxFuncts.h"
 
+// Global Constants
+const double START_A = 1; 
+const double END_B = 5;
+const double EPSILON = 0.000001; // 10^-6
+//const double EPSILON = 0.0;	// FOR DEBUGGING
+const double SLOPE = 12;
+const int MGR_BUFF_SIZE = 10000;
+const int WKR_BUFF_SIZE = 10000;
+const int DEBUG_FREQ = 1000;
+
+// For curState of circalQueues
+const int STATUS_EMPTY = 0;
+const int STATUS_MID = 1; 
+const int STATUS_FULL = 2; 
+
+// For global circalQueue 
+const int FUN_DEQUEUE = 0;
+const int FUN_SINGLE_Q = 1;
+const int FUN_DOUBLE_Q = 2;
+
 
 // Global Stuff
 bool manager_allWorking; 

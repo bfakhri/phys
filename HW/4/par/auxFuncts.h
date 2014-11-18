@@ -8,12 +8,12 @@
 #include <iostream>
 
 #define START_A 1 
-#define END_B 10
+#define END_B 100
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
-#define GLOBAL_BUFF_SIZE 10000
-#define LOCAL_BUFF_SIZE 10000
+#define MGR_BUFF_SIZE 10000
+#define WKR_BUFF_SIZE 10000
 #define DEBUG_FREQ 1000
 
 // For curState of circalQueues

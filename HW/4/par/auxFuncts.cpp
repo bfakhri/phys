@@ -2,13 +2,13 @@
 
 
 // Global Stuff
-bool global_allWorking; 
-double global_curMaxVal; 
-double global_circalQueue[GLOBAL_BUFF_SIZE];
-int global_front; 
-int global_back; 
-int global_buffState; 
-bool * global_dArray;
+bool manager_allWorking; 
+double manager_curMaxVal; 
+double manager_circalQueue[GLOBAL_BUFF_SIZE];
+int manager_front; 
+int manager_back; 
+int manager_buffState; 
+bool * manager_dArray;
 
 double mathFun(double x)
 {
@@ -27,9 +27,9 @@ double mathFun(double x)
 	return outside; 
 }
 
-bool local_qWork(double c, double d, double * circalQueue, int * head, int * tail, int * status)
+bool worker_qWork(double c, double d, double * circalQueue, int * head, int * tail, int * curState)
 {
-	if(*status == STATUS_FULL)
+	if(*curState == STATUS_FULL)
 	{
 		return false;
 	}
@@ -40,17 +40,17 @@ bool local_qWork(double c, double d, double * circalQueue, int * head, int * tai
 		circalQueue[*tail+1] = d; 
 		*tail = (*tail+2)%LOCAL_BUFF_SIZE;  
 		if(*tail == *head)
-			*status = STATUS_FULL;
+			*curState = STATUS_FULL;
 		else
-			*status = STATUS_MID; 
+			*curState = STATUS_MID; 
 
 		return true; 
 	}
 }
 
-bool local_deqWork(double * c, double * d, double * circalQueue, int * head, int * tail, int * status)
+bool worker_deqWork(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState)
 {
-	if(*status == STATUS_EMPTY)
+	if(*curState == STATUS_EMPTY)
 	{
 		return false;
 	}
@@ -61,16 +61,16 @@ bool local_deqWork(double * c, double * d, double * circalQueue, int * head, int
 		*d = circalQueue[*head+1]; 
 		*head = (*head+2)%LOCAL_BUFF_SIZE;  
 		if(*tail == *head)
-			*status = STATUS_EMPTY;
+			*curState = STATUS_EMPTY;
 		else
-			*status = STATUS_MID; 
+			*curState = STATUS_MID; 
 
 		return true; 
 	}
 }
 
 
-bool global_safeWorkBuffer(int function, double * c, double * d, double c2, double d2)
+bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, double d2)
 {
 	bool ret = true; 
 	#pragma omp critical
@@ -78,18 +78,18 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 		// Dequeue function
 		if(function == FUN_DEQUEUE)
 		{
-			if(global_buffState == STATUS_EMPTY)
+			if(manager_buffState == STATUS_EMPTY)
 				ret = false;
 			else
 			{
 				// Get from circular circalQueue
-				*c = global_circalQueue[global_front];
-				*d = global_circalQueue[global_front+1]; 
-				global_front = (global_front+2)%GLOBAL_BUFF_SIZE;  
-				if(global_back == global_front)
-					global_buffState = STATUS_EMPTY;
+				*c = manager_circalQueue[manager_front];
+				*d = manager_circalQueue[manager_front+1]; 
+				manager_front = (manager_front+2)%GLOBAL_BUFF_SIZE;  
+				if(manager_back == manager_front)
+					manager_buffState = STATUS_EMPTY;
 				else
-					global_buffState = STATUS_MID; 
+					manager_buffState = STATUS_MID; 
 			
 			}
 
@@ -97,7 +97,7 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 		// Insert into circalQueue
 		else
 		{
-			if(global_buffState == STATUS_FULL)
+			if(manager_buffState == STATUS_FULL)
 			{
 				ret = false;
 			}
@@ -106,14 +106,14 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 				// Check if inserting two intervals
 				if(function == FUN_DOUBLE_Q)
 				{
-					if(spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState) >= 4)
+					if(spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState) >= 4)
 					{
 						// Insert both intervals
-						global_circalQueue[global_back] = *c;
-						global_circalQueue[global_back+1] = *d; 
-						global_circalQueue[global_back+2] = c2;
-						global_circalQueue[global_back+3] = d2; 
-						global_back = (global_back+4)%GLOBAL_BUFF_SIZE;  
+						manager_circalQueue[manager_back] = *c;
+						manager_circalQueue[manager_back+1] = *d; 
+						manager_circalQueue[manager_back+2] = c2;
+						manager_circalQueue[manager_back+3] = d2; 
+						manager_back = (manager_back+4)%GLOBAL_BUFF_SIZE;  
 					}
 					else
 					{
@@ -124,15 +124,15 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 				else
 				{
 					// Already checked to make sure it is not full so insert
-					global_circalQueue[global_back] = *c;
-					global_circalQueue[global_back+1] = *d; 
-					global_back = (global_back+2)%GLOBAL_BUFF_SIZE;  
+					manager_circalQueue[manager_back] = *c;
+					manager_circalQueue[manager_back+1] = *d; 
+					manager_back = (manager_back+2)%GLOBAL_BUFF_SIZE;  
 				}
 				// Add to circular circalQueue
-				if(global_back == global_front)
-					global_buffState = STATUS_FULL;
+				if(manager_back == manager_front)
+					manager_buffState = STATUS_FULL;
 				else
-					global_buffState = STATUS_MID; 
+					manager_buffState = STATUS_MID; 
 			}
 		}
 	} // End Critical Section
@@ -140,9 +140,9 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 	return ret; 
 }
 
-bool local_peek(double * c, double * d, double * circalQueue, int * head, int * tail, int * status)
+bool worker_peek(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState)
 {
-	if(*status == STATUS_EMPTY)
+	if(*curState == STATUS_EMPTY)
 	{
 		return false;
 	}
@@ -155,7 +155,7 @@ bool local_peek(double * c, double * d, double * circalQueue, int * head, int * 
 	}
 }
 
-bool local_setMax(double * currentMax, double fc, double fd)
+bool worker_setMax(double * currentMax, double fc, double fd)
 {
 	if(*currentMax + EPSILON < fc)
 		*currentMax = fc;
@@ -167,18 +167,18 @@ bool local_setMax(double * currentMax, double fc, double fd)
 	return true; 
 }
 
-bool global_setMax(double fc, double fd)
+bool manager_setMax(double fc, double fd)
 {
 	bool ret = true; 
 	#pragma omp critical
 	{
-		if(global_curMaxVal + EPSILON < fc)
+		if(manager_curMaxVal + EPSILON < fc)
 		{
-			global_curMaxVal = fc; 
+			manager_curMaxVal = fc; 
 		}
-		else if(global_curMaxVal + EPSILON < fd)
+		else if(manager_curMaxVal + EPSILON < fd)
 		{
-			global_curMaxVal = fd; 
+			manager_curMaxVal = fd; 
 		}
 		else
 		{ 
@@ -202,7 +202,7 @@ bool validIntervalAndMax(double * currentMax, double c, double d)
 {
 	double fC = mathFun(c); 
 	double fD = mathFun(d); 
-	if(local_setMax(currentMax, fC, fD))
+	if(worker_setMax(currentMax, fC, fD))
 	{
 		return true; 
 	}
@@ -244,11 +244,11 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	return true; 
 }
 
-int spaceLeft(int circalQueueSize, int head, int tail, int status)
+int spaceLeft(int circalQueueSize, int head, int tail, int curState)
 {
-	if(status == STATUS_EMPTY)
+	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
-	else if(status == STATUS_FULL)
+	else if(curState == STATUS_FULL)
 		return 0; 
 	else
 	{
@@ -260,11 +260,11 @@ int spaceLeft(int circalQueueSize, int head, int tail, int status)
 }
 
 // THIS VERSION ONLY WORKS WITH STACK VERSION OF q/deqWork
-/*int spaceLeft(int circalQueueSize, int head, int tail, int status)
+/*int spaceLeft(int circalQueueSize, int head, int tail, int curState)
 {
-	if(status == STATUS_EMPTY)
+	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
-	else if(status == STATUS_FULL)
+	else if(curState == STATUS_FULL)
 		return 0; 
 	else
 	{
@@ -285,26 +285,26 @@ bool allDone(bool * doneArr, int size)
 	// All threads are still working
 	if(doneCount == 0)
 	{
-		global_allWorking = true; 
+		manager_allWorking = true; 
 		return false;
 	}
 	// No threads are still working
 	else if(doneCount >= size)
 	{
-		global_allWorking = false; 
+		manager_allWorking = false; 
 		return true; 
 	}
 	// Some but not all threads are still working
 	else
 	{
-		global_allWorking = false; 
+		manager_allWorking = false; 
 		return false; 
 	}
 }
 
-double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int head, int tail, int status)
+double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int head, int tail, int curState)
 {
-	if(status == STATUS_EMPTY)
+	if(curState == STATUS_EMPTY)
 		return 0; 
 	else 
 	{
@@ -319,9 +319,9 @@ double intervalLeft(double originalSize, double * circalQueue, int circalQueueSi
 	}
 }
 
-double averageSubintervalSize(double * circalQueue, int circalQueueSize, int head, int tail, int status)
+double averageSubintervalSize(double * circalQueue, int circalQueueSize, int head, int tail, int curState)
 {
-	if(status == STATUS_EMPTY)
+	if(curState == STATUS_EMPTY)
 		return 0; 
 	else
 	{
@@ -356,14 +356,14 @@ void spinWait()
 }
 
 // For diagnostic output
-void printDiagOutput(int * d, int local_front, int local_back, int local_buffState, int local_threadNum, double * local_circalQueue)
+void printDiagOutput(int * d, int worker_front, int worker_back, int worker_buffState, int worker_threadNum, double * worker_circalQueue)
 {
 	*d += 1; 
 	if(*d == DEBUG_FREQ)
 	{
-		//printBuff(local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, 10); 
-		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState));
-		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_buffState, spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState), global_curMaxVal, intervalLeft(END_B-START_A, local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, local_buffState), averageSubintervalSize(local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, local_buffState));
+		//printBuff(worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, 10); 
+		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState));
+		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", worker_threadNum, worker_buffState, spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState), manager_curMaxVal, intervalLeft(END_B-START_A, worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState), averageSubintervalSize(worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState));
 		*d = 0; 
 	}
 }

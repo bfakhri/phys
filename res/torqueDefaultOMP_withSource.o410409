@@ -1,0 +1,12 @@
+module: Command not found.
+trap: Command not found.
+case: Too many arguments.
+cd /brashear/fakhri
+cp /usr/users/7/fakhri//bf-eecs587/HW/4/par/assignment5.exec .
+setenv OMP_NUM_THREADS 16
+omplace -nt 16 ./assignment5.exec 16
+=>> PBS: job killed: walltime 99 exceeded limit 60
+
+User Max Threads: 16	Program Max Threads: 16	OMP Max Threads: 16
+GlobalMax = 4.999998745077649076051784504671 in 101.036589 seconds
+

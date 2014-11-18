@@ -8,7 +8,7 @@
 #include <iostream>
 
 #define START_A 1 
-#define END_B 20 
+#define END_B 100 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12

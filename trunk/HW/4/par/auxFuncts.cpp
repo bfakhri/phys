@@ -9,18 +9,18 @@ int global_head;
 int global_tail; 
 int global_status; 
 
-double f(double x)
+double mathFun(double x)
 {
-	double outerSum = 0; 
+	double outside = 0; 
 	for(unsigned int i = 100; i >= 1; --i)
 	{
-		double innerSum = 0; 
+		double inside = 0; 
 		for(unsigned int j = i; j >= 1; --j)
 		{
-			innerSum += pow((x + j), -3.1);
+			inside += pow((x + j), -3.1f);
 		}
 		
-		outerSum += sin(x + innerSum)/pow(1.2, i);
+		outside += sin(x + inside)/pow(1.2f, i);
 	}
 
 	return outerSum; 
@@ -355,4 +355,14 @@ void spinWait()
 }
 
 // For diagnostic output
-void printDiagOutput(int * d, int local_head, int local_tail, int local_status, int local_threadNum, double * local_buffer);
+void printDiagOutput(int * d, int local_head, int local_tail, int local_status, int local_threadNum, double * local_buffer)
+{
+	*d += 1; 
+	if(*d == DEBUG_FREQ)
+	{
+		//printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
+		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status));
+		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status));
+		*d = 0; 
+	}
+}

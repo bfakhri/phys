@@ -105,7 +105,9 @@ int main(int argc, char * argv[])
 					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
 					// Two intervals will not fit in local buffer
-					if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
+					int local_locSpaceLeft = spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status);
+					int local_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status);
+					if(local_locSpaceLeft == 2 || !global_allWorking)	//((local_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (local_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
 					{
 						// Global buffer is full too - so we shrink the current interval instead of splitting it
 						if(global_status == STATUS_FULL)

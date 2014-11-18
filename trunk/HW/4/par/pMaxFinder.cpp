@@ -70,16 +70,18 @@ int main(int argc, char * argv[])
 				worker_deqWork(&worker_c, &worker_d, worker_circalQueue, &worker_front, &worker_back, &worker_buffState);
 				manager_dArray[worker_threadNum] = false; 
 				keepGoing = true; 
-			}
-			
+			}			
 			else
 			{
 				manager_dArray[worker_threadNum] = true; 
-				while(!allDone(manager_dArray, numThreads) && !keepGoing)
+				while(!allDone(manager_dArray, numThreads))
 				{
 					if(manager_buffState != STATUS_EMPTY)
 					{
 						keepGoing = manager_safeWorkBuffer(FUN_DEQUEUE, &worker_c, &worker_d, 0, 0);
+						// Can continue because we now have work
+						if(keepGoing)
+							break;
 					}
 				}
 				if(keepGoing)
@@ -115,10 +117,10 @@ int main(int argc, char * argv[])
 						}
 						else 
 						{
-							double pC = worker_c;
-							double pD = ((worker_d-worker_c)/2)+worker_c;
-							double pC2 = ((worker_d-worker_c)/2)+worker_c;
-							double pD2 = worker_d; 
+							double pC = worker_c, pD = ((worker_d-worker_c)/2)+worker_c, pC2 = ((worker_d-worker_c)/2)+worker_c, pD2 = worker_d; 
+							// If all else fails and we have NO ROOM 
+							// we must add this interval back to the buffer
+							// but to make progress we shrink it
 							if(!manager_safeWorkBuffer(FUN_DOUBLE_Q, &pC, &pD, pC2, pD2))
 							{
 								shrinkInterval(manager_curMaxVal, &worker_c, &worker_d);
@@ -154,6 +156,7 @@ int main(int argc, char * argv[])
 			}
 			else
 			{
+				// Leave loop because we're done
 				break; 
 			}
 		}

@@ -18,10 +18,10 @@ double mathFun(double x)
 		double inside = 0; 
 		for(unsigned int j = i; j >= 1; --j)
 		{
-			inside += pow((x + j), -3.1f);
+			inside += pow((x + j), -3.1);
 		}
 		
-		outside += sin(x + inside)/pow(1.2f, i);
+		outside += sin(x + inside)/pow(1.2, i);
 	}
 
 	return outside; 

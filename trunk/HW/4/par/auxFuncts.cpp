@@ -126,7 +126,7 @@ bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, dou
 				// Check if inserting two intervals
 				if(function == FUN_DOUBLE_Q)
 				{
-					if(spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) >= 4)
+					if(currentCapacity(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) >= 4)
 					{
 						// Insert both intervals
 						manager_circalQueue[manager_back] = *c;
@@ -208,7 +208,7 @@ bool manager_setMax(double fc, double fd)
 	return ret; 
 }
 
-bool validInterval(double currentMax, double c, double d)
+bool promisingInterval(double currentMax, double c, double d)
 {
 	if((SLOPE*(d - c)) < EPSILON)
 		return false; 
@@ -218,7 +218,7 @@ bool validInterval(double currentMax, double c, double d)
 		return false;
 }
 
-bool validIntervalAndMax(double * currentMax, double c, double d)
+bool promisingIntervalAndMax(double * currentMax, double c, double d)
 {
 	double fC = mathFun(c); 
 	double fD = mathFun(d); 
@@ -237,14 +237,14 @@ bool validIntervalAndMax(double * currentMax, double c, double d)
 
 
 
-bool shrinkInterval(double currentMax, double * c, double * d)
+bool cutInterval(double currentMax, double * c, double * d)
 {
 	// Save the original values
 	double C = *c; 
 	double D = *d; 
 	
 	// Shrink from the left side
-	while(validInterval(currentMax, C, D))
+	while(promisingInterval(currentMax, C, D))
 	{
 		D = (D - C)/2 + C; 
 	}
@@ -254,7 +254,7 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	D = *d; 	
 
 	// Shrink from the right side
-	while(validInterval(currentMax, C, D))
+	while(promisingInterval(currentMax, C, D))
 	{
 		C = (D - C)/2 + C; 
 	}
@@ -264,7 +264,7 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	return true; 
 }
 
-int spaceLeft(int circalQueueSize, int front, int back, int curState)
+int currentCapacity(int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
@@ -280,7 +280,7 @@ int spaceLeft(int circalQueueSize, int front, int back, int curState)
 }
 
 // THIS VERSION ONLY WORKS WITH STACK VERSION OF q/deqWork
-/*int spaceLeft(int circalQueueSize, int front, int back, int curState)
+/*int currentCapacity(int circalQueueSize, int front, int back, int curState)
 {
 	if(curState == STATUS_EMPTY)
 		return circalQueueSize;
@@ -292,11 +292,11 @@ int spaceLeft(int circalQueueSize, int front, int back, int curState)
 	}
 }*/
 
-bool allDone(bool * doneArr, int size)
+bool readyToLeave(bool * doneArr, int numThreads)
 {
 	// Count how many threads are done
 	int doneCount = 0; 
-	for(int i=0; i<size; i++)
+	for(int i=0; i<numThreads; i++)
 	{
 		if(doneArr[i])
 			doneCount++; 
@@ -309,7 +309,7 @@ bool allDone(bool * doneArr, int size)
 		return false;
 	}
 	// No threads are still working
-	else if(doneCount >= size)
+	else if(doneCount >= numThreads)
 	{
 		manager_allWorking = false; 
 		return true; 
@@ -382,8 +382,8 @@ void printDiagOutput(int * d, int worker_front, int worker_back, int worker_buff
 	if(*d == DEBUG_FREQ)
 	{
 		//printBuff(worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, 10); 
-		printf("GlobalSpaceLeft: %d\t", spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState));
-		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", worker_threadNum, worker_buffState, spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), manager_curMaxVal, intervalLeft(END_B-START_A, worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), averageSubintervalSize(worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState));
+		printf("GlobalSpaceLeft: %d\t", currentCapacity(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState));
+		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", worker_threadNum, worker_buffState, currentCapacity(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), manager_curMaxVal, intervalLeft(END_B-START_A, worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), averageSubintervalSize(worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState));
 		*d = 0; 
 	}
 }

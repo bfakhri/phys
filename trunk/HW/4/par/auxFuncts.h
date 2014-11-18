@@ -57,16 +57,16 @@ bool worker_setMax(double * currentMax, double fc, double fd);
 bool manager_setMax(double fc, double fd);
 
 // Returns true only if it is possible to get a higher value in this interval
-bool validInterval(double currentMax, double c, double d);
+bool promisingInterval(double currentMax, double c, double d);
 
 // Attempts to rid itself of a piece of the interval handed to it
-bool shrinkInterval(double currentMax, double * c, double * d);
+bool cutInterval(double currentMax, double * c, double * d);
 
 // Returns space left in circalQueue 
-int spaceLeft(int circalQueueSize, int front, int back, int curState);
+int currentCapacity(int circalQueueSize, int front, int back, int curState);
 
 // Returns true if all processors are done 
-bool allDone(bool * doneArr, int size);
+bool readyToLeave(bool * doneArr, int numThreads);
 
 // Returns the amount of the remaining interval represented in the circalQueue 
 // as a percentage

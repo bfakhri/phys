@@ -23,7 +23,7 @@ double mathFun(double x)
 		outside += sin(x + inside)/pow(1.2f, i);
 	}
 
-	return outerSum; 
+	return outside; 
 }
 
 bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
@@ -191,7 +191,7 @@ bool validInterval(double currentMax, double c, double d)
 {
 	if((SLOPE*(d - c)) < EPSILON)
 		return false; 
-	if(((f(c) + f(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
+	if(((mathFun(c) + mathFun(d) + SLOPE*(d - c))/2) > (currentMax + EPSILON))
 		return true; 
 	else
 		return false;
@@ -199,8 +199,8 @@ bool validInterval(double currentMax, double c, double d)
 
 bool validIntervalAndMax(double * currentMax, double c, double d)
 {
-	double fC = f(c); 
-	double fD = f(d); 
+	double fC = mathFun(c); 
+	double fD = mathFun(d); 
 	if(local_setMax(currentMax, fC, fD))
 	{
 		return true; 

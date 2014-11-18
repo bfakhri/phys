@@ -67,7 +67,7 @@ int main(int argc, char * argv[])
 		while(lContinue)	
 		{
 			// For debugging
-			printDiagOutput(&debugCount, local_head, local_tail, local_status, local_threadNum, local_buffer);
+			//printDiagOutput(&debugCount, local_head, local_tail, local_status, local_threadNum, local_buffer);
 
 			bool cont = false;	
 			// Get work from a queue
@@ -100,14 +100,16 @@ int main(int argc, char * argv[])
 				// Check if possible larger
 				if(validInterval(global_max, local_c, local_d))
 				{
-					global_setMax(f(local_c), f(local_d)); 
+					global_setMax(mathFun(local_c), mathFun(local_d)); 
 					
 					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
 					// Two intervals will not fit in local buffer
 					int local_locSpaceLeft = spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status);
 					int local_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status);
-					if(local_locSpaceLeft == 2 || !global_allWorking)	//((local_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (local_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
+					//if(local_locSpaceLeft == 2 || !global_allWorking ||((local_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (local_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
+					//if(local_locSpaceLeft == 2 || ((local_globSpaceLeft > GLOBAL_BUFF_SIZE/2)))
+					if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status) > GLOBAL_BUFF_SIZE/2)
 					{
 						// Global buffer is full too - so we shrink the current interval instead of splitting it
 						if(global_status == STATUS_FULL)

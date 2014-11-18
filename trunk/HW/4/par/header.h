@@ -8,7 +8,7 @@
 #include <iostream>
 
 #define START_A 1
-#define END_B 100
+#define END_B 5 
 #define EPSILON 0.000001 // 10^-6
 //#define EPSILON 0.0	// FOR DEBUGGING
 #define SLOPE 12
@@ -29,7 +29,7 @@
 
 // Global Stuff
 extern double global_max; 
-extern double * global_buffer;
+extern double global_buffer[];
 extern int global_head; 
 extern int global_tail; 
 extern int global_status; 

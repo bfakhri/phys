@@ -10,29 +10,45 @@
 
 using namespace std; 
 
-int main()
-{
+int main(int argc, char * argv[])
+{ 
+	int MAX_THREADS = 0; 
+	if(argc > 1)
+	{
+		MAX_THREADS = atoi(argv[1]); 		
+	}
 	// Set number of threads
-	// TRY HYPERTHREADING? 
-	int numThreads = omp_get_num_procs(); 	
-	//int numThreads = 2;
+	// Default is the number of processors
+	int numThreads;
+	if(MAX_THREADS == 0) 
+		numThreads = omp_get_num_procs(); 	
+	else
+		numThreads = MAX_THREADS; 
+
 	omp_set_num_threads(numThreads);
 
 	// Vars to be used  
 	double intervalSpan = END_B - START_A;
 	double chunkSize = intervalSpan/numThreads;
 
-	//printf("\nNumber of threads: %d\n", numThreads); 	
+	printf("\nUser Max Threads: %d\tProgram Max Threads: %d\tOMP Max Threads: %d\n", MAX_THREADS, numThreads, omp_get_max_threads()); 	
+	
+	// Initializing the global buffer
+	global_max = 0;  
+	global_head = 0; 
+	global_tail = 0; 
+	global_status = STATUS_EMPTY; 
 
-	global_initBuffer(); 
+	// This array determines when ALL threads are finished
 	bool * global_doneArray = new bool[numThreads]; 
 	for(int i=0; i<numThreads; i++)
 		global_doneArray[i] = false;
-	
+
+	// For timing purposes
+	double startTime = omp_get_wtime();	
 	#pragma omp parallel 
 	{
 		// Init local variables
-		//double local_max = 0; 
 		double local_buffer[LOCAL_BUFF_SIZE]; 
 		double local_c = 0;
 		double local_d = 0; 
@@ -40,7 +56,7 @@ int main()
 		int local_tail = 0; 
 		int local_status = STATUS_EMPTY; 
 	
-		// Add init interval to queue
+		// Add first interval to queue
 		int local_threadNum = omp_get_thread_num(); 
 		local_qWork(local_threadNum*chunkSize+START_A, (local_threadNum+1)*chunkSize+START_A, local_buffer, &local_head, &local_tail, &local_status);
 
@@ -63,6 +79,7 @@ int main()
 				debugCount = 0; 
 			}
 			*/
+	
 			bool cont = false;	
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
@@ -138,8 +155,9 @@ int main()
 		
 		global_doneArray[local_threadNum] = true; 	
 	} // END PARALLEL 
+	double endTime = omp_get_wtime(); 
 
-	//delete[] global_doneArray;
-	printf("GlobalMax = %2.30f\n", global_max); 
+	delete[] global_doneArray;
+	printf("GlobalMax = %2.30f in %f seconds\n\n", global_max, endTime - startTime); 
 	return 0; 	 
 }

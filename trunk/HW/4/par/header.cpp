@@ -3,11 +3,12 @@
 
 // Global Stuff
 double global_max; 
-double * global_buffer;
+double global_buffer[GLOBAL_BUFF_SIZE];
 int global_head; 
 int global_tail; 
 int global_status; 
 
+/*
 void global_initBuffer()
 {
 	global_max = 0;  
@@ -17,7 +18,7 @@ void global_initBuffer()
 	global_status = STATUS_EMPTY; 
 
 }
-
+*/
 // Function we want to find the maximum of
 double f(double x)
 {

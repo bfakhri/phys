@@ -36,7 +36,7 @@ extern int global_tail;
 extern int global_status; 
 
 // Function we want to find the maximum of
-double f(double x);
+double mathFun(double x);
 
 // Local Circular Queue
 bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status);

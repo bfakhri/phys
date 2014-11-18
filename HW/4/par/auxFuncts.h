@@ -40,15 +40,15 @@ extern bool * manager_dArray;
 double mathFun(double x);
 
 // Local Circular Queue
-bool worker_qWork(double c, double d, double * circalQueue, int * head, int * tail, int * curState);
+bool worker_qWork(double c, double d, double * circalQueue, int * front, int * back, int * curState);
 
-bool worker_deqWork(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState);
+bool worker_deqWork(double * c, double * d, double * circalQueue, int * front, int * back, int * curState);
 
 // Global Circular Queue 
 bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, double d2);
 
 // Gives front value but does not pop it off the queue
-bool worker_peek(double * c, double * d, double * circalQueue, int * head, int * tail, int * curState);
+bool worker_peek(double * c, double * d, double * circalQueue, int * front, int * back, int * curState);
 
 // Returns true only if max changed
 bool worker_setMax(double * currentMax, double fc, double fd);
@@ -63,7 +63,7 @@ bool validInterval(double currentMax, double c, double d);
 bool shrinkInterval(double currentMax, double * c, double * d);
 
 // Returns space left in circalQueue 
-int spaceLeft(int circalQueueSize, int head, int tail, int curState);
+int spaceLeft(int circalQueueSize, int front, int back, int curState);
 
 // Returns true if all processors are done 
 bool allDone(bool * doneArr, int size);
@@ -71,15 +71,15 @@ bool allDone(bool * doneArr, int size);
 // Returns the amount of the remaining interval represented in the circalQueue 
 // as a percentage
 // FOR DEBUGGING
-double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int head, int tail, int curState);
+double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int front, int back, int curState);
 
 // Returns the average size of the subintervals in the circalQueue
 // FOR DEBUGGING ONLY
-double averageSubintervalSize(double * circalQueue, int circalQueueSize, int head, int tail, int curState);
+double averageSubintervalSize(double * circalQueue, int circalQueueSize, int front, int back, int curState);
 
 // Prints the intervals in the circalQueue
 // FOR DEBUGGING ONLY
-void printBuff(double * circalQueue, int circalQueueSize, int head, int tail, int count);
+void printBuff(double * circalQueue, int circalQueueSize, int front, int back, int count);
 
 // FOR DEBUGGING
 void spinWait();

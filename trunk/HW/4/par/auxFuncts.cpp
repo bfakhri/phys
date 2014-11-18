@@ -3,11 +3,12 @@
 
 // Global Stuff
 bool global_allWorking; 
-double global_max; 
-double global_buffer[GLOBAL_BUFF_SIZE];
-int global_head; 
-int global_tail; 
-int global_status; 
+double global_curMaxVal; 
+double global_circalQueue[GLOBAL_BUFF_SIZE];
+int global_front; 
+int global_back; 
+int global_buffState; 
+bool * global_dArray;
 
 double mathFun(double x)
 {
@@ -26,7 +27,7 @@ double mathFun(double x)
 	return outside; 
 }
 
-bool local_qWork(double c, double d, double * buffer, int * head, int * tail, int * status)
+bool local_qWork(double c, double d, double * circalQueue, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_FULL)
 	{
@@ -34,9 +35,9 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 	}
 	else
 	{
-		// Add to circular buffer
-		buffer[*tail] = c;
-		buffer[*tail+1] = d; 
+		// Add to circular circalQueue
+		circalQueue[*tail] = c;
+		circalQueue[*tail+1] = d; 
 		*tail = (*tail+2)%LOCAL_BUFF_SIZE;  
 		if(*tail == *head)
 			*status = STATUS_FULL;
@@ -47,7 +48,7 @@ bool local_qWork(double c, double d, double * buffer, int * head, int * tail, in
 	}
 }
 
-bool local_deqWork(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+bool local_deqWork(double * c, double * d, double * circalQueue, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
 	{
@@ -55,9 +56,9 @@ bool local_deqWork(double * c, double * d, double * buffer, int * head, int * ta
 	}
 	else
 	{
-		// Get from circular buffer
-		*c = buffer[*head];
-		*d = buffer[*head+1]; 
+		// Get from circular circalQueue
+		*c = circalQueue[*head];
+		*d = circalQueue[*head+1]; 
 		*head = (*head+2)%LOCAL_BUFF_SIZE;  
 		if(*tail == *head)
 			*status = STATUS_EMPTY;
@@ -77,26 +78,26 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 		// Dequeue function
 		if(function == FUN_DEQUEUE)
 		{
-			if(global_status == STATUS_EMPTY)
+			if(global_buffState == STATUS_EMPTY)
 				ret = false;
 			else
 			{
-				// Get from circular buffer
-				*c = global_buffer[global_head];
-				*d = global_buffer[global_head+1]; 
-				global_head = (global_head+2)%GLOBAL_BUFF_SIZE;  
-				if(global_tail == global_head)
-					global_status = STATUS_EMPTY;
+				// Get from circular circalQueue
+				*c = global_circalQueue[global_front];
+				*d = global_circalQueue[global_front+1]; 
+				global_front = (global_front+2)%GLOBAL_BUFF_SIZE;  
+				if(global_back == global_front)
+					global_buffState = STATUS_EMPTY;
 				else
-					global_status = STATUS_MID; 
+					global_buffState = STATUS_MID; 
 			
 			}
 
 		}
-		// Insert into buffer
+		// Insert into circalQueue
 		else
 		{
-			if(global_status == STATUS_FULL)
+			if(global_buffState == STATUS_FULL)
 			{
 				ret = false;
 			}
@@ -105,14 +106,14 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 				// Check if inserting two intervals
 				if(function == FUN_DOUBLE_Q)
 				{
-					if(spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status) >= 4)
+					if(spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState) >= 4)
 					{
 						// Insert both intervals
-						global_buffer[global_tail] = *c;
-						global_buffer[global_tail+1] = *d; 
-						global_buffer[global_tail+2] = c2;
-						global_buffer[global_tail+3] = d2; 
-						global_tail = (global_tail+4)%GLOBAL_BUFF_SIZE;  
+						global_circalQueue[global_back] = *c;
+						global_circalQueue[global_back+1] = *d; 
+						global_circalQueue[global_back+2] = c2;
+						global_circalQueue[global_back+3] = d2; 
+						global_back = (global_back+4)%GLOBAL_BUFF_SIZE;  
 					}
 					else
 					{
@@ -123,15 +124,15 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 				else
 				{
 					// Already checked to make sure it is not full so insert
-					global_buffer[global_tail] = *c;
-					global_buffer[global_tail+1] = *d; 
-					global_tail = (global_tail+2)%GLOBAL_BUFF_SIZE;  
+					global_circalQueue[global_back] = *c;
+					global_circalQueue[global_back+1] = *d; 
+					global_back = (global_back+2)%GLOBAL_BUFF_SIZE;  
 				}
-				// Add to circular buffer
-				if(global_tail == global_head)
-					global_status = STATUS_FULL;
+				// Add to circular circalQueue
+				if(global_back == global_front)
+					global_buffState = STATUS_FULL;
 				else
-					global_status = STATUS_MID; 
+					global_buffState = STATUS_MID; 
 			}
 		}
 	} // End Critical Section
@@ -139,7 +140,7 @@ bool global_safeWorkBuffer(int function, double * c, double * d, double c2, doub
 	return ret; 
 }
 
-bool local_peek(double * c, double * d, double * buffer, int * head, int * tail, int * status)
+bool local_peek(double * c, double * d, double * circalQueue, int * head, int * tail, int * status)
 {
 	if(*status == STATUS_EMPTY)
 	{
@@ -147,9 +148,9 @@ bool local_peek(double * c, double * d, double * buffer, int * head, int * tail,
 	}
 	else
 	{
-		// Add to circular buffer
-		*c = buffer[*head];
-		*d = buffer[*head+1]; 
+		// Add to circular circalQueue
+		*c = circalQueue[*head];
+		*d = circalQueue[*head+1]; 
 		return true; 
 	}
 }
@@ -171,13 +172,13 @@ bool global_setMax(double fc, double fd)
 	bool ret = true; 
 	#pragma omp critical
 	{
-		if(global_max + EPSILON < fc)
+		if(global_curMaxVal + EPSILON < fc)
 		{
-			global_max = fc; 
+			global_curMaxVal = fc; 
 		}
-		else if(global_max + EPSILON < fd)
+		else if(global_curMaxVal + EPSILON < fd)
 		{
-			global_max = fd; 
+			global_curMaxVal = fd; 
 		}
 		else
 		{ 
@@ -243,26 +244,26 @@ bool shrinkInterval(double currentMax, double * c, double * d)
 	return true; 
 }
 
-int spaceLeft(int bufferSize, int head, int tail, int status)
+int spaceLeft(int circalQueueSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
-		return bufferSize;
+		return circalQueueSize;
 	else if(status == STATUS_FULL)
 		return 0; 
 	else
 	{
 		if(tail > head)
-			return bufferSize - (tail - head); 
+			return circalQueueSize - (tail - head); 
 		else
-			return bufferSize - ((bufferSize - head) + tail); 		
+			return circalQueueSize - ((circalQueueSize - head) + tail); 		
 	}
 }
 
 // THIS VERSION ONLY WORKS WITH STACK VERSION OF q/deqWork
-/*int spaceLeft(int bufferSize, int head, int tail, int status)
+/*int spaceLeft(int circalQueueSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
-		return bufferSize;
+		return circalQueueSize;
 	else if(status == STATUS_FULL)
 		return 0; 
 	else
@@ -301,7 +302,7 @@ bool allDone(bool * doneArr, int size)
 	}
 }
 
-double intervalLeft(double originalSize, double * buffer, int bufferSize, int head, int tail, int status)
+double intervalLeft(double originalSize, double * circalQueue, int circalQueueSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
 		return 0; 
@@ -310,15 +311,15 @@ double intervalLeft(double originalSize, double * buffer, int bufferSize, int he
 		double runSum = 0; 
 		do
 		{
-			runSum += (buffer[head+1] - buffer[head]);
-			head = (head+2)%bufferSize;
+			runSum += (circalQueue[head+1] - circalQueue[head]);
+			head = (head+2)%circalQueueSize;
 		}while(head != tail);
 		
 		return 100*runSum/originalSize; 
 	}
 }
 
-double averageSubintervalSize(double * buffer, int bufferSize, int head, int tail, int status)
+double averageSubintervalSize(double * circalQueue, int circalQueueSize, int head, int tail, int status)
 {
 	if(status == STATUS_EMPTY)
 		return 0; 
@@ -328,21 +329,21 @@ double averageSubintervalSize(double * buffer, int bufferSize, int head, int tai
 		int itemCount = 0;  
 		do
 		{
-			runSum += (buffer[head+1] - buffer[head]);
-			head = (head+2)%bufferSize;
+			runSum += (circalQueue[head+1] - circalQueue[head]);
+			head = (head+2)%circalQueueSize;
 			itemCount++; 
 		}while(head != tail);
 		return runSum/(itemCount); 
 	}
 }
 
-void printBuff(double * buffer, int bufferSize, int head, int tail, int count)
+void printBuff(double * circalQueue, int circalQueueSize, int head, int tail, int count)
 {
 	int iterCount = 0;  
 	do
 	{
-		printf("[%f, %f]\t", buffer[head], buffer[head+1]);
-		head = (head+2)%bufferSize;
+		printf("[%f, %f]\t", circalQueue[head], circalQueue[head+1]);
+		head = (head+2)%circalQueueSize;
 		iterCount++; 
 	}while(head != tail && iterCount < count);
 	
@@ -355,14 +356,14 @@ void spinWait()
 }
 
 // For diagnostic output
-void printDiagOutput(int * d, int local_head, int local_tail, int local_status, int local_threadNum, double * local_buffer)
+void printDiagOutput(int * d, int local_front, int local_back, int local_buffState, int local_threadNum, double * local_circalQueue)
 {
 	*d += 1; 
 	if(*d == DEBUG_FREQ)
 	{
-		//printBuff(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, 10); 
-		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status));
-		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_status, spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status), global_max, intervalLeft(END_B-START_A, local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status), averageSubintervalSize(local_buffer, LOCAL_BUFF_SIZE, local_head, local_tail, local_status));
+		//printBuff(local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, 10); 
+		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, global_front, global_back, global_buffState));
+		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", local_threadNum, local_buffState, spaceLeft(LOCAL_BUFF_SIZE, local_front, local_back, local_buffState), global_curMaxVal, intervalLeft(END_B-START_A, local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, local_buffState), averageSubintervalSize(local_circalQueue, LOCAL_BUFF_SIZE, local_front, local_back, local_buffState));
 		*d = 0; 
 	}
 }

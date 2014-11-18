@@ -67,35 +67,35 @@ int main(int argc, char * argv[])
 		while(lContinue)	
 		{
 			// For debugging
-			//printDiagOutput(&debugCount, local_head, local_tail, local_status, local_threadNum, local_buffer);
+			printDiagOutput(&debugCount, local_head, local_tail, local_status, local_threadNum, local_buffer);
 
-			bool cont = false;	
+			bool keepGoing = false;	
 			// Get work from a queue
 			if(local_status != STATUS_EMPTY)
 			{
 				// Local buffer still has work so we get some from there
 				local_deqWork(&local_c, &local_d, local_buffer, &local_head, &local_tail, &local_status);
 				global_doneArray[local_threadNum] = false; 
-				cont = true; 
+				keepGoing = true; 
 			}
 			
 			else
 			{
 				global_doneArray[local_threadNum] = true; 
-				while(!allDone(global_doneArray, numThreads) && !cont)
+				while(!allDone(global_doneArray, numThreads) && !keepGoing)
 				{
 					if(global_status != STATUS_EMPTY)
 					{
-						cont = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
+						keepGoing = global_safeWorkBuffer(FUN_DEQUEUE, &local_c, &local_d, 0, 0);
 					}
 				}
-				if(cont)
+				if(keepGoing)
 				{
 					global_doneArray[local_threadNum] = false; 
 				}
 			}
 		
-			if(cont)
+			if(keepGoing)
 			{	
 				// Check if possible larger
 				if(validInterval(global_max, local_c, local_d))
@@ -109,7 +109,8 @@ int main(int argc, char * argv[])
 					int local_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status);
 					//if(local_locSpaceLeft == 2 || !global_allWorking ||((local_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (local_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
 					//if(local_locSpaceLeft == 2 || ((local_globSpaceLeft > GLOBAL_BUFF_SIZE/2)))
-					if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status) > GLOBAL_BUFF_SIZE/2)
+					//if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, global_head, global_tail, global_status) > GLOBAL_BUFF_SIZE/2)
+					if(spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) == 2)
 					{
 						// Global buffer is full too - so we shrink the current interval instead of splitting it
 						if(global_status == STATUS_FULL)
@@ -137,6 +138,24 @@ int main(int argc, char * argv[])
 					{
 						local_qWork(local_c, ((local_d-local_c)/2)+local_c, local_buffer, &local_head, &local_tail, &local_status);
 						local_qWork(((local_d-local_c)/2)+local_c, local_d, local_buffer, &local_head, &local_tail, &local_status);	
+					}
+				}
+	
+				// Throws some to the global if necessary
+				if(!global_allWorking && spaceLeft(LOCAL_BUFF_SIZE, local_head, local_tail, local_status) < LOCAL_BUFF_SIZE/2)
+				{
+					for(int i=0; i<3; i++)
+					{
+						double tempC;
+						double tempD; 
+						if(local_deqWork(&tempC, &tempD, local_buffer, &local_head, &local_tail, &local_status))
+						{
+							if(!global_safeWorkBuffer(FUN_SINGLE_Q, &tempC, &tempD, 0, 0))
+							{
+								shrinkInterval(global_max, &local_c, &local_d);
+								local_qWork(local_c, local_d, local_buffer, &local_head, &local_tail, &local_status); 
+							}
+						}
 					}
 				}
 			}

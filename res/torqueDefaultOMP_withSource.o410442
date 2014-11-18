@@ -1,0 +1,11 @@
+module: Command not found.
+trap: Command not found.
+case: Too many arguments.
+cd /brashear/fakhri
+cp /usr/users/7/fakhri//bf-eecs587/HW/4/par/assignment5.exec .
+setenv OMP_NUM_THREADS 4
+omplace -nt 4 ./assignment5.exec 4
+
+User Max Threads: 4	Program Max Threads: 4	OMP Max Threads: 4
+GlobalMax = 4.999998745077649076051784504671 in 387.528722 seconds
+

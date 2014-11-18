@@ -4,7 +4,7 @@
 // Global Stuff
 bool manager_allWorking; 
 double manager_curMaxVal; 
-double manager_circalQueue[GLOBAL_BUFF_SIZE];
+double manager_circalQueue[MGR_BUFF_SIZE];
 int manager_front; 
 int manager_back; 
 int manager_buffState; 
@@ -38,7 +38,7 @@ bool worker_qWork(double c, double d, double * circalQueue, int * front, int * b
 		// Add to circular circalQueue
 		circalQueue[*back] = c;
 		circalQueue[*back+1] = d; 
-		*back = (*back+2)%LOCAL_BUFF_SIZE;  
+		*back = (*back+2)%WKR_BUFF_SIZE;  
 		if(*back == *front)
 			*curState = STATUS_FULL;
 		else
@@ -59,7 +59,7 @@ bool worker_deqWork(double * c, double * d, double * circalQueue, int * front, i
 		// Get from circular circalQueue
 		*c = circalQueue[*front];
 		*d = circalQueue[*front+1]; 
-		*front = (*front+2)%LOCAL_BUFF_SIZE;  
+		*front = (*front+2)%WKR_BUFF_SIZE;  
 		if(*back == *front)
 			*curState = STATUS_EMPTY;
 		else
@@ -85,7 +85,7 @@ bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, dou
 				// Get from circular circalQueue
 				*c = manager_circalQueue[manager_front];
 				*d = manager_circalQueue[manager_front+1]; 
-				manager_front = (manager_front+2)%GLOBAL_BUFF_SIZE;  
+				manager_front = (manager_front+2)%MGR_BUFF_SIZE;  
 				if(manager_back == manager_front)
 					manager_buffState = STATUS_EMPTY;
 				else
@@ -106,14 +106,14 @@ bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, dou
 				// Check if inserting two intervals
 				if(function == FUN_DOUBLE_Q)
 				{
-					if(spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState) >= 4)
+					if(spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) >= 4)
 					{
 						// Insert both intervals
 						manager_circalQueue[manager_back] = *c;
 						manager_circalQueue[manager_back+1] = *d; 
 						manager_circalQueue[manager_back+2] = c2;
 						manager_circalQueue[manager_back+3] = d2; 
-						manager_back = (manager_back+4)%GLOBAL_BUFF_SIZE;  
+						manager_back = (manager_back+4)%MGR_BUFF_SIZE;  
 					}
 					else
 					{
@@ -126,7 +126,7 @@ bool manager_safeWorkBuffer(int function, double * c, double * d, double c2, dou
 					// Already checked to make sure it is not full so insert
 					manager_circalQueue[manager_back] = *c;
 					manager_circalQueue[manager_back+1] = *d; 
-					manager_back = (manager_back+2)%GLOBAL_BUFF_SIZE;  
+					manager_back = (manager_back+2)%MGR_BUFF_SIZE;  
 				}
 				// Add to circular circalQueue
 				if(manager_back == manager_front)
@@ -268,7 +268,7 @@ int spaceLeft(int circalQueueSize, int front, int back, int curState)
 		return 0; 
 	else
 	{
-		return (LOCAL_BUFF_SIZE-(front - 2));
+		return (WKR_BUFF_SIZE-(front - 2));
 	}
 }*/
 
@@ -361,9 +361,9 @@ void printDiagOutput(int * d, int worker_front, int worker_back, int worker_buff
 	*d += 1; 
 	if(*d == DEBUG_FREQ)
 	{
-		//printBuff(worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, 10); 
-		printf("GlobalSpaceLeft: %d\t", spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState));
-		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", worker_threadNum, worker_buffState, spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState), manager_curMaxVal, intervalLeft(END_B-START_A, worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState), averageSubintervalSize(worker_circalQueue, LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState));
+		//printBuff(worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, 10); 
+		printf("GlobalSpaceLeft: %d\t", spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState));
+		printf("tNum: %d\t\tStatus: %d\tSpacLeft: %d\t\tCurMax: %2.30f\tPercentLeft: %f\tAvgSubIntSize: %1.8f\n", worker_threadNum, worker_buffState, spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), manager_curMaxVal, intervalLeft(END_B-START_A, worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState), averageSubintervalSize(worker_circalQueue, WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState));
 		*d = 0; 
 	}
 }

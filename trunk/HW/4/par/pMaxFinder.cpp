@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
 	#pragma omp parallel 
 	{
 		// Init local variables
-		double worker_circalQueue[LOCAL_BUFF_SIZE]; 
+		double worker_circalQueue[WKR_BUFF_SIZE]; 
 		double worker_c = 0;
 		double worker_d = 0; 
 		int worker_front = 0; 
@@ -100,12 +100,12 @@ int main(int argc, char * argv[])
 					// IF FULL, SEND WORK TO GLOBAL BUFF AT A RATE DETERMINED BY A CONSTANT
 
 					// Two intervals will not fit in local circalQueue
-					int worker_locSpaceLeft = spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState);
-					int worker_globSpaceLeft = spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState);
-					//if(worker_locSpaceLeft == 2 || !manager_allWorking ||((worker_globSpaceLeft > GLOBAL_BUFF_SIZE/10) && (worker_locSpaceLeft < LOCAL_BUFF_SIZE/10)))
-					//if(worker_locSpaceLeft == 2 || ((worker_globSpaceLeft > GLOBAL_BUFF_SIZE/2)))
-					//if(spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2 || spaceLeft(GLOBAL_BUFF_SIZE, manager_front, manager_back, manager_buffState) > GLOBAL_BUFF_SIZE/2)
-					if(spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2)
+					int worker_locSpaceLeft = spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState);
+					int worker_globSpaceLeft = spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState);
+					//if(worker_locSpaceLeft == 2 || !manager_allWorking ||((worker_globSpaceLeft > MGR_BUFF_SIZE/10) && (worker_locSpaceLeft < WKR_BUFF_SIZE/10)))
+					//if(worker_locSpaceLeft == 2 || ((worker_globSpaceLeft > MGR_BUFF_SIZE/2)))
+					//if(spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2 || spaceLeft(MGR_BUFF_SIZE, manager_front, manager_back, manager_buffState) > MGR_BUFF_SIZE/2)
+					if(spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) == 2)
 					{
 						// Global circalQueue is full too - so we shrink the current interval instead of splitting it
 						if(manager_buffState == STATUS_FULL)
@@ -137,7 +137,7 @@ int main(int argc, char * argv[])
 				}
 	
 				// Throws some to the global if necessary
-				if(!manager_allWorking && spaceLeft(LOCAL_BUFF_SIZE, worker_front, worker_back, worker_buffState) < LOCAL_BUFF_SIZE/2)
+				if(!manager_allWorking && spaceLeft(WKR_BUFF_SIZE, worker_front, worker_back, worker_buffState) < WKR_BUFF_SIZE/2)
 				{
 					for(int i=0; i<3; i++)
 					{

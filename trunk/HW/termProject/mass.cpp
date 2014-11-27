@@ -1,8 +1,24 @@
 #include "mass.h"
 
+mass::mass()
+{
+	objectMass = 1; 	// Default 1Kg
+	position.x = 0; 
+	position.y = 0; 
+	position.z = 0; 
+
+	velocity.x = 0; 
+	velocity.y = 0; 
+	velocity.z = 0; 
+
+	cumalForces.x = 0; 
+	cumalForces.y = 0; 
+	cumalForces.z = 0; 
+		
+}
 
 double mass::getMass(){
-	return mass; 
+	return objectMass; 
 }
 
 cartesian mass::getPos(){
@@ -14,14 +30,14 @@ cartesian mass::getVelocity(){
 }
 
 void mass::setMass(double newMass){
-	mass = newMass; 
+	objectMass = newMass; 
 }
 
 void mass::setPos(cartesian newPos){
 	position = newPos;
 }
 
-void mass::setVelocity(cartestian newVelocity){
+void mass::setVelocity(cartesian newVelocity){
 	velocity = newVelocity; 
 }
 
@@ -43,12 +59,12 @@ void mass::addForce(cartesian force){
 // d = d0 + v0*t + 0.5*a*t^2
 cartesian mass::updateVelAndPos(double timeStep){
 	// Updates the position
-	position.x += velocity.x*timeStep + 0.5*(cumalForces.x/mass)*(timeStep*timeStep);
-	position.x += velocity.y*timeStep + 0.5*(cumalForces.y/mass)*(timeStep*timeStep);
-	position.x += velocity.z*timeStep + 0.5*(cumalForces.z/mass)*(timeStep*timeStep);
+	position.x += velocity.x*timeStep + 0.5*(cumalForces.x/objectMass)*(timeStep*timeStep);
+	position.x += velocity.y*timeStep + 0.5*(cumalForces.y/objectMass)*(timeStep*timeStep);
+	position.x += velocity.z*timeStep + 0.5*(cumalForces.z/objectMass)*(timeStep*timeStep);
 	
 	// Updates the velocity
-	velocity.x += (cumalForces.x/mass)*(timeStep); 
-	velocity.y += (cumalForces.y/mass)*(timeStep); 
-	velocity.z += (cumalForces.z/mass)*(timeStep); 
+	velocity.x += (cumalForces.x/objectMass)*(timeStep); 
+	velocity.y += (cumalForces.y/objectMass)*(timeStep); 
+	velocity.z += (cumalForces.z/objectMass)*(timeStep); 
 }

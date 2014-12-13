@@ -64,7 +64,7 @@ void Mass::influence(Mass obj){
 	diffPos.y = position.y - objPos.y;
 	diffPos.z = position.z - objPos.z;
 
-	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y * diffPos.y + diffPos.z * diffPos.z); 
+	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y*diffPos.y + diffPos.z*diffPos.z); 
 
 	double netForce = newtonGrav(obj.getMass(), distance); 
 
@@ -80,8 +80,8 @@ void Mass::influence(Mass obj){
 cartesian Mass::updateVelAndPos(double timeStep){
 	// Updates the position
 	position.x += velocity.x*timeStep + 0.5*(cumalForces.x/objectMass)*(timeStep*timeStep);
-	position.x += velocity.y*timeStep + 0.5*(cumalForces.y/objectMass)*(timeStep*timeStep);
-	position.x += velocity.z*timeStep + 0.5*(cumalForces.z/objectMass)*(timeStep*timeStep);
+	position.y += velocity.y*timeStep + 0.5*(cumalForces.y/objectMass)*(timeStep*timeStep);
+	position.z += velocity.z*timeStep + 0.5*(cumalForces.z/objectMass)*(timeStep*timeStep);
 	
 	// Updates the velocity
 	velocity.x += (cumalForces.x/objectMass)*(timeStep); 

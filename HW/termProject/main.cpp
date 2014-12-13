@@ -11,7 +11,7 @@ using namespace std;
 int main(int argc, char ** argv)
 {
 	Mass earth;
-	earth.setMass(5.9736*1000000000000000000000000); 
+	earth.setMass(5.9736*100); 
 
 	Mass massArr[10]; 
 

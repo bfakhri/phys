@@ -1,6 +1,8 @@
 // Main
 
 #include <iostream>
+#include <iomanip>
+#include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 #include "mass.h"
@@ -13,11 +15,14 @@
 using namespace std; 
 
 // For debugging
-void printforces(Mass m){
+void printF(Mass m){
 	cout << "Forces:\tX = " << m.getCumalForces().x << "\tY = " << m.getCumalForces().y << "\tZ = " << m.getCumalForces().z << endl; 
 } 
-void printvelocities(Mass m){
+void printVel(Mass m){
 	cout << "Velocities:\tX = " << m.getVelocity().x << "\tY = " << m.getVelocity().y << "\tZ = " << m.getVelocity().z << endl; 
+} 
+void printPos(Mass m){
+	cout << "Pos:\tX = " << m.getPos().x << "   \tY = " << m.getPos().y << "   \tZ = " << m.getPos().z << endl; 
 } 
 
 int main(int argc, char ** argv)
@@ -103,17 +108,22 @@ int main(int argc, char ** argv)
 				<< ", "<<massVector[i].getPos().z<<endl; */
 
 				//cout << massVector[1].getVelocity().z << endl; 
-				printforces(massVector[1]);
-				printvelocities(massVector[1]);  
-				
+				//printF(massVector[1]);
+				//printVel(massVector[1]);  
+				printPos(massVector[1]); 
 			}
 			massVector[i].updateVelAndPos(TIME_STEP); 
 			massVector[i].resetForces();  
 		}	
 		
-		if(c > 100 && (massVector[1].getPos().z < 1.0f))
+		if(c > 100 && (abs(massVector[1].getPos().z) < 1))
 		{
-			cout<<"Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
+			cout << setprecision(51) << "Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
+			printf("\n%f\n", massVector[1].getPos().z); 
+			if((double)abs(massVector[1].getPos().z) < (double)1)
+				cout << "Yes it's above" << endl; 
+			int wait; 
+			cin >> wait; 
 		}
 
 	}

@@ -1,3 +1,3 @@
-nbody: main.cpp mass.cpp 
-	g++ main.cpp mass.cpp -o nbody.exec 
+nbody: main.cpp mass.cpp mather.cpp 
+	g++ main.cpp mass.cpp mather.cpp -o nbody.exec 
 

@@ -29,7 +29,7 @@ void printF(Mass m){
 	cout << "Forces:\tX = " << m.getCumalForces().x << "\tY = " << m.getCumalForces().y << "\tZ = " << m.getCumalForces().z << endl; 
 } 
 void printVel(Mass m){
-	cout << "Velocities:\tX = " << m.getVelocity().x << "\tY = " << m.getVelocity().y << "\tZ = " << m.getVelocity().z << endl; 
+	cout << "Velocities:\tX = " << m.getVelocity().x << "\tY = " << m.getVelocity().y << "\tZ = " << m.getVelocity().z; 
 } 
 void printPos(Mass m){
 	cout << "Pos:\tX = " << m.getPos().x << "   \tY = " << m.getPos().y << "   \tZ = " << m.getPos().z; 
@@ -40,7 +40,7 @@ void printDist(Mass m1, Mass m2){
 	diffPos.y =  m1.getPos().y - m2.getPos().y;
 	diffPos.z =  m1.getPos().z - m2.getPos().z;
 	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y*diffPos.y + diffPos.z*diffPos.z); 
-	cout << "\tR = " << distance << endl; 
+	cout << "\t   R = " << distance << endl; 
 }
 
 int main(int argc, char ** argv)
@@ -129,7 +129,8 @@ int main(int argc, char ** argv)
 				//cout << massVector[1].getVelocity().z << endl; 
 				//printF(massVector[1]);
 				//printVel(massVector[1]);  
-				printTime(c); 
+				printTime(c);
+				//printVel(massVector[1]);  
 				printPos(massVector[1]); 
 				printDist(massVector[0], massVector[1]); 
 			}

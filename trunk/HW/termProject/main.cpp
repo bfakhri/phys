@@ -15,6 +15,16 @@
 using namespace std; 
 
 // For debugging
+void printTime(int seconds){
+	int days =  seconds/(60*60*24);
+	seconds = seconds%(60*60*24); 
+	int hours = seconds/(60*60); 
+	seconds = seconds%(60*60); 
+	int minutes = seconds/60; 
+	seconds = seconds%60; 
+	cout << "Days:    " << days << "\tHrs:    " << hours << "\tMin:   " << minutes << "\tSec:   " << seconds << "\t"; 
+}
+
 void printF(Mass m){
 	cout << "Forces:\tX = " << m.getCumalForces().x << "\tY = " << m.getCumalForces().y << "\tZ = " << m.getCumalForces().z << endl; 
 } 
@@ -22,8 +32,16 @@ void printVel(Mass m){
 	cout << "Velocities:\tX = " << m.getVelocity().x << "\tY = " << m.getVelocity().y << "\tZ = " << m.getVelocity().z << endl; 
 } 
 void printPos(Mass m){
-	cout << "Pos:\tX = " << m.getPos().x << "   \tY = " << m.getPos().y << "   \tZ = " << m.getPos().z << endl; 
+	cout << "Pos:\tX = " << m.getPos().x << "   \tY = " << m.getPos().y << "   \tZ = " << m.getPos().z; 
 } 
+void printDist(Mass m1, Mass m2){
+	cartesian diffPos;
+	diffPos.x =  m1.x - m2.x;
+	diffPos.y =  m1.y - m2.y;
+	diffPos.z =  m1.z - m2.z;
+	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y*diffPos.y + diffPos.z*diffPos.z); 
+	cout << "\tR = " << distance << endl; 
+}
 
 int main(int argc, char ** argv)
 {
@@ -56,7 +74,8 @@ int main(int argc, char ** argv)
 	moon.setMass(scientificNotation(7.349, 22)); 
 	moon.setName("Moon"); 
 	moon.setPos(scientificNotation(3.626, 8), 0, 0); 
-	moon.setVelocity(0, 0, 1076); 
+	//moon.setVelocity(0, 0, 1076); 
+	moon.setVelocity(0, 0, 800); 
 
 	massVector.push_back(earth);
 	massVector.push_back(moon);
@@ -110,20 +129,22 @@ int main(int argc, char ** argv)
 				//cout << massVector[1].getVelocity().z << endl; 
 				//printF(massVector[1]);
 				//printVel(massVector[1]);  
+				printTime(c); 
 				printPos(massVector[1]); 
+				printDist(massVector[0], massVector[1]); 
 			}
 			massVector[i].updateVelAndPos(TIME_STEP); 
 			massVector[i].resetForces();  
 		}	
 		
-		if(c > 100 && (abs(massVector[1].getPos().z) < 1))
+		if(c > 100 && (fabs(massVector[1].getPos().z) < 1.0f))
 		{
-			cout << setprecision(51) << "Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
-			printf("\n%f\n", massVector[1].getPos().z); 
-			if((double)abs(massVector[1].getPos().z) < (double)1)
-				cout << "Yes it's above" << endl; 
-			int wait; 
-			cin >> wait; 
+			//cout << setprecision(51) << "Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
+			printf("\n%f\n", fabs(massVector[1].getPos().z)); 
+			//if((double)abs(massVector[1].getPos().z) < (double)1)
+			//	cout << "Yes it's above" << endl; 
+			//int wait; 
+			//cin >> wait; 
 		}
 
 	}

@@ -100,9 +100,9 @@ double Mass::newtonGrav(double objMass, double distance){
 void Mass::influence(Mass obj){
 	cartesian objPos = obj.getPos();
 	cartesian diffPos; 
-	diffPos.x = position.x - objPos.x;
-	diffPos.y = position.y - objPos.y;
-	diffPos.z = position.z - objPos.z;
+	diffPos.x =  objPos.x - position.x;
+	diffPos.y =  objPos.y - position.y;
+	diffPos.z =  objPos.z - position.z;
 
 	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y*diffPos.y + diffPos.z*diffPos.z); 
 

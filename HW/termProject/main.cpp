@@ -4,7 +4,9 @@
 #include <iomanip>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <vector>
+
 #include "mass.h"
 #include "mather.h"
 
@@ -46,8 +48,8 @@ void printDist(Mass m1, Mass m2){
 int main(int argc, char ** argv)
 {
 	double TIME_STEP = DEF_TIME_STEP;
-	unsigned int SIM_STEPS = DEF_SIM_STEPS;
-	unsigned int STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
+	uint32_t SIM_STEPS = DEF_SIM_STEPS;
+	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
 
 	if(argc > 1)
 	{
@@ -64,6 +66,10 @@ int main(int argc, char ** argv)
 		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl 
 		<< "Steps per output = " << STEP_PER_OUTPUT << endl; 
 
+	// Ouput file stuff
+	FILE * vidFile;
+	vidFile = fopen("vidFile.bin", "wb"); 
+
 	initConsts(); 
 
 	vector<Mass> massVector; 
@@ -75,7 +81,9 @@ int main(int argc, char ** argv)
 	moon.setName("Moon"); 
 	moon.setPos(scientificNotation(3.626, 8), 0, 0); 
 	//moon.setVelocity(0, 0, 1076); 
-	moon.setVelocity(0, 0, 800); 
+	//moon.setVelocity(0, 1076000, 0); 
+	moon.setVelocity(0, 1023, 0); 
+	//moon.setVelocity(0, 0, 800); 
 
 	massVector.push_back(earth);
 	massVector.push_back(moon);
@@ -85,19 +93,11 @@ int main(int argc, char ** argv)
 	cout << "Earth Mass:\t" << earth.getMass() << endl; 
 	cout << "Moon Mass:\t" << moon.getMass() << endl; 
 	
-	//Mass massVector[10]; 
 	
-	/*
-	// Init random masses
-	for(int i=0; i<10; i++)
-	{
-		cartesian tempCart; 
-		tempCart.x = rand()%1000; 
-		tempCart.x = rand()%1000; 
-		tempCart.z = rand()%1000; 
-		massVector[i].setPos(tempCart); 
-	}*/
-
+	// Output file stuff
+	uint32_t numObjects = 2; 
+	fwrite ( (const void*)(&numObjects), 4, 1, vidFile );
+	fwrite ( (const void*)(&SIM_STEPS), 4, 1, vidFile );
 
 
 	// Simulation loop
@@ -122,32 +122,23 @@ int main(int argc, char ** argv)
 		{
 			// General case output
 			if(c%STEP_PER_OUTPUT == 0){
-				/*cout<<"Timestep: " << c << "\tObject Number: "<< i <<"\tObject Name: " << massVector[i].getName() 
-				<< "\tPos: "<<massVector[i].getPos().x<<", "<<massVector[i].getPos().y
-				<< ", "<<massVector[i].getPos().z<<endl; */
-
-				//cout << massVector[1].getVelocity().z << endl; 
 				//printF(massVector[1]);
 				//printVel(massVector[1]);  
-				printTime(c);
+				printTime(c*TIME_STEP);
 				//printVel(massVector[1]);  
 				printPos(massVector[1]); 
 				printDist(massVector[0], massVector[1]); 
+				
 			}
+			// For output
+			double tX, tY; 
+			tX = massVector[i].getPos().x;
+			tY = massVector[i].getPos().y;
+			fwrite((const void *)(&tX), 8, 1, vidFile); 
+			fwrite((const void *)(&tY), 8, 1, vidFile); 
 			massVector[i].updateVelAndPos(TIME_STEP); 
 			massVector[i].resetForces();  
 		}	
-		
-		if(c > 100 && (fabs(massVector[1].getPos().z) < 1.0f))
-		{
-			//cout << setprecision(51) << "Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
-			printf("\n%f\n", fabs(massVector[1].getPos().z)); 
-			//if((double)abs(massVector[1].getPos().z) < (double)1)
-			//	cout << "Yes it's above" << endl; 
-			//int wait; 
-			//cin >> wait; 
-		}
-
 	}
 
 	return 0;

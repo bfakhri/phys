@@ -1,0 +1,29 @@
+// Bijan Fakhri
+// CSE 470 
+// Project 1
+// Due 9-25-13
+
+A) Navigation - The arrow keys are used to move the paddle. 
+	RIGHT - move paddle right
+	LEFT - move paddle left
+	UP - rotate paddle counter clockwise
+	DOWN - rotate paddle clockwise
+	SPACE-BAR - fire a missile from the paddle
+	RIGHT-CLICK - opens the pop-up menu with quit, reset, polygon-wire and polygon-fill options. 
+		QUIT - quits the program
+		RESET - resets the game (score/time)
+		POLYGON-WIRE - makes the targets wireframes
+		POLYGON-FILL - makes the targets solid
+
+
+B) Special Functions - none
+C) Changes to Spec - none
+D) Important notes - A working executable is located in the "Release" folder along with the necessary dll. The 		     score increments when a missile is fired.
+
+E) Other Libraries/Code - 
+	<string>			// Used for drawing scoreboard/timer
+	<iostream>			// For debugging purposes 
+	<vector>			// Vectors used to house drawable objects
+	<time.h>			// Used for tracking time 
+	<math.h>			// For trig and other math functions
+	"glut.h" and glut32.dll		// For openGL 

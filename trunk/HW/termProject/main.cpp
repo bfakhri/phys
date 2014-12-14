@@ -36,9 +36,9 @@ void printPos(Mass m){
 } 
 void printDist(Mass m1, Mass m2){
 	cartesian diffPos;
-	diffPos.x =  m1.x - m2.x;
-	diffPos.y =  m1.y - m2.y;
-	diffPos.z =  m1.z - m2.z;
+	diffPos.x =  m1.getPos().x - m2.getPos().x;
+	diffPos.y =  m1.getPos().y - m2.getPos().y;
+	diffPos.z =  m1.getPos().z - m2.getPos().z;
 	double distance = sqrt(diffPos.x*diffPos.x + diffPos.y*diffPos.y + diffPos.z*diffPos.z); 
 	cout << "\tR = " << distance << endl; 
 }

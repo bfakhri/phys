@@ -1,7 +1,16 @@
 #include "mass.h"
+#include "mather.h"
+
+double G; 
+
+void initConsts(){
+	// Init G
+	G = scientificNotation(6.67384, -11); 
+}
 
 Mass::Mass()
 {
+	name = "Mass"; 
 	objectMass = 1; 	// Default 1Kg
 	position.x = 0; 
 	position.y = 0; 
@@ -17,6 +26,10 @@ Mass::Mass()
 		
 }
 
+string Mass::getName(){
+	return name; 
+}
+
 double Mass::getMass(){
 	return objectMass; 
 }
@@ -29,6 +42,14 @@ cartesian Mass::getVelocity(){
 	return velocity; 
 }
 
+cartesian Mass::getCumalForces(){
+	return cumalForces;
+}
+
+void Mass::setName(string newName){
+	name = newName; 
+}
+
 void Mass::setMass(double newMass){
 	objectMass = newMass; 
 }
@@ -37,8 +58,20 @@ void Mass::setPos(cartesian newPos){
 	position = newPos;
 }
 
+void Mass::setPos(double x, double y, double z){
+	position.x = x; 
+	position.y = y; 
+	position.z = z; 
+}
+
 void Mass::setVelocity(cartesian newVelocity){
 	velocity = newVelocity; 
+}
+
+void Mass::setVelocity(double x, double y, double z){
+	velocity.x = x; 
+	velocity.y = y; 
+	velocity.z = z; 
 }
 
 void Mass::resetForces(){
@@ -53,10 +86,17 @@ void Mass::addForce(cartesian force){
 	cumalForces.z += force.z;
 }	
 
+void Mass::addForce(double x, double y, double z){
+	cumalForces.x += x; 
+	cumalForces.y += y;
+	cumalForces.z += z;
+}
+	
 double Mass::newtonGrav(double objMass, double distance){
 	return G*(objectMass*objMass)/(distance*distance); 
 }
 
+// Should modify so that the whole object isn't copied
 void Mass::influence(Mass obj){
 	cartesian objPos = obj.getPos();
 	cartesian diffPos; 
@@ -69,9 +109,12 @@ void Mass::influence(Mass obj){
 	double netForce = newtonGrav(obj.getMass(), distance); 
 
 	// Check this math just in case
+	addForce(netForce * diffPos.x/distance, netForce * diffPos.y/distance, netForce * diffPos.z/distance); 
+	/*
 	cumalForces.x += netForce * diffPos.x/distance; 
 	cumalForces.y += netForce * diffPos.y/distance; 
 	cumalForces.z += netForce * diffPos.z/distance; 	
+	*/
 }
 // MAKE FASTER BY GETTING RID OF REDUNDANT COMPUTING
 // F = ma, a = F/m

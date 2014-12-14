@@ -1,52 +1,121 @@
 // Main
 
-#include "mass.h"
 #include <iostream>
 #include <stdlib.h>
+#include <vector>
+#include "mass.h"
+#include "mather.h"
 
-#define TIME_STEP 0.01
-#define SIM_STEPS 100
+#define DEF_TIME_STEP 1
+#define DEF_SIM_STEPS 100
+#define DEF_STEP_PER_OUTPUT 1
+
 using namespace std; 
+
+// For debugging
+void printforces(Mass m){
+	cout << "Forces:\tX = " << m.getCumalForces().x << "\tY = " << m.getCumalForces().y << "\tZ = " << m.getCumalForces().z << endl; 
+} 
+void printvelocities(Mass m){
+	cout << "Velocities:\tX = " << m.getVelocity().x << "\tY = " << m.getVelocity().y << "\tZ = " << m.getVelocity().z << endl; 
+} 
 
 int main(int argc, char ** argv)
 {
-	Mass earth;
-	earth.setMass(5.9736*100); 
+	double TIME_STEP = DEF_TIME_STEP;
+	unsigned int SIM_STEPS = DEF_SIM_STEPS;
+	unsigned int STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
 
-	Mass massArr[10]; 
+	if(argc > 1)
+	{
+		if(argc != 4){
+			cout << endl << "ERROR, incorrect number of arguments" << endl; 
+			return -1; 
+		}else{
+			SIM_STEPS = atoi(argv[1]); 
+			TIME_STEP = atoi(argv[2]); 
+			STEP_PER_OUTPUT = atoi(argv[3]); 	
+		}
+	}
+	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
+		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl 
+		<< "Steps per output = " << STEP_PER_OUTPUT << endl; 
 
+	initConsts(); 
+
+	vector<Mass> massVector; 
+
+	Mass earth, moon; 
+	earth.setMass(scientificNotation(5.9736, 24)); 
+	earth.setName("Earth"); 
+	moon.setMass(scientificNotation(7.349, 22)); 
+	moon.setName("Moon"); 
+	moon.setPos(scientificNotation(3.626, 8), 0, 0); 
+	moon.setVelocity(0, 0, 1076); 
+
+	massVector.push_back(earth);
+	massVector.push_back(moon);
+	
+
+	cout << "G:\t" << G << endl; 
+	cout << "Earth Mass:\t" << earth.getMass() << endl; 
+	cout << "Moon Mass:\t" << moon.getMass() << endl; 
+	
+	//Mass massVector[10]; 
+	
+	/*
+	// Init random masses
 	for(int i=0; i<10; i++)
 	{
 		cartesian tempCart; 
 		tempCart.x = rand()%1000; 
 		tempCart.x = rand()%1000; 
 		tempCart.z = rand()%1000; 
-		massArr[i].setPos(tempCart); 
-	}
+		massVector[i].setPos(tempCart); 
+	}*/
+
+
 
 	// Simulation loop
 	for(int c=0; c<SIM_STEPS; c++)
 	{
 		// Influences
-		for(int i=0; i<10; i++)
+		for(int i=0; i<massVector.size(); i++)
 		{
-			massArr[i].resetForces(); 
-			for(int j=0; j<10; j++)
+			massVector[i].resetForces(); 
+			for(int j=0; j<massVector.size(); j++)
 			{
 				if(i != j)
 				{
-					massArr[i].influence(massArr[j]); 
+					massVector[i].influence(massVector[j]); 
 				}
 			}
 
 		}
 		
 		// Update position
-		for(int i=0; i<10; i++)
+		for(int i=0; i<massVector.size(); i++)
 		{
-			cout<<"Object: \t"<<i<<"\tPos: "<<massArr[i].getPos().x<<", "<<massArr[i].getPos().y<<", "<<massArr[i].getPos().z<<endl;
-			massArr[i].updateVelAndPos(TIME_STEP);  
+			// General case output
+			if(c%STEP_PER_OUTPUT == 0){
+				/*cout<<"Timestep: " << c << "\tObject Number: "<< i <<"\tObject Name: " << massVector[i].getName() 
+				<< "\tPos: "<<massVector[i].getPos().x<<", "<<massVector[i].getPos().y
+				<< ", "<<massVector[i].getPos().z<<endl; */
+
+				//cout << massVector[1].getVelocity().z << endl; 
+				printforces(massVector[1]);
+				printvelocities(massVector[1]);  
+				
+			}
+			massVector[i].updateVelAndPos(TIME_STEP); 
+			massVector[i].resetForces();  
 		}	
+		
+		if(c > 100 && (massVector[1].getPos().z < 1.0f))
+		{
+			cout<<"Timestep: " << c << "\tObject Name: " << massVector[1].getName() << "\tPos: "<<massVector[1].getPos().x<<", "<<massVector[1].getPos().y<<", "<<massVector[1].getPos().z<<endl;
+		}
+
 	}
 
 	return 0;

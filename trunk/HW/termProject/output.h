@@ -2,13 +2,15 @@
 #define OUTPUT_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 extern FILE * ext_vidFile;
 
 void initOutput();
 void outputObjectCount(uint32_t objectCount);
-void outputObjectMass(uint32_t mass);
+void outputObjectMass(double mass);
 void outputSimSteps(uint32_t simSteps);
 void outputFrames(double x, double y); 
 void outputClose(); 
- 
+
+#endif 

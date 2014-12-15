@@ -15,7 +15,6 @@
 #define DEF_TIME_STEP 1
 #define DEF_SIM_STEPS 100
 #define DEF_STEP_PER_OUTPUT 1
-#define DEF_TOTAL_OBJECTS 3
 
 using namespace std; 
 
@@ -26,7 +25,6 @@ int main(int argc, char ** argv)
 	double TIME_STEP = DEF_TIME_STEP;
 	uint32_t SIM_STEPS = DEF_SIM_STEPS;
 	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
-	uint32_t TOTAL_OBJECTS = DEF_TOTAL_OBJECTS; 
 
 	// Custom simulation parameters 
 	if(argc > 1)
@@ -70,6 +68,7 @@ int main(int argc, char ** argv)
 	massVector.push_back(earth);
 	massVector.push_back(moon);
 	massVector.push_back(moon2);
+
 
 	// Export object count to output	
 	outputObjectCount((uint32_t)massVector.size()); 

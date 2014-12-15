@@ -17,6 +17,7 @@
 #define DEF_STEP_PER_OUTPUT 1
 #define DEF_PROGRESS_OUT 1
 #define DEF_RESULTS_OUT 1
+#define DEF_CPU_PARALLEL 1
 using namespace std; 
 
 
@@ -28,11 +29,12 @@ int main(int argc, char ** argv)
 	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
 	int PROGRESS_OUT = DEF_PROGRESS_OUT; 
 	int RESULTS_OUT = DEF_RESULTS_OUT; 
+	int CPU_PARALLEL = DEF_CPU_PARALLEL; 
 
 	// Custom simulation parameters 
 	if(argc > 1)
 	{
-		if(argc != 6){
+		if(argc != 7){
 			cout << endl << "ERROR, incorrect number of arguments" << endl; 
 			return -1; 
 		}else{
@@ -41,11 +43,15 @@ int main(int argc, char ** argv)
 			STEP_PER_OUTPUT = atoi(argv[3]); 	
 			PROGRESS_OUT = atoi(argv[4]); 
 			RESULTS_OUT = atoi(argv[5]); 
+			CPU_PARALLEL = atoi(argv[6]); 
 		}
 	}
 	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
 		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl 
-		<< "Steps per output = " << STEP_PER_OUTPUT << endl; 
+		<< "Steps per output = " << STEP_PER_OUTPUT << endl
+		<< "Progress out?  = " << PROGRESS_OUT << endl 
+		<< "Results out? = " << RESULTS_OUT << endl
+		<< "CPU Parallel? = " << CPU_PARALLEL << endl; 
 
 
 	// Initialize constants like G
@@ -108,6 +114,7 @@ int main(int argc, char ** argv)
 	for(int t=0; t<SIM_STEPS; t++)
 	{	
 		// Influences
+		#pragma omp parallel for if(CPU_PARALLEL) schedule(guided)
 		for(int i=0; i<massVector.size(); i++)
 		{
 			massVector[i].resetForces(); 
@@ -132,6 +139,7 @@ int main(int argc, char ** argv)
 		}
 
 		// Update position
+		#pragma omp parallel for if(CPU_PARALLEL) schedule(guided)
 		for(int i=0; i<massVector.size(); i++)
 		{
 			if(PROGRESS_OUT){

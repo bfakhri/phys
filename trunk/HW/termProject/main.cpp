@@ -15,7 +15,8 @@
 #define DEF_TIME_STEP 1
 #define DEF_SIM_STEPS 100
 #define DEF_STEP_PER_OUTPUT 1
-
+#define DEF_PROGRESS_OUT 1
+#define DEF_RESULTS_OUT 1
 using namespace std; 
 
 
@@ -25,17 +26,21 @@ int main(int argc, char ** argv)
 	double TIME_STEP = DEF_TIME_STEP;
 	uint32_t SIM_STEPS = DEF_SIM_STEPS;
 	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
+	int PROGRESS_OUT = DEF_PROGRESS_OUT; 
+	int RESULTS_OUT = DEF_RESULTS_OUT; 
 
 	// Custom simulation parameters 
 	if(argc > 1)
 	{
-		if(argc != 4){
+		if(argc != 6){
 			cout << endl << "ERROR, incorrect number of arguments" << endl; 
 			return -1; 
 		}else{
 			SIM_STEPS = atoi(argv[1]); 
 			TIME_STEP = atoi(argv[2]); 
 			STEP_PER_OUTPUT = atoi(argv[3]); 	
+			PROGRESS_OUT = atoi(argv[4]); 
+			RESULTS_OUT = atoi(argv[5]); 
 		}
 	}
 	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
@@ -46,8 +51,10 @@ int main(int argc, char ** argv)
 	// Initialize constants like G
 	initConsts(); 
 
-	// Initialize output 
-	initOutput(); 
+	if(PROGRESS_OUT){
+		// Initialize output 
+		initOutput(); 
+	}
 
 	// Holds all of the masses 
 	vector<Mass> massVector; 
@@ -86,15 +93,16 @@ int main(int argc, char ** argv)
 		massVector.push_back(solarSystem[i]); 
 	}
 
-	// Export object count to output	
-	outputObjectCount((uint32_t)massVector.size()); 
-	// Export masses to output
-	for(int i=0; i<massVector.size(); i++){
-		outputObjectMass(massVector[i].getMass()); 
+	if(PROGRESS_OUT){
+		// Export object count to output	
+		outputObjectCount((uint32_t)massVector.size()); 
+		// Export masses to output
+		for(int i=0; i<massVector.size(); i++){
+			outputObjectMass(massVector[i].getMass()); 
+		}
+		// Export number of simulation steps
+		outputSimSteps(SIM_STEPS); 	
 	}
-	// Export number of simulation steps
-	outputSimSteps(SIM_STEPS); 	
-
 
 	// MAIN SIMULATION LOOP
 	for(int t=0; t<SIM_STEPS; t++)
@@ -113,32 +121,38 @@ int main(int argc, char ** argv)
 
 		}
 		
-		// Moon output
-		if(t%STEP_PER_OUTPUT == 0){
-			//printF(massVector[1]);
-			//printVel(massVector[1]);  
-			//printTime(t*TIME_STEP);
-			//printVel(massVector[1]);  
-			printPos(massVector[1]);
-			cout << endl; 
-			printPos(massVector[2]); 
-			printDist(massVector[0], massVector[1]); 
-			
+		// Moon some 
+		if(PROGRESS_OUT){
+			if(t%STEP_PER_OUTPUT == 0){
+				printTime(t*TIME_STEP);
+				printPos(massVector[1]);
+				printDist(massVector[0], massVector[1]); 
+				
+			}
 		}
 
 		// Update position
 		for(int i=0; i<massVector.size(); i++)
 		{
-			// Export coordinates of all objects to output
-			outputFrames(massVector[i].getPos().x, massVector[i].getPos().y);
+			if(PROGRESS_OUT){
+				// Export coordinates of all objects to output
+				outputFrames(massVector[i].getPos().x, massVector[i].getPos().y);
+			}
 
 			massVector[i].updateVelAndPos(TIME_STEP); 
 			massVector[i].resetForces();  
 		}	
 	}
 
-	// Close output file
-	outputClose(); 
+	if(PROGRESS_OUT){
+		// Close output file
+		outputClose(); 
+	}
+
+	if(RESULTS_OUT){
+		// Prints last positions of masses to file
+		outputResults(massVector); 
+	}
 
 	return 0;
 }

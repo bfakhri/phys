@@ -1,7 +1,8 @@
 #include "all_includes.h"
 
-unsigned __int32 numObjects; 
-unsigned __int32 framesPerObject; 
+unsigned __int64 numObjects; 
+unsigned __int64 framesPerObject; 
+double maxDimension; 
 
 /* Targets */
 // Wall
@@ -14,19 +15,19 @@ void initFrames()
 	vidFile = fopen ("vidFile.bin","rb");
 	if (vidFile!=NULL)
 	{
-		fread(&numObjects, 4, 1, vidFile);
+		fread(&numObjects, 8, 1, vidFile);
 
 		double tempDouble; 
 		for(int i=0; i<numObjects; i++){
 			fread(&tempDouble, 8, 1, vidFile);
-			if(log10(tempDouble) > 23)
+			if(log10(tempDouble) > 29)
 				//circles.push_back(*(new Circle(0, 0, 0, log10(tempDouble)/24)));
-				circles.push_back(*(new Circle(0, 0, 0, 0.1)));
+				circles.push_back(*(new Circle(0, 0, 0, 0.02)));
 			else
-				circles.push_back(*(new Circle(0, 0, 0, 0.01)));
+				circles.push_back(*(new Circle(0, 0, 0, 0.001)));
 		}
 
-		fread(&framesPerObject, 4, 1, vidFile);
+		fread(&framesPerObject, 8, 1, vidFile);
 		frameArr = new double[framesPerObject*numObjects*2]; 
 		for(int i=0; i<framesPerObject*numObjects*2; i++){
 			fread(&tempDouble, 8, 1, vidFile);
@@ -40,7 +41,16 @@ void initFrames()
 
 void initShapes()
 {
-	
+	double avgDim = 0; 
+	maxDimension = 0; 
+	for(__int64 i=0; i<framesPerObject*numObjects*2; i++)
+	{
+		avgDim += fabs(frameArr[i]); 
+		if(fabs(frameArr[i]) > maxDimension)
+			maxDimension = fabs(frameArr[i]); 
+	}
+	avgDim /= (framesPerObject*numObjects*2); 
+	maxDimension /= 1000; 
 }
 
 
@@ -48,8 +58,8 @@ void drawAllShapes()
 {
 	for(unsigned int i=0; i<numObjects; i++)
 	{
-		circles[i].setX(frameArr[(ext_frameCount*numObjects*2+i*2)]/1000000000); 
-		circles[i].setY(frameArr[(ext_frameCount*numObjects*2+1+i*2)]/1000000000); 
+		circles[i].setX(frameArr[(ext_frameCount*numObjects*2+i*2)]/maxDimension); 
+		circles[i].setY(frameArr[(ext_frameCount*numObjects*2+1+i*2)]/maxDimension); 
 		if(i != 0)
 			std::cout << "Frame: "<< ext_frameCount << "/" << framesPerObject << "\t" << circles[i].getX() << "     \t\t" << circles[i].getY() << std::endl;
 		circles[i].draw(); 

@@ -159,7 +159,7 @@ static void idle()
 	if((clock() - ext_lastRefreshClock) >= ext_clocksPerRefresh)
 	{ 
 		ext_lastRefreshClock = clock();			// Records last time a frame was launched
-		ext_frameCount+=2;						// Increments frame counter
+		ext_frameCount++;						// Increments frame counter
 		if(ext_frameCount >= ext_refreshRate)	// Checks to see if a second has gone by
 		{
 			ext_secGameTime++;		// Increments game time

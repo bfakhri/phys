@@ -1,7 +1,7 @@
 #include "all_includes.h"
 
 unsigned __int32 numObjects; 
-unsigned __int32 totalFrames; 
+unsigned __int32 framesPerObject; 
 
 /* Targets */
 // Wall
@@ -15,16 +15,22 @@ void initFrames()
 	if (vidFile!=NULL)
 	{
 		fread(&numObjects, 4, 1, vidFile);
-		fread(&totalFrames, 4, 1, vidFile);
-		frameArr = new double[totalFrames*2]; 
-		double bs; 
-		//fread(&bs, 4, 1, vidFile);
+
 		double tempDouble; 
-		for(int i=0; i<totalFrames; i+=2){
+		for(int i=0; i<numObjects; i++){
+			fread(&tempDouble, 8, 1, vidFile);
+			if(log10(tempDouble) > 23)
+				//circles.push_back(*(new Circle(0, 0, 0, log10(tempDouble)/24)));
+				circles.push_back(*(new Circle(0, 0, 0, 0.1)));
+			else
+				circles.push_back(*(new Circle(0, 0, 0, 0.01)));
+		}
+
+		fread(&framesPerObject, 4, 1, vidFile);
+		frameArr = new double[framesPerObject*numObjects*2]; 
+		for(int i=0; i<framesPerObject*numObjects*2; i++){
 			fread(&tempDouble, 8, 1, vidFile);
 			frameArr[i] = tempDouble; 
-			fread(&tempDouble, 8, 1, vidFile);
-			frameArr[i+1] = tempDouble; 
 		}
 		fclose(vidFile);
 	}else{
@@ -34,27 +40,25 @@ void initFrames()
 
 void initShapes()
 {
-	for(int i=0; i<numObjects; i++){
-		circles.push_back(*(new Circle(0, 0, 0, 0.02)));
-	}
+	
 }
 
 
 void drawAllShapes()
 {
-	// Parent orbitles 
 	for(unsigned int i=0; i<numObjects; i++)
 	{
-		circles[i].setX(frameArr[(ext_frameCount+i*2)%(totalFrames*2)]/1000000000); 
-		circles[i].setY(frameArr[(ext_frameCount+1+i*2)%(totalFrames*2)]/1000000000); 
-		std::cout << "Frame: "<< ext_frameCount << "/" << totalFrames << "\t" << circles[i].getX() << "\t" << circles[i].getY() << std::endl;
+		circles[i].setX(frameArr[(ext_frameCount*numObjects*2+i*2)]/1000000000); 
+		circles[i].setY(frameArr[(ext_frameCount*numObjects*2+1+i*2)]/1000000000); 
+		if(i != 0)
+			std::cout << "Frame: "<< ext_frameCount << "/" << framesPerObject << "\t" << circles[i].getX() << "     \t\t" << circles[i].getY() << std::endl;
 		circles[i].draw(); 
 		int temp; 
 		//std::cin >> temp; 
 	}
 
-	Circle * center = new Circle(0, 0, 0, 0.005); 
-	center->draw(); 
+	//Circle * center = new Circle(0, 0, 0, 0.005); 
+	//center->draw(); 
 }
 
 

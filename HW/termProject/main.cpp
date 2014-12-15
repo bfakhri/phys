@@ -15,7 +15,7 @@
 #define DEF_TIME_STEP 1
 #define DEF_SIM_STEPS 100
 #define DEF_STEP_PER_OUTPUT 1
-#define DEF_TOTAL_OBJECTS 2
+#define DEF_TOTAL_OBJECTS 3
 
 using namespace std; 
 
@@ -55,16 +55,21 @@ int main(int argc, char ** argv)
 	vector<Mass> massVector; 
 
 	// Earth/Moon sim
-	Mass earth, moon; 
+	Mass earth, moon, moon2; 
 	earth.setMass(scientificNotation(5.9736, 24)); 
 	earth.setName("Earth"); 
 	moon.setMass(scientificNotation(7.349, 22)); 
 	moon.setName("Moon"); 
 	moon.setPos(scientificNotation(3.626, 8), 0, 0); 
 	moon.setVelocity(0, 1023, 0); 
+	moon2.setMass(scientificNotation(7.349, 22)); 
+	moon2.setName("Moon2"); 
+	moon2.setPos(0-scientificNotation(3.626, 8), 0, 0); 
+	moon2.setVelocity(0, 1023, 0); 
 
 	massVector.push_back(earth);
 	massVector.push_back(moon);
+	massVector.push_back(moon2);
 
 	// Export object count to output	
 	outputObjectCount((uint32_t)massVector.size()); 
@@ -93,19 +98,22 @@ int main(int argc, char ** argv)
 
 		}
 		
+		// Moon output
+		if(t%STEP_PER_OUTPUT == 0){
+			//printF(massVector[1]);
+			//printVel(massVector[1]);  
+			//printTime(t*TIME_STEP);
+			//printVel(massVector[1]);  
+			printPos(massVector[1]);
+			cout << endl; 
+			printPos(massVector[2]); 
+			printDist(massVector[0], massVector[1]); 
+			
+		}
+
 		// Update position
 		for(int i=0; i<massVector.size(); i++)
 		{
-			// General case output
-			if(t%STEP_PER_OUTPUT == 0){
-				//printF(massVector[1]);
-				//printVel(massVector[1]);  
-				printTime(t*TIME_STEP);
-				//printVel(massVector[1]);  
-				printPos(massVector[1]); 
-				printDist(massVector[0], massVector[1]); 
-				
-			}
 			// Export coordinates of all objects to output
 			outputFrames(massVector[i].getPos().x, massVector[i].getPos().y);
 

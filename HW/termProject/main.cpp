@@ -10,6 +10,7 @@
 #include "mass.h"
 #include "mather.h"
 #include "debug.h"
+#include "output.h"
 
 #define DEF_TIME_STEP 1
 #define DEF_SIM_STEPS 100
@@ -96,7 +97,7 @@ int main(int argc, char ** argv)
 		for(int i=0; i<massVector.size(); i++)
 		{
 			// General case output
-			if(c%STEP_PER_OUTPUT == 0){
+			if(t%STEP_PER_OUTPUT == 0){
 				//printF(massVector[1]);
 				//printVel(massVector[1]);  
 				printTime(t*TIME_STEP);

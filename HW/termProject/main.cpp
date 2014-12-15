@@ -14,16 +14,20 @@
 #define DEF_TIME_STEP 1
 #define DEF_SIM_STEPS 100
 #define DEF_STEP_PER_OUTPUT 1
+#define DEF_TOTAL_OBJECTS 2
 
 using namespace std; 
 
 
 int main(int argc, char ** argv)
 {
+	// Simulation parameter variables
 	double TIME_STEP = DEF_TIME_STEP;
 	uint32_t SIM_STEPS = DEF_SIM_STEPS;
 	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
+	uint32_t TOTAL_OBJECTS = DEF_TOTAL_OBJECTS; 
 
+	// Custom simulation parameters 
 	if(argc > 1)
 	{
 		if(argc != 4){
@@ -39,43 +43,41 @@ int main(int argc, char ** argv)
 		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl 
 		<< "Steps per output = " << STEP_PER_OUTPUT << endl; 
 
-	// Ouput file stuff
-	FILE * vidFile;
-	vidFile = fopen("vidFile.bin", "wb"); 
 
+	// Initialize constants like G
 	initConsts(); 
 
+	// Initialize output 
+	initOutput(); 
+
+	// Holds all of the masses 
 	vector<Mass> massVector; 
 
+	// Earth/Moon sim
 	Mass earth, moon; 
 	earth.setMass(scientificNotation(5.9736, 24)); 
 	earth.setName("Earth"); 
 	moon.setMass(scientificNotation(7.349, 22)); 
 	moon.setName("Moon"); 
 	moon.setPos(scientificNotation(3.626, 8), 0, 0); 
-	//moon.setVelocity(0, 0, 1076); 
-	//moon.setVelocity(0, 1076000, 0); 
 	moon.setVelocity(0, 1023, 0); 
-	//moon.setVelocity(0, 0, 800); 
 
 	massVector.push_back(earth);
 	massVector.push_back(moon);
-	
 
-	cout << "G:\t" << G << endl; 
-	cout << "Earth Mass:\t" << earth.getMass() << endl; 
-	cout << "Moon Mass:\t" << moon.getMass() << endl; 
-	
-	
-	// Output file stuff
-	uint32_t numObjects = 2; 
-	fwrite ( (const void*)(&numObjects), 4, 1, vidFile );
-	fwrite ( (const void*)(&SIM_STEPS), 4, 1, vidFile );
+	// Export object count to output	
+	outputObjectCount((uint32_t)massVector.size()); 
+	// Export masses to output
+	for(int i=0; i<massVector.size(); i++){
+		outputObjectMass(massVector[i].getMass()); 
+	}
+	// Export number of simulation steps
+	outputSimSteps(SIM_STEPS); 	
 
 
-	// Simulation loop
-	for(int c=0; c<SIM_STEPS; c++)
-	{
+	// MAIN SIMULATION LOOP
+	for(int t=0; t<SIM_STEPS; t++)
+	{	
 		// Influences
 		for(int i=0; i<massVector.size(); i++)
 		{
@@ -97,22 +99,22 @@ int main(int argc, char ** argv)
 			if(c%STEP_PER_OUTPUT == 0){
 				//printF(massVector[1]);
 				//printVel(massVector[1]);  
-				printTime(c*TIME_STEP);
+				printTime(t*TIME_STEP);
 				//printVel(massVector[1]);  
 				printPos(massVector[1]); 
 				printDist(massVector[0], massVector[1]); 
 				
 			}
-			// For output
-			double tX, tY; 
-			tX = massVector[i].getPos().x;
-			tY = massVector[i].getPos().y;
-			fwrite((const void *)(&tX), 8, 1, vidFile); 
-			fwrite((const void *)(&tY), 8, 1, vidFile); 
+			// Export coordinates of all objects to output
+			outputFrames(massVector[i].getPos().x, massVector[i].getPos().y);
+
 			massVector[i].updateVelAndPos(TIME_STEP); 
 			massVector[i].resetForces();  
 		}	
 	}
+
+	// Close output file
+	outputClose(); 
 
 	return 0;
 }

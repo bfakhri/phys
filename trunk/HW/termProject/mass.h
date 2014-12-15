@@ -1,4 +1,7 @@
 // NEED BIG NUM BOOST LIBRARY IN ORDER TO EXPRESS SOME OF THESE NUMBERS
+#ifndef MASS_H
+#define MASS_H
+
 #include <math.h>
 #include <string> 
 
@@ -45,3 +48,5 @@ class Mass
 		void influence(Mass obj); 
 		cartesian updateVelAndPos(double timeStep);
 };
+
+#endif

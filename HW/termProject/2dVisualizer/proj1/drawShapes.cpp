@@ -10,7 +10,6 @@ double* frameArr;
 
 void initFrames()
 {
-	std::cout << sizeof(double); 
 	FILE * vidFile;
 	vidFile = fopen ("vidFile.bin","rb");
 	if (vidFile!=NULL)
@@ -29,7 +28,6 @@ void initFrames()
 		}
 		fclose(vidFile);
 	}else{
-		// Do some error stuff
 		std::cout << "ERROR FILE NOT FOUND" << std::endl; 
 	}
 }
@@ -47,8 +45,8 @@ void drawAllShapes()
 	// Parent orbitles 
 	for(unsigned int i=0; i<numObjects; i++)
 	{
-		circles[i].setX(frameArr[(ext_frameCount+i)%(totalFrames*2)]/1000000000); 
-		circles[i].setY(frameArr[(ext_frameCount+1+i)%(totalFrames*2)]/1000000000); 
+		circles[i].setX(frameArr[(ext_frameCount+i*2)%(totalFrames*2)]/1000000000); 
+		circles[i].setY(frameArr[(ext_frameCount+1+i*2)%(totalFrames*2)]/1000000000); 
 		std::cout << "Frame: "<< ext_frameCount << "/" << totalFrames << "\t" << circles[i].getX() << "\t" << circles[i].getY() << std::endl;
 		circles[i].draw(); 
 		int temp; 

@@ -14,16 +14,19 @@ typedef struct Mass
 	double cumalForcesZ;
 };
 
+__device__
 void resetForces(Mass *m){
 	m.cumalForcesX = 0;
 	m.cumalForcesY = 0;
 	m.cumalForcesZ = 0;
 }
 
+__device__
 double newtonGrav(double m1Mass, double m2Mass, double distance){
 	return G*(m1Mass*m2Mass)/(distance*distance);
 }
 
+__device__
 void influence(Mass *m1, Mass *m2){
 	double diffPosX = m1.positionX - m2.positionX;
 	double diffPosY = m1.positionY - m2.positionY;
@@ -35,6 +38,7 @@ void influence(Mass *m1, Mass *m2){
 	m1.cumalForcesZ += netForce * diffPosZ/distance;
 }
 
+__device__
 void updateVelAndPos(Mass *m, double timeStep){
 	double accelerationX = m.cumalForcesX/m.objectMass;
 	double accelerationY = m.cumalForcesY/m.objectMass;

@@ -4,6 +4,7 @@
 // By Ingemar Ragnemalm 2010
  
 #include <stdio.h>
+#include "mass.cu"
 
 const int N = 7;
 const int blocksize = 7;
@@ -12,6 +13,42 @@ __global__
 void hello(char *a, int *b)
 {
  a[threadIdx.x] += b[threadIdx.x];
+}
+
+__global__
+void simulateOneTick(Mass * masses, unsigned long numMasses, double deltaT)
+{
+	// Calc forces on all masses
+	for(unsigned long i=0; i<numMasses; i++)
+	{
+		if(i != threadIx.x)
+		{
+			influence(masses[threadIx.x], masses[i]); 
+		}
+	}
+
+	// Sync threads so positions are not updated before all other 
+	__syncthreads(); 
+
+	// Update position of all masses
+	updateVelAndPos(masses[threadIx.x], timeStep); 
+
+	// Reset forces
+	resetForces(masses[threadIx.x]); 
+}
+
+__global__
+void simulateOnDevice(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps)
+{
+	// Calc forces on all masses
+	for(unsigned long i=0; i<numMasses; i++)
+	{
+		// Perform step
+		simulateOneTick(masses, numMasses, deltaT); 
+		// Sync threads
+		// **** IS THIS AUTOMATICALLY SYNCED!? **** // 
+		
+	}
 }
 
 int main()

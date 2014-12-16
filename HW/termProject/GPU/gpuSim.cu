@@ -108,9 +108,9 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 }
 
 __global__
-void testEff(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
+void testEff(Mass * masses)//, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
 {
-	masses[threadIdx.x].positionX = threadIdx.x; 
+	masses[threadIdx.x].positionX = 0;//(double)threadIdx.x; 
 }
 
 
@@ -139,6 +139,7 @@ int main(int argc, char ** argv)
 
 	// Make masses	
 	Mass * h_massArray =(Mass*) malloc(N*sizeof(Mass)); 
+	Mass * h_massArray2 =(Mass*) malloc(N*sizeof(Mass)); 
 	
 	// Populate array of masses
 	for(int i=0; i<N; i++){
@@ -161,8 +162,9 @@ int main(int argc, char ** argv)
 
 
 	// Allocate memory on device for masses
-	Mass * d_massArray;
+	Mass * d_massArray, * d_massArray2;
 	cudaMalloc( (void**)&d_massArray, N*sizeof(Mass));
+	cudaMalloc( (void**)&d_massArray2, N*sizeof(Mass));
 
 	// Copy masses onto device
 	cudaMemcpy( d_massArray, h_massArray, (N*sizeof(Mass)), cudaMemcpyHostToDevice );
@@ -173,17 +175,22 @@ int main(int argc, char ** argv)
 
 	// Do sim
 	//simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
-	testEff<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
+	testEff<<< gridDimensions, blockDimensions >>>(d_massArray);
+
+	cudaMemcpy( d_massArray2, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToDevice); 
+	// Sync just in case? 
+	cudaThreadSynchronize();
 
 	// Get data back
-	cudaMemcpy( h_massArray, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );
+	cudaMemcpy( h_massArray2, d_massArray2, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );
 
 	// Free device mem 
 	cudaFree( d_massArray );
+	cudaFree( d_massArray2 ); 
 
 	// Output
 	for(int i=0; i<N; i++){
-		std::cout << h_massArray[i].positionX << std::endl; 
+		std::cout << h_massArray2[i].positionX << std::endl; 
 	}
 
 	return EXIT_SUCCESS;

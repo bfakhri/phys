@@ -13,7 +13,12 @@ double scientificNotation(double num,  int exp)
 	return num; 
 }
 
-double G = scientificNotation(6.67384, -11);
+extern double G;
+double G = 0;
+
+void initG(){
+	G = scientificNotation(6.67384, -11);
+}
 
 typedef struct Mass
 {
@@ -37,17 +42,17 @@ void resetForces(Mass *m){
 }
 
 __device__
-double newtonGrav(double m1Mass, double m2Mass, double distance){
-	return G*(m1Mass*m2Mass)/(distance*distance);
+double newtonGrav(double m1Mass, double m2Mass, double distance, double localG){
+	return localG*(m1Mass*m2Mass)/(distance*distance);
 }
 
 __device__
-void influence(Mass *m1, Mass *m2){
+void influence(Mass *m1, Mass *m2, double localG){
 	double diffPosX = m1->positionX - m2->positionX;
 	double diffPosY = m1->positionY - m2->positionY;
 	double diffPosZ = m1->positionZ - m2->positionZ;
 	double distance = sqrt(diffPosX*diffPosX + diffPosY*diffPosY + diffPosZ*diffPosZ);
-	double netForce = newtonGrav(m1->objectMass, m2->objectMass, distance);
+	double netForce = newtonGrav(m1->objectMass, m2->objectMass, distance, localG);
 	m1->cumalForcesX += netForce * diffPosX/distance; 
 	m1->cumalForcesY += netForce * diffPosY/distance; 
 	m1->cumalForcesZ += netForce * diffPosZ/distance;

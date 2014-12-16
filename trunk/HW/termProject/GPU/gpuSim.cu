@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <iostream>
+#include <math.h>
 //#include "mass.cu"
 
-const int N = 7;
+const int N = 240;
 
 double scientificNotation(double num,  int exp)
 { 
@@ -52,25 +53,29 @@ double newtonGrav(double m1Mass, double m2Mass, double distance, double localG){
 }
 
 __device__
-void influence(Mass *m1, Mass *m2, double localG){
+void influence(Mass *m1, Mass *m2, double localG, double * dist){
 	double diffPosX = m1->positionX - m2->positionX;
 	double diffPosY = m1->positionY - m2->positionY;
 	double diffPosZ = m1->positionZ - m2->positionZ;
 	double distance = sqrt(diffPosX*diffPosX + diffPosY*diffPosY + diffPosZ*diffPosZ);
+	//*dist = distance; 
+	//*dist = 15; 
 	double netForce = newtonGrav(m1->objectMass, m2->objectMass, distance, localG);
+	//*dist = netForce;
 	m1->cumalForcesX += netForce * diffPosX/distance; 
 	m1->cumalForcesY += netForce * diffPosY/distance; 
 	m1->cumalForcesZ += netForce * diffPosZ/distance;
 }
 
 __device__
-void updateVelAndPos(Mass *m, double timeStep){
+void updateVelAndPos(Mass *m, double timeStep, double * dist){
 	double accelerationX = m->cumalForcesX/m->objectMass;
 	double accelerationY = m->cumalForcesY/m->objectMass;
 	double accelerationZ = m->cumalForcesZ/m->objectMass;
 	double timeStepSquared = timeStep*timeStep;
 
 	m->positionX += m->velocityX*timeStep + 0.5*(accelerationX)*(timeStepSquared);
+	*dist = m->velocityX*timeStep + 0.5*(accelerationX)*(timeStepSquared);
 	m->positionY += m->velocityY*timeStep + 0.5*(accelerationY)*(timeStepSquared);
 	m->positionZ += m->velocityZ*timeStep + 0.5*(accelerationZ)*(timeStepSquared);
 
@@ -80,8 +85,9 @@ void updateVelAndPos(Mass *m, double timeStep){
 }
 
 __global__
-void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
+void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG, double * dist)
 {
+	double temp;
 	for(unsigned long i=0; i<totalTimeSteps; i++)
 	{
 		// Sync threads so positions are not updated before all other 
@@ -92,7 +98,7 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 		{
 			if(i != threadIdx.x)
 			{
-				influence(&masses[threadIdx.x], &masses[i], localG); 
+				influence(&masses[threadIdx.x], &masses[i], localG, &temp); 
 			}
 		}
 
@@ -100,7 +106,7 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 		__syncthreads(); 
 
 		// Update position of all masses
-		updateVelAndPos(&masses[threadIdx.x], deltaT); 
+		updateVelAndPos(&masses[threadIdx.x], deltaT, dist); 
 
 		// Reset forces
 		resetForces(&masses[threadIdx.x]);
@@ -110,7 +116,18 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 __global__
 void testEff(Mass * masses)//, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
 {
-	masses[threadIdx.x].positionX = 0;//(double)threadIdx.x; 
+	masses[threadIdx.x].positionX = (double)threadIdx.x; 
+}
+
+__global__
+void testInfluence(Mass * masses, unsigned int numMasses, double localG, double * dist){
+	for(unsigned long i=0; i<numMasses; i++)
+	{
+		if(i != threadIdx.x)
+		{
+			influence(&masses[threadIdx.x], &masses[i], localG, dist); 
+		}
+	}
 }
 
 
@@ -134,7 +151,8 @@ int main(int argc, char ** argv)
 		}
 	}
 	std::cout << "Simulation: " << std::endl << "Number of steps = " << TOTAL_SIM_STEPS 
-		<< std::endl << "Size of time step (seconds) = " << TIME_STEP_SIZE << std::endl;
+		<< std::endl << "Size of time step (seconds) = " << TIME_STEP_SIZE
+		<< std::endl << "Value of G = " << G << std::endl;
  
 
 	// Make masses	
@@ -156,15 +174,21 @@ int main(int argc, char ** argv)
 	}
 
 	// Start output
-	for(int i=0; i<N; i++){
-		std::cout << h_massArray[i].positionX << std::endl; 
-	}
+	std::cout << "Start Posisions (X): " << std::endl;
+	//for(int i=0; i<N; i++){
+	//	std::cout << h_massArray[i].positionX << std::endl; 
+	//}
+	std::cout << h_massArray[0].positionX << std::endl; 
 
 
 	// Allocate memory on device for masses
 	Mass * d_massArray, * d_massArray2;
 	cudaMalloc( (void**)&d_massArray, N*sizeof(Mass));
 	cudaMalloc( (void**)&d_massArray2, N*sizeof(Mass));
+
+	// For debugging
+	double * d_dist, h_dist;
+	cudaMalloc((void**)&d_dist, sizeof(double)); 
 
 	// Copy masses onto device
 	cudaMemcpy( d_massArray, h_massArray, (N*sizeof(Mass)), cudaMemcpyHostToDevice );
@@ -174,8 +198,9 @@ int main(int argc, char ** argv)
 	dim3 gridDimensions( 1, 1 );
 
 	// Do sim
-	//simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
-	testEff<<< gridDimensions, blockDimensions >>>(d_massArray);
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G, d_dist);
+	//testEff<<< gridDimensions, blockDimensions >>>(d_massArray);
+	//testInfluence<<< gridDimensions, blockDimensions >>>(d_massArray, N, G, d_dist); 
 
 	cudaMemcpy( d_massArray2, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToDevice); 
 	// Sync just in case? 
@@ -183,15 +208,20 @@ int main(int argc, char ** argv)
 
 	// Get data back
 	cudaMemcpy( h_massArray2, d_massArray2, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );
+	cudaMemcpy( &h_dist, d_dist, sizeof(double), cudaMemcpyDeviceToHost );
 
 	// Free device mem 
 	cudaFree( d_massArray );
 	cudaFree( d_massArray2 ); 
 
 	// Output
-	for(int i=0; i<N; i++){
-		std::cout << h_massArray2[i].positionX << std::endl; 
-	}
+	std::cout << std::endl << "End Posisions (X): " << std::endl;
+	//std::cout << "Distance: " << h_dist << std::endl;
+	//for(int i=0; i<N; i++){
+	//	std::cout << h_massArray2[i].positionX << std::endl; 
+	//	std::cout << h_massArray2[i].cumalForcesX << std::endl; 	
+	//}
+	std::cout << h_massArray2[0].positionX << std::endl; 
 
 	return EXIT_SUCCESS;
 }

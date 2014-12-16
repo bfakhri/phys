@@ -3,12 +3,12 @@
 using namespace std;
 
 // For debugging
-void printTime(int seconds){
-	int days =  seconds/(60*60*24);
+void printTime(uint64_t seconds){
+	uint64_t days =  seconds/(60*60*24);
 	seconds = seconds%(60*60*24); 
-	int hours = seconds/(60*60); 
+	uint64_t hours = seconds/(60*60); 
 	seconds = seconds%(60*60); 
-	int minutes = seconds/60; 
+	uint64_t minutes = seconds/60; 
 	seconds = seconds%60; 
 	cout << "Days:    " << days << "\tHrs:    " << hours << "\tMin:   " << minutes << "\tSec:   " << seconds << "\t"; 
 }

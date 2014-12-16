@@ -11,16 +11,16 @@ void initOutput(char * name){
 	ext_vidFile = fopen(name, "wb"); 
 }
 
-void outputObjectCount(uint32_t objectCount){
-	fwrite ( (const void*)(&objectCount), 4, 1, ext_vidFile );
+void outputObjectCount(uint64_t objectCount){
+	fwrite ( (const void*)(&objectCount), 8, 1, ext_vidFile );
 }
 
 void outputObjectMass(double mass){
 	fwrite ( (const void*)(&mass), 8, 1, ext_vidFile );
 }
 
-void outputSimSteps(uint32_t simSteps){
-	fwrite ( (const void*)(&simSteps), 4, 1, ext_vidFile );
+void outputSimSteps(uint64_t simSteps){
+	fwrite ( (const void*)(&simSteps), 8, 1, ext_vidFile );
 }
 
 void outputFrames(double x, double y){

@@ -53,20 +53,47 @@ int main(int argc, char ** argv)
 	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
 		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl;
  
-	const int massArraySize = N*sizeof(Mass);
 
-	cudaMalloc( (void**)&ad, csize );
-	cudaMalloc( (void**)&bd, isize );
-	cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice );
-	cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice );
+	// Make masses	
+	Mass * h_massArray =(Mass*) malloc(N*sizeof(Mass)); 
+	
+	// Populate array of masses
+	for(int i=0; i<N; i++){
+		h_massArray[i].objectMass = scientificNotation(6+i, 23); 
+		h_massArray[i].positionX = scientificNotation(6+i, 10); 	
+		h_massArray[i].positionY = scientificNotation(6+i, 10); 	
+		h_massArray[i].positionZ = scientificNotation(6+i, 10); 	
+		h_massArray[i].velocityX = scientificNotation(6+i, 1); 	
+		h_massArray[i].velocityY = scientificNotation(6+i, 2); 	
+		h_massArray[i].velocityZ = scientificNotation(6+i, 1); 	
+		h_massArray[i].cumalForcesX = 0; 	
+		h_massArray[i].cumalForcesY = 0; 	
+		h_massArray[i].cumalForcesZ = 0; 	
+	}
 
+
+	// Allocate memory on device for masses
+	Mass * d_massArray;
+	cudaMalloc( (void**)&d_massArray, N*sizeof(Mass));
+
+	// Copy masses onto device
+	cudaMemcpy( d_massArray, h_massArray, (N*sizeof(Mass)), cudaMemcpyHostToDevice );
+
+	// Dimensions for cuda function call 
 	dim3 blockDimensions( N, 1 );
 	dim3 gridDimensions( 1, 1 );
 
-	simulate<<< gridDimensions, blockDimensions >>>(massArray, N, stepSize, totalSteps);
-	cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost );
-	cudaFree( ad );
+	// Do sim
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, stepSize, totalSteps);
 
-	printf("%s\n", a);
+	// Get data back
+	cudaMemcpy( h_massArray, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );
+
+	// Free device mem 
+	cudaFree( d_massArray );
+
+	// Output
+	// Some output
+
 	return EXIT_SUCCESS;
 }

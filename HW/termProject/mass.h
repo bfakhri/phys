@@ -28,6 +28,7 @@ class Mass
 	public:
 		// Getters and setters
 		Mass();
+		Mass(double mass, cartesian pos, cartesian vel);
 		string getName(); 
 		double getMass(); 
 		cartesian getPos(); 

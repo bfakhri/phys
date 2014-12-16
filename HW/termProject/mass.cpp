@@ -26,6 +26,23 @@ Mass::Mass()
 		
 }
 
+Mass::Mass(double mass, cartesian pos, cartesian vel){
+	name = "Mass"; 
+	objectMass = mass; 	// Default 1Kg
+	position.x = pos.x; 
+	position.y = pos.y; 
+	position.z = pos.z; 
+
+	velocity.x = vel.x; 
+	velocity.y = vel.y; 
+	velocity.z = vel.z; 
+
+	cumalForces.x = 0; 
+	cumalForces.y = 0; 
+	cumalForces.z = 0; 
+}
+	
+
 string Mass::getName(){
 	return name; 
 }

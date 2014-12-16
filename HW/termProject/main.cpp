@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <vector>
+#include <cstdlib> 
 
 #include "mass.h"
 #include "mather.h"
@@ -25,8 +26,8 @@ int main(int argc, char ** argv)
 {
 	// Simulation parameter variables
 	double TIME_STEP = DEF_TIME_STEP;
-	uint32_t SIM_STEPS = DEF_SIM_STEPS;
-	uint32_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
+	uint64_t SIM_STEPS = DEF_SIM_STEPS;
+	uint64_t STEP_PER_OUTPUT = DEF_STEP_PER_OUTPUT;  
 	int PROGRESS_OUT = DEF_PROGRESS_OUT; 
 	int RESULTS_OUT = DEF_RESULTS_OUT; 
 	int CPU_PARALLEL = DEF_CPU_PARALLEL; 
@@ -65,6 +66,7 @@ int main(int argc, char ** argv)
 	// Holds all of the masses 
 	vector<Mass> massVector; 
 
+	/*
 	// Earth/Moon sim
 	Mass solarSystem[9]; 
 	solarSystem[0].setMass(scientificNotation(1.99, 30)); 
@@ -95,15 +97,29 @@ int main(int argc, char ** argv)
 	solarSystem[8].setPos(scientificNotation(4.49, 12), 0, 0); 
 	solarSystem[8].setVelocity(0, scientificNotation(5.44, 3), 0);
 
- 	for(int i=0; i<8; i++){
+ 	for(uint64_t i=0; i<8; i++){
 		massVector.push_back(solarSystem[i]); 
+	}
+*/
+	for(uint64_t i=0; i<220; i++){
+		double rMass;
+		cartesian rPos; 
+		cartesian rVel; 
+		rMass = scientificNotation(rand()%10+1, rand()%30+1);
+		rPos.x = scientificNotation(rand()%9+1, rand()%3+10);
+		rPos.y = scientificNotation(rand()%9+1, rand()%3+10);
+		rPos.z = scientificNotation(rand()%9+1, rand()%3+10);
+		rVel.x = scientificNotation(rand()%9+1, rand()%3+2);
+		rVel.y = scientificNotation(rand()%9+1, rand()%3+2);
+		rVel.z = scientificNotation(rand()%9+1, rand()%3+2);
+		massVector.push_back(*(new Mass(rMass, rPos, rVel))); 
 	}
 
 	if(PROGRESS_OUT){
 		// Export object count to output	
-		outputObjectCount((uint32_t)massVector.size()); 
+		outputObjectCount((uint64_t)massVector.size()); 
 		// Export masses to output
-		for(int i=0; i<massVector.size(); i++){
+		for(uint64_t i=0; i<massVector.size(); i++){
 			outputObjectMass(massVector[i].getMass()); 
 		}
 		// Export number of simulation steps
@@ -111,14 +127,14 @@ int main(int argc, char ** argv)
 	}
 
 	// MAIN SIMULATION LOOP
-	for(int t=0; t<SIM_STEPS; t++)
+	for(uint64_t t=0; t<SIM_STEPS; t++)
 	{	
 		// Influences
 		#pragma omp parallel for if(CPU_PARALLEL) schedule(guided)
-		for(int i=0; i<massVector.size(); i++)
+		for(uint64_t i=0; i<massVector.size(); i++)
 		{
 			massVector[i].resetForces(); 
-			for(int j=0; j<massVector.size(); j++)
+			for(uint64_t j=0; j<massVector.size(); j++)
 			{
 				if(i != j)
 				{
@@ -140,7 +156,7 @@ int main(int argc, char ** argv)
 
 		// Update position
 		#pragma omp parallel for if(CPU_PARALLEL) schedule(guided)
-		for(int i=0; i<massVector.size(); i++)
+		for(uint64_t i=0; i<massVector.size(); i++)
 		{
 			if(PROGRESS_OUT){
 				// Export coordinates of all objects to output

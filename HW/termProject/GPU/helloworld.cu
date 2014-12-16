@@ -2,13 +2,7 @@
 #include "mass.cu"
 
 const int N = 7;
-const int blocksize = 7;
 
-__global__
-void hello(char *a, int *b)
-{
- a[threadIdx.x] += b[threadIdx.x];
-}
 
 __global__
 void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps)
@@ -39,29 +33,40 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 }
 
 
-int main()
+int main(int argc, char ** argv)
 {
- char a[N] = "Hello ";
- int b[N] = {15, 10, 6, 0, -11, 1, 0};
+	// Simulation parameter variables
+	double TIME_STEP_SIZE = 1;
+	unsigned long TOTAL_SIM_STEPS = 1000;
 
- char *ad;
- int *bd;
- const int csize = N*sizeof(char);
- const int isize = N*sizeof(int);
+	// Custom simulation parameters 
+	if(argc > 1)
+	{
+		if(argc != 3){
+			cout << endl << "ERROR, incorrect number of arguments" << endl; 
+			return -1; 
+		}else{
+			TOTAL_SIM_STEPS = atoi(argv[1]); 
+			TIME_STEP_SIZE = atoi(argv[2]); 
+		}
+	}
+	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
+		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl;
+ 
+	const int massArraySize = N*sizeof(Mass);
 
- printf("%s", a);
+	cudaMalloc( (void**)&ad, csize );
+	cudaMalloc( (void**)&bd, isize );
+	cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice );
+	cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice );
 
- cudaMalloc( (void**)&ad, csize );
- cudaMalloc( (void**)&bd, isize );
- cudaMemcpy( ad, a, csize, cudaMemcpyHostToDevice );
- cudaMemcpy( bd, b, isize, cudaMemcpyHostToDevice );
+	dim3 blockDimensions( N, 1 );
+	dim3 gridDimensions( 1, 1 );
 
- dim3 dimBlock( blocksize, 1 );
- dim3 dimGrid( 1, 1 );
- hello<<<dimGrid, dimBlock>>>(ad, bd);
- cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost );
- cudaFree( ad );
+	simulate<<< gridDimensions, blockDimensions >>>(massArray, N, stepSize, totalSteps);
+	cudaMemcpy( a, ad, csize, cudaMemcpyDeviceToHost );
+	cudaFree( ad );
 
- printf("%s\n", a);
- return EXIT_SUCCESS;
+	printf("%s\n", a);
+	return EXIT_SUCCESS;
 }

@@ -1,8 +1,3 @@
-// This is the REAL "hello world" for CUDA!
-// It takes the string "Hello ", prints it, then passes it to CUDA with an array
-// of offsets. Then the offsets are added in parallel to produce the string "World!"
-// By Ingemar Ragnemalm 2010
- 
 #include <stdio.h>
 #include "mass.cu"
 
@@ -16,40 +11,33 @@ void hello(char *a, int *b)
 }
 
 __global__
-void simulateOneTick(Mass * masses, unsigned long numMasses, double deltaT)
+void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps)
 {
-	// Calc forces on all masses
-	for(unsigned long i=0; i<numMasses; i++)
+	for(unsigned long i=0; i<totalTimeSteps; i++)
 	{
-		if(i != threadIx.x)
+		// Sync threads so positions are not updated before all other 
+		__syncthreads(); 
+
+		// Calc forces on all masses
+		for(unsigned long i=0; i<numMasses; i++)
 		{
-			influence(masses[threadIx.x], masses[i]); 
+			if(i != threadIx.x)
+			{
+				influence(masses[threadIx.x], masses[i]); 
+			}
 		}
-	}
 
-	// Sync threads so positions are not updated before all other 
-	__syncthreads(); 
+		// Sync threads so positions are not updated before all other 
+		__syncthreads(); 
 
-	// Update position of all masses
-	updateVelAndPos(masses[threadIx.x], timeStep); 
+		// Update position of all masses
+		updateVelAndPos(masses[threadIx.x], timeStep); 
 
-	// Reset forces
-	resetForces(masses[threadIx.x]); 
+		// Reset forces
+		resetForces(masses[threadIx.x]);
+	} 
 }
 
-__global__
-void simulateOnDevice(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps)
-{
-	// Calc forces on all masses
-	for(unsigned long i=0; i<numMasses; i++)
-	{
-		// Perform step
-		simulateOneTick(masses, numMasses, deltaT); 
-		// Sync threads
-		// **** IS THIS AUTOMATICALLY SYNCED!? **** // 
-		
-	}
-}
 
 int main()
 {

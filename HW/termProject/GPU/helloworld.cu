@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <iostream>
 #include "mass.cu"
 
 const int N = 7;
@@ -15,9 +16,9 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 		// Calc forces on all masses
 		for(unsigned long i=0; i<numMasses; i++)
 		{
-			if(i != threadIx.x)
+			if(i != threadIdx.x)
 			{
-				influence(masses[threadIx.x], masses[i]); 
+				influence(&masses[threadIdx.x], &masses[i]); 
 			}
 		}
 
@@ -25,10 +26,10 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 		__syncthreads(); 
 
 		// Update position of all masses
-		updateVelAndPos(masses[threadIx.x], timeStep); 
+		updateVelAndPos(&masses[threadIdx.x], deltaT); 
 
 		// Reset forces
-		resetForces(masses[threadIx.x]);
+		resetForces(&masses[threadIdx.x]);
 	} 
 }
 
@@ -43,15 +44,15 @@ int main(int argc, char ** argv)
 	if(argc > 1)
 	{
 		if(argc != 3){
-			cout << endl << "ERROR, incorrect number of arguments" << endl; 
+			std::cout << std::endl << "ERROR, incorrect number of arguments" << std::endl; 
 			return -1; 
 		}else{
 			TOTAL_SIM_STEPS = atoi(argv[1]); 
 			TIME_STEP_SIZE = atoi(argv[2]); 
 		}
 	}
-	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
-		<< endl << "Size of time step (seconds) = " << TIME_STEP << endl;
+	std::cout << "Simulation: " << std::endl << "Number of steps = " << TOTAL_SIM_STEPS 
+		<< std::endl << "Size of time step (seconds) = " << TIME_STEP_SIZE << std::endl;
  
 
 	// Make masses	
@@ -84,7 +85,7 @@ int main(int argc, char ** argv)
 	dim3 gridDimensions( 1, 1 );
 
 	// Do sim
-	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, stepSize, totalSteps);
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS);
 
 	// Get data back
 	cudaMemcpy( h_massArray, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );

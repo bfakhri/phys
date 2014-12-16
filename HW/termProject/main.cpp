@@ -101,7 +101,7 @@ int main(int argc, char ** argv)
 		massVector.push_back(solarSystem[i]); 
 	}
 */
-	for(uint64_t i=0; i<220; i++){
+	for(uint64_t i=0; i<240; i++){
 		double rMass;
 		cartesian rPos; 
 		cartesian rVel; 

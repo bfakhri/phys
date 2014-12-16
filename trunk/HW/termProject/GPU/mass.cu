@@ -1,3 +1,17 @@
+double scientificNotation(double num,  int exp)
+{ 
+	if(exp > 0)
+	{
+		for(int i=0; i<exp; i++){
+			num *= 10; 
+		}
+	}else{
+		for(int i=0; i>exp; i--){
+			num /= 10; 
+		}
+	}
+}
+
 double G = scientificNotation(6.67384, -11);
 
 typedef struct Mass

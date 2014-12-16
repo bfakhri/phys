@@ -6,7 +6,7 @@ const int N = 7;
 
 
 __global__
-void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps)
+void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
 {
 	for(unsigned long i=0; i<totalTimeSteps; i++)
 	{
@@ -18,7 +18,7 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 		{
 			if(i != threadIdx.x)
 			{
-				influence(&masses[threadIdx.x], &masses[i]); 
+				influence(&masses[threadIdx.x], &masses[i], localG); 
 			}
 		}
 
@@ -36,6 +36,8 @@ void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned lo
 
 int main(int argc, char ** argv)
 {
+	initG(); 
+
 	// Simulation parameter variables
 	double TIME_STEP_SIZE = 1;
 	unsigned long TOTAL_SIM_STEPS = 1000;
@@ -85,7 +87,7 @@ int main(int argc, char ** argv)
 	dim3 gridDimensions( 1, 1 );
 
 	// Do sim
-	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS);
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
 
 	// Get data back
 	cudaMemcpy( h_massArray, d_massArray, (N*sizeof(Mass)), cudaMemcpyDeviceToHost );

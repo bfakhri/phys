@@ -3,7 +3,7 @@
 #include <math.h>
 //#include "mass.cu"
 
-const int N = 240;
+const int N = 480;
 
 double scientificNotation(double num,  int exp)
 { 

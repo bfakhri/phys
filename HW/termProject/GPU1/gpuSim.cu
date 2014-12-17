@@ -86,40 +86,9 @@ void updateVelAndPos(Mass *m, double timeStep){
 }
 
 __global__
-void simulate(Mass * masses, unsigned long numMasses, unsigned int massesPerCore, double deltaT, unsigned long totalTimeSteps, double localG)
+void simulate(Mass * masses, unsigned long numMasses, unsigned int massesPerBlock, double deltaT, unsigned long totalTimeSteps, double localG)
 {
-	for(unsigned int i=0; i<totalTimeSteps; i++)
-	{
-		// Sync threads so positions are not updated before all other 
-		__syncthreads(); 
-
-		// Calc forces on all masses
-		for(unsigned long i=0; i<numMasses; i+=massesPerCore){
-			for(int c=0; c<massesPerCore; c++){
-				if(i != threadIdx.x*massesPerCore+c)
-					influence(&masses[threadIdx.x*massesPerCore+c], &masses[i], localG); 
-			}
-		}
-		
-
-		// Sync threads so positions are not updated before all other 
-		__syncthreads(); 
-
-		// Update position of all masses
-		for(int c=0; c<massesPerCore; c++){
-			updateVelAndPos(&masses[threadIdx.x*massesPerCore+c], deltaT); 
-		}
-
-		// Reset forces
-		for(int c=0; c<massesPerCore; c++){
-			resetForces(&masses[threadIdx.x*massesPerCore+c]);
-		}
-	} 
-}
-/*
-__global__
-void simulateLean(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
-{
+	unsigned int myId = blockIdx.x*massesPerBlock + threadIdx.x; 
 	for(unsigned int i=0; i<totalTimeSteps; i++)
 	{
 		// Sync threads so positions are not updated before all other 
@@ -127,8 +96,8 @@ void simulateLean(Mass * masses, unsigned long numMasses, double deltaT, unsigne
 
 		// Calc forces on all masses
 		for(unsigned long i=0; i<numMasses; i++){
-			if(i != threadIdx.x)
-				influence(&masses[threadIdx.x], &masses[i], localG); 
+			if(i != myId)
+				influence(&masses[myId], &masses[i], localG); 
 		}
 		
 
@@ -136,16 +105,12 @@ void simulateLean(Mass * masses, unsigned long numMasses, double deltaT, unsigne
 		__syncthreads(); 
 
 		// Update position of all masses
-		for(int c=0; c<massesPerCore; c++){
-			updateVelAndPos(&masses[threadIdx.x*massesPerCore+c], deltaT); 
-		}
+		updateVelAndPos(&masses[myId], deltaT); 
 
 		// Reset forces
-		for(int c=0; c<massesPerCore; c++){
-			resetForces(&masses[threadIdx.x*massesPerCore+c]);
-		}
+		resetForces(&masses[myId]);
 	} 
-}*/
+}
 
 __global__
 void testEff(Mass * masses)//, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
@@ -227,11 +192,15 @@ int main(int argc, char ** argv)
 	cudaMemcpy( d_massArray, h_massArray, (N*sizeof(Mass)), cudaMemcpyHostToDevice );
 
 	// Dimensions for cuda function call 
-	dim3 blockDimensions( N/MASSES_PER_CORE, 1 );
-	dim3 gridDimensions( 1, 1 );
+	dim3 blockDimensions( 32, 1 );
+	dim3 gridDimensions( 8, 1 );
 
-	// Do sim
-	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, MASSES_PER_CORE, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
+	// Do simi
+	unsigned int massesPerBlock = N/blockDimensions.x; 
+	//unsigned int massesPerThread = massesPerBlock/gridDimensions.x;
+ 
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, massesPerBlock, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
+	//simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, MASSES_PER_CORE, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
 	//testEff<<< gridDimensions, blockDimensions >>>(d_massArray);
 	//testInfluence<<< gridDimensions, blockDimensions >>>(d_massArray, N, G, d_dist); 
 

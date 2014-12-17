@@ -3,7 +3,8 @@
 #include <math.h>
 //#include "mass.cu"
 
-const int N = 480;
+unsigned int N;
+unsigned int MASSES_PER_CORE;
 
 double scientificNotation(double num,  int exp)
 { 
@@ -85,38 +86,34 @@ void updateVelAndPos(Mass *m, double timeStep){
 }
 
 __global__
-void simulate(Mass * masses, unsigned long numMasses, double deltaT, unsigned long totalTimeSteps, double localG)
+void simulate(Mass * masses, unsigned long numMasses, unsigned int massesPerCore, double deltaT, unsigned long totalTimeSteps, double localG)
 {
-	int id1 = threadIdx.x*2; 
-	int id2 = threadIdx.x*2+1; 
-	for(unsigned long i=0; i<totalTimeSteps; i++)
+	for(unsigned int i=0; i<totalTimeSteps; i++)
 	{
 		// Sync threads so positions are not updated before all other 
 		__syncthreads(); 
 
 		// Calc forces on all masses
-		for(unsigned long i=0; i<numMasses; i+=2)
-		{
-			if(i != id1)
-			{
-				influence(&masses[id1], &masses[i], localG); 
-			}
-			if(i != id2)
-			{
-				influence(&masses[id2], &masses[i], localG); 
+		for(unsigned long i=0; i<numMasses; i+=massesPerCore){
+			for(int c=0; c<massesPerCore; c++){
+				if(i != threadIdx.x*massesPerCore+c)
+					influence(&masses[threadIdx.x*massesPerCore+c], &masses[i], localG); 
 			}
 		}
+		
 
 		// Sync threads so positions are not updated before all other 
 		__syncthreads(); 
 
 		// Update position of all masses
-		updateVelAndPos(&masses[id1], deltaT); 
-		updateVelAndPos(&masses[id2], deltaT); 
+		for(int c=0; c<massesPerCore; c++){
+			updateVelAndPos(&masses[threadIdx.x*massesPerCore+c], deltaT); 
+		}
 
 		// Reset forces
-		resetForces(&masses[id1]);
-		resetForces(&masses[id2]);
+		for(int c=0; c<massesPerCore; c++){
+			resetForces(&masses[threadIdx.x*massesPerCore+c]);
+		}
 	} 
 }
 
@@ -149,16 +146,20 @@ int main(int argc, char ** argv)
 	// Custom simulation parameters 
 	if(argc > 1)
 	{
-		if(argc != 3){
+		if(argc != 5){
 			std::cout << std::endl << "ERROR, incorrect number of arguments" << std::endl; 
 			return -1; 
 		}else{
 			TOTAL_SIM_STEPS = atoi(argv[1]); 
 			TIME_STEP_SIZE = atoi(argv[2]); 
+			N = atoi(argv[3]); 
+			MASSES_PER_CORE = atoi(argv[4]); 
 		}
 	}
 	std::cout << "Simulation: " << std::endl << "Number of steps = " << TOTAL_SIM_STEPS 
 		<< std::endl << "Size of time step (seconds) = " << TIME_STEP_SIZE
+		<< std::endl << "N (number of masses) = " << N
+		<< std::endl << "Masses per core = " << MASSES_PER_CORE 
 		<< std::endl << "Value of G = " << G << std::endl;
  
 
@@ -196,11 +197,11 @@ int main(int argc, char ** argv)
 	cudaMemcpy( d_massArray, h_massArray, (N*sizeof(Mass)), cudaMemcpyHostToDevice );
 
 	// Dimensions for cuda function call 
-	dim3 blockDimensions( N/2, 1 );
+	dim3 blockDimensions( N/MASSES_PER_CORE, 1 );
 	dim3 gridDimensions( 1, 1 );
 
 	// Do sim
-	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
+	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, MASSES_PER_CORE, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
 	//testEff<<< gridDimensions, blockDimensions >>>(d_massArray);
 	//testInfluence<<< gridDimensions, blockDimensions >>>(d_massArray, N, G, d_dist); 
 

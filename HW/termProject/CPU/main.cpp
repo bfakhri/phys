@@ -19,11 +19,14 @@
 #define DEF_PROGRESS_OUT 1
 #define DEF_RESULTS_OUT 1
 #define DEF_CPU_PARALLEL 1
+#define DEF_N 120
+
 using namespace std; 
 
 
 int main(int argc, char ** argv)
 {
+	cout << endl << endl; 
 	// Simulation parameter variables
 	double TIME_STEP = DEF_TIME_STEP;
 	uint64_t SIM_STEPS = DEF_SIM_STEPS;
@@ -31,11 +34,12 @@ int main(int argc, char ** argv)
 	int PROGRESS_OUT = DEF_PROGRESS_OUT; 
 	int RESULTS_OUT = DEF_RESULTS_OUT; 
 	int CPU_PARALLEL = DEF_CPU_PARALLEL; 
+	uint64_t N = DEF_N; 
 
 	// Custom simulation parameters 
 	if(argc > 1)
 	{
-		if(argc != 7){
+		if(argc != 8){
 			cout << endl << "ERROR, incorrect number of arguments" << endl; 
 			return -1; 
 		}else{
@@ -45,6 +49,7 @@ int main(int argc, char ** argv)
 			PROGRESS_OUT = atoi(argv[4]); 
 			RESULTS_OUT = atoi(argv[5]); 
 			CPU_PARALLEL = atoi(argv[6]); 
+			N = atoi(argv[7]); 
 		}
 	}
 	cout << "Simulation: " << endl << "Number of steps = " << SIM_STEPS 
@@ -52,7 +57,8 @@ int main(int argc, char ** argv)
 		<< "Steps per output = " << STEP_PER_OUTPUT << endl
 		<< "Progress out?  = " << PROGRESS_OUT << endl 
 		<< "Results out? = " << RESULTS_OUT << endl
-		<< "CPU Parallel? = " << CPU_PARALLEL << endl; 
+		<< "CPU Parallel? = " << CPU_PARALLEL << endl
+		<< "N (masses)? = " << N << endl; 
 
 
 	// Initialize constants like G
@@ -101,7 +107,7 @@ int main(int argc, char ** argv)
 		massVector.push_back(solarSystem[i]); 
 	}
 */
-	for(uint64_t i=0; i<240; i++){
+	for(uint64_t i=0; i<N; i++){
 		double rMass;
 		cartesian rPos; 
 		cartesian rVel; 
@@ -177,6 +183,9 @@ int main(int argc, char ** argv)
 		// Prints last positions of masses to file
 		outputResults(massVector); 
 	}
+
+
+	cout << endl << endl; 
 
 	return 0;
 }

@@ -198,6 +198,57 @@ int main(int argc, char ** argv)
 	// Do simi
 	unsigned int massesPerBlock = N/blockDimensions.x; 
 	//unsigned int massesPerThread = massesPerBlock/gridDimensions.x;
+
+
+	// Split data between CPU and GPU
+	
+	
+	for(unsigned int t=0; t<TOTAL_TIME_STEPS; t++)
+	{
+		// Make proxy mass for both clumps
+		Mass proxyMassCPU;
+		proxyMassCPU.objectMass = 0; 
+		proxyMassCPU.positionX = 0; 
+		proxyMassCPU.positionY = 0; 
+		proxyMassCPU.positionZ = 0; 
+		for(unsigned int d=0; d<dividor; d++)
+		{
+			proxyMassCPU.objectMass += h_massArray[d].objectMass;
+			proxyMassCPU.positionX += h_massArray[d].positionX;
+			proxyMassCPU.positionY += h_massArray[d].positionY;
+			proxyMassCPU.positionZ += h_massArray[d].positionZ;
+		}
+		// Calculate averages
+		proxyMassCPU.objectMass /= dividor;
+		proxyMassCPU.positionX /= dividor;
+		proxyMassCPU.positionY /= dividor;
+		proxyMassCPU.positionZ /= dividor;
+		
+			
+		Mass proxyMassGPU;
+		proxyMassGPU.objectMass = 0; 
+		proxyMassGPU.positionX = 0; 
+		proxyMassGPU.positionY = 0; 
+		proxyMassGPU.positionZ = 0; 
+		for(unsigned int d=0; d<N-dividor; d++)
+		{
+			proxyMassGPU.objectMass += h_massArray[d+dividor].objectMass;
+			proxyMassGPU.positionX += h_massArray[d+dividor].positionX;
+			proxyMassGPU.positionY += h_massArray[d+dividor].positionY;
+			proxyMassGPU.positionZ += h_massArray[d+dividor].positionZ;
+		}
+		// Calculate averages
+		proxyMassGPU.objectMass /= (N-dividor);
+		proxyMassGPU.positionX /= (N-dividor);
+		proxyMassGPU.positionY /= (N-dividor);
+		proxyMassGPU.positionZ /= (N-dividor);
+		
+		// Send GPU its portion of the array and proxy mass
+
+		// Perform one tick of simulation
+
+
+	}
  
 	simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, massesPerBlock, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);
 	//simulate<<< gridDimensions, blockDimensions >>>(d_massArray, N, MASSES_PER_CORE, TIME_STEP_SIZE, TOTAL_SIM_STEPS, G);

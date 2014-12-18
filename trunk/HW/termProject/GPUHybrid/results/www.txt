@@ -1,0 +1,14 @@
+Simulation: 
+Number of steps = 1000
+Size of time step (seconds) = 10000
+N (number of masses) = 2048
+Masses per core = 0
+Value of G = 6.67384e-11
+Start Posisions (X): 
+6e+10
+1.542e+13
+M: 512
+
+End Posisions (X): 
+6.05885e+10
+1.55727e+13

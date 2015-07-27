@@ -72,49 +72,23 @@ int main(int argc, char ** argv)
 	// Holds all of the masses 
 	vector<Mass> massVector; 
 
-	/*
-	// Earth/Moon sim
-	Mass solarSystem[9]; 
-	solarSystem[0].setMass(scientificNotation(1.99, 30)); 
-	solarSystem[0].setPos(scientificNotation(0, 1), 0, 0); 
-	solarSystem[0].setVelocity(0, scientificNotation(0, 1), 0);
-	solarSystem[1].setMass(scientificNotation(3.301, 23)); 
-	solarSystem[1].setPos(scientificNotation(6.9, 10), 0, 0); 
-	solarSystem[1].setVelocity(0, scientificNotation(3.94, 4), 0);
-	solarSystem[2].setMass(scientificNotation(4.867, 24)); 
-	solarSystem[2].setPos(scientificNotation(1.09, 11), 0, 0); 
-	solarSystem[2].setVelocity(0, scientificNotation(3.48, 4), 0);
-	solarSystem[3].setMass(scientificNotation(5.97, 24)); 
-	solarSystem[3].setPos(scientificNotation(1.47, 11), 0, 0); 
-	solarSystem[3].setVelocity(0, scientificNotation(3.026, 4), 0);
-	solarSystem[4].setMass(scientificNotation(6.42, 23)); 
-	solarSystem[4].setPos(scientificNotation(2.83, 11), 0, 0); 
-	solarSystem[4].setVelocity(0, scientificNotation(2.65, 4), 0);
-	solarSystem[5].setMass(scientificNotation(1.898, 27)); 
-	solarSystem[5].setPos(scientificNotation(7.95, 11), 0, 0); 
-	solarSystem[5].setVelocity(0, scientificNotation(1.28, 4), 0);
-	solarSystem[6].setMass(scientificNotation(5.68, 26)); 
-	solarSystem[6].setPos(scientificNotation(1.49, 12), 0, 0); 
-	solarSystem[6].setVelocity(0, scientificNotation(9.216, 3), 0);
-	solarSystem[7].setMass(scientificNotation(8.68, 25)); 
-	solarSystem[7].setPos(scientificNotation(2.99, 12), 0, 0); 
-	solarSystem[7].setVelocity(0, scientificNotation(6.51, 3), 0);
-	solarSystem[8].setMass(scientificNotation(1.02, 26)); 
-	solarSystem[8].setPos(scientificNotation(4.49, 12), 0, 0); 
-	solarSystem[8].setVelocity(0, scientificNotation(5.44, 3), 0);
-
- 	for(uint64_t i=0; i<8; i++){
-		massVector.push_back(solarSystem[i]); 
-	}
-*/
 	for(uint64_t i=0; i<N; i++){
 		double rMass;
 		cartesian rPos; 
 		cartesian rVel; 
 		rMass = scientificNotation(rand()%10+1, rand()%30+1);
-		rPos.x = scientificNotation(rand()%9+1, rand()%3+10);
-		rPos.y = scientificNotation(rand()%9+1, rand()%3+10);
-		rPos.z = scientificNotation(rand()%9+1, rand()%3+10);
+		uint32_t dirX = rand()%2; 
+		uint32_t dirY = rand()%2; 
+		if(dirX == 0)
+			rPos.x = scientificNotation(rand()%9+1+i, rand()%3+10);
+		else
+			rPos.x = -1*scientificNotation(rand()%9+1+i, rand()%3+10);
+		if(dirY == 0)
+			rPos.y = scientificNotation(rand()%9+1+i, rand()%3+10);
+		else
+			rPos.y = -1*scientificNotation(rand()%9+1+i, rand()%3+10);
+
+		rPos.z = scientificNotation(rand()%9+1+i, rand()%3+10);
 		rVel.x = scientificNotation(rand()%9+1, rand()%3+2);
 		rVel.y = scientificNotation(rand()%9+1, rand()%3+2);
 		rVel.z = scientificNotation(rand()%9+1, rand()%3+2);

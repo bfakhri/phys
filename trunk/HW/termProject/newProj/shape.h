@@ -41,8 +41,6 @@ Class Shape
 		void updatePosResetForces();	// Updates both trans and rot positions and resets forces
 }
 		
-
-		
 		
 
 #endif

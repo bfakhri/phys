@@ -20,7 +20,6 @@ void initConsts();
 class Mass
 {
 	private:
-		string name; 			// Name of the object, if applicable
 		double objectMass;		// The Mass of this Mass in Kg
 		cartesian position;		// The cartesian position of this Mass
 		cartesian velocity;		// Decomposed velocity of this Mass
@@ -34,7 +33,6 @@ class Mass
 		cartesian getPos(); 
 		cartesian getVelocity(); 
 		cartesian getCumalForces();
-		void setName(string newName); 
 		void setMass(double newMass); 
 		void setPos(cartesian newPos); 
 		void setPos(double x, double y, double z); 
@@ -47,7 +45,7 @@ class Mass
 		void addForce(double x, double y, double z);
 		double newtonGrav(double objMass, double distance); 
 		void influence(Mass obj); 
-		cartesian updateVelAndPos(double timeStep);
+		void updateVelAndPos(double timeStep);
 };
 
 #endif

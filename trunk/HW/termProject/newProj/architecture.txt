@@ -8,7 +8,7 @@ main.cpp	- Contains default glut redefined functions
 
 draw.h/cpp	- Contains functions that elaborate on drawing procedures of glut
 
-shapes.h/cpp	- Defines the shape class 
+shape.h/cpp	- Defines the shape class 
 		- Need to decide how static (how much functionality) will be in this file
 			- Probably the more the better
 

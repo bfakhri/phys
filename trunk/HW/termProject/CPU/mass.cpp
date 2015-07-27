@@ -10,7 +10,6 @@ void initConsts(){
 
 Mass::Mass()
 {
-	name = "Mass"; 
 	objectMass = 1; 	// Default 1Kg
 	position.x = 0; 
 	position.y = 0; 
@@ -27,7 +26,6 @@ Mass::Mass()
 }
 
 Mass::Mass(double mass, cartesian pos, cartesian vel){
-	name = "Mass"; 
 	objectMass = mass; 	// Default 1Kg
 	position.x = pos.x; 
 	position.y = pos.y; 
@@ -43,9 +41,6 @@ Mass::Mass(double mass, cartesian pos, cartesian vel){
 }
 	
 
-string Mass::getName(){
-	return name; 
-}
 
 double Mass::getMass(){
 	return objectMass; 
@@ -63,9 +58,6 @@ cartesian Mass::getCumalForces(){
 	return cumalForces;
 }
 
-void Mass::setName(string newName){
-	name = newName; 
-}
 
 void Mass::setMass(double newMass){
 	objectMass = newMass; 
@@ -137,7 +129,7 @@ void Mass::influence(Mass obj){
 // F = ma, a = F/m
 // v = v0 + at  ---> v = v0 + F/m * t
 // d = d0 + v0*t + 0.5*a*t^2
-cartesian Mass::updateVelAndPos(double timeStep){
+void Mass::updateVelAndPos(double timeStep){
 	// Updates the position
 	position.x += velocity.x*timeStep + 0.5*(cumalForces.x/objectMass)*(timeStep*timeStep);
 	position.y += velocity.y*timeStep + 0.5*(cumalForces.y/objectMass)*(timeStep*timeStep);

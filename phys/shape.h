@@ -8,22 +8,24 @@
 
 // This should be as concise as possible so we will use the cartesian structure as much as possible
 
+// All units should adhere to SI standards
+
 Class Shape
 {
 	private:
 		// Scalar quantities
-		double mass;
+		double mass;	// kilograms
 
 		// Vector quantities
 		// 	Translational
-		cart t_position;
-		cart t_velocity;
-		cart t_forces;
+		cart t_position;	// meters from origin
+		cart t_velocity;	// m/s
+		cart t_forces;		// newtons
 
 		//	Rotational
-		cart r_position;
-		cart r_velocity;
-		cart r_forces;
+		cart r_position;	// radians from origin
+		cart r_velocity;	// rad/sec
+		cart r_forces;		// torques - Nm
 
 	public:
 		// Constructors
@@ -35,10 +37,10 @@ Class Shape
 		void r_addForce(cart force);	// Addes a rotational force
 		void resetForces();		// Resets ALL forces to zero
 		
-		void t_updatePos();		// Updates translational position
-		void r_updatePos();		// Updates rotational position
+		void t_updatePos(double t);	// Updates translational position
+		void r_updatePos(double t);	// Updates rotational position
 
-		void updatePosResetForces();	// Updates both trans and rot positions and resets forces
+		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
 }
 		
 		

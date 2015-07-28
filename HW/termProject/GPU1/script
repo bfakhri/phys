@@ -1,6 +1,0 @@
-#!/bin/sh
-# Format: 
-# time ./simGpu.exec totalTimeSteps secondsPerStep N massesPerCore
-
-# default parallel
-time ./simGpu.exec 1000 10000 240 2

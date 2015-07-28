@@ -1,6 +1,5 @@
 #ifndef SHAPE_H
 #define SHAPE_H
-#include "all_includes.h"
 
 // scalar quantities are preceded by nothing
 // vector quantities are preceded by either a "t_" for translational or

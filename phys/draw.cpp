@@ -1,5 +1,4 @@
-#include "all_includes.h"
-
+#include "draw.h"
 
 void drawAllShapes()
 {

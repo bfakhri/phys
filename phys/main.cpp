@@ -1,5 +1,3 @@
-#include "all_includes.h"
-
 
 // Dummy main and function just for compiling purposes
 void display()

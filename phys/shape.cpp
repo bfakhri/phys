@@ -1,4 +1,3 @@
-#include "all_includes.h"
 #include "shape.h"
 
 Shape::Shape()

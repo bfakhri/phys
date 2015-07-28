@@ -9,7 +9,6 @@
 #ifndef PHYS_H
 #define PHYS_H
 
-#include "all_includes.h"
 #include "shape.h"
 
 // Adds gravitational forces acting on all object by all objects

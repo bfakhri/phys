@@ -1,6 +1,5 @@
 // Description of the files of this project
 
-all_includes.h	- Contains all globals of the project including the vector containing all shapes
 
 main.cpp	- Contains default glut redefined functions
 		- Calls glutmainloop()
@@ -10,12 +9,18 @@ draw.h/cpp	- Contains functions that elaborate on drawing procedures of glut
 
 shape.h/cpp	- Defines the shape class 
 		- Need to decide how static (how much functionality) will be in this file
+
 			- Probably the more the better
+		- Subclasses of Shape must provide these functions:
+			- volume
+			- moment of inertia
+			- density? 
 
 phys.h/cpp	- Defines the main physics loop that updates the states of all of the shapes
 			- Collision detection/resolution etc
 
 
+mather.h	- Declares structures used for math throughout the project like the cartesian struct
 
 Information pathways:
 
@@ -23,10 +28,9 @@ main ---> phys		// main drives each step of physics loop
 			// settings are sent to physics loop such as turning gravity on/off and world-wrapping
 
 
-main ---> draw		// main drive draw (chooses when to refresh frame)
+main ---> shape ---> draw	// main drive shape which then drives draw (chooses when to refresh frame)
 
 
-phys ---> draw		// locations of shapes so they can be drawn
 
 
 

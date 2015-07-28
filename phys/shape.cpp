@@ -1,5 +1,21 @@
 #include "shape.h"
 
+#include <vector>	// For vector to hold all shapes
+
+std::vector<Shape> shapeVector;
+
+void populateShapeVector()
+{
+	// write this
+}
+
+void drawAllShapes()
+{
+	for(int i=0; i<shapeVector.size(); i++){
+		shapeVector[i].draw();
+	}
+}
+
 Shape::Shape()
 {
 	// Scalar quantities
@@ -105,4 +121,9 @@ void Shape::updatePosResetForces(double t)
 	r_updatePos(t);
 	resetForces();
 };
+
+void Shape::draw()
+{
+	// Call drawing function from draw.cpp with elements from this shape
+}
 

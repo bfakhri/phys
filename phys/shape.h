@@ -1,7 +1,7 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include "mather.h"	// For cart type
+#include "mather.h"	// For cart type	
 
 // scalar quantities are preceded by nothing
 // vector quantities are preceded by either a "t_" for translational or
@@ -11,6 +11,15 @@
 
 // All units should adhere to SI standards
 
+// Maybe makes this flexible - can take in shapes from files or random shapes
+// depending on the inputs to the function
+void populateShapeVector();
+
+// Function to draw all of the shapesin the shape vector
+void drawAllShapes();
+
+
+// Shape class (used to be the 'mass' class)
 class Shape
 {
 	private:
@@ -42,8 +51,10 @@ class Shape
 		void r_updatePos(double t);	// Updates rotational position
 
 		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
+
+		// Drawing stuff
+		void draw();
 };
-		
-		
+				
 
 #endif

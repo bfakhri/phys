@@ -1,0 +1,10 @@
+1) Decide if I can eliminate need for global shape vector
+	I can do this by putting allShapes vector in shapes.cpp 
+	New call hierarchy:
+		main:display() -> shape:drawAll() -> draw:drawShape()
+2) Move all shapes elements into shape files
+3) Figure out why struct won't work in all_includes.h
+4) Try and get rid of all_includes.h
+
+5) Implement physics functions
+6) Implement the rest of the files

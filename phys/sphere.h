@@ -7,7 +7,7 @@
 
 #include "shape.h"
 
-Class Sphere : public Shape		// Is public the right modifier here? 
+class Sphere : public Shape		// Is public the right modifier here? 
 {
 	private:
 		double radius;		// The radius of the sphere

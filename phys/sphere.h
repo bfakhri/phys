@@ -13,9 +13,10 @@ class Sphere : public Shape		// Is public the right modifier here?
 		double radius;		// The radius of the sphere
 	
 	public:
-		// Need a constructor
-		// Figure out how to do this elegantly
-		Sphere();	// Constructor
+		// Default
+		Sphere();
+		// With params
+		Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVel);
 
 		double volume();	// Returns volume of sphere
 		double moment();	// Returns moment of inertia of sphere

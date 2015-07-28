@@ -22,7 +22,7 @@ void drawAllShapes();
 // Shape class (used to be the 'mass' class)
 class Shape
 {
-	private:
+	protected:
 		// Scalar quantities
 		double mass;	// kilograms
 

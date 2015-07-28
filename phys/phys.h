@@ -1,4 +1,4 @@
-// This file defines the physics related functions of the project
+// This file defines the physics/math related functions of the project
 // The following physical phenomena shall be defined here
 // - Interparticle forces such as gravity
 // - Collision detection/resolution
@@ -10,6 +10,7 @@
 #define PHYS_H
 
 #include "shape.h"
+#include "mather.h"
 
 // Adds gravitational forces acting on all object by all objects
 // Include option for universal gravity source 

@@ -1,3 +1,6 @@
+// Glut files
+#include <GL/glut.h>
+#include <GL/gl.h>
 
 // Dummy main and function just for compiling purposes
 void display()

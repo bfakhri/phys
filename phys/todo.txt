@@ -1,7 +1,6 @@
 	New call hierarchy:
 		main:display() -> shape:drawAll() -> draw:drawShape()
 
-1) Put shape files into own folder just for shape information
 2) Figure out constructor for subclasses of Shape
 ----
 5) Implement physics functions

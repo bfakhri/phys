@@ -1,0 +1,15 @@
+﻿Build started 9/10/2013 1:36:58 PM.
+     1>Project "C:\Users\bijaker1penis\Dropbox\School\Current_Classes\cse470\proj1\proj1\proj1\proj1.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Debug\proj1.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt proj1.cpp shapes.cpp
+         shapes.cpp
+     1>c:\users\bijaker1penis\dropbox\school\current_classes\cse470\proj1\proj1\proj1\shapes.cpp(43): fatal error C1075: end of file found before the left brace '{' at 'c:\users\bijaker1penis\dropbox\school\current_classes\cse470\proj1\proj1\proj1\shapes.cpp(32)' was matched
+         proj1.cpp
+         Generating Code...
+     1>Done Building Project "C:\Users\bijaker1penis\Dropbox\School\Current_Classes\cse470\proj1\proj1\proj1\proj1.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:10.13

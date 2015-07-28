@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -l ncpus=32
+#PBS -N v5
+#PBS -j oe
+#PBS -o $JOB_ID.err
+#PBS -l walltime=00:02:00
+
+cd $PBS_OWORKDIR
+make
+(time ./alexandrian) 2> timeResults.txt 1> alexNumbers.txt

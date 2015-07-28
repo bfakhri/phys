@@ -1,0 +1,19 @@
+#!/bin/sh
+# Format: 
+# time ./nbody.exec totalTimeSteps secondsPerStep stepsPerOutput progress? results? parallel? N
+
+# default serial
+# time ./nbody.exec 1000 10000 1 0 0 0 N
+
+# default parallel
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 1_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 2_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 3_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 4_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 5_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 6_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 7_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 8_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 9_2048p.txt
+time ./nbody.exec 1000 10000 1 0 0 1 2048 1> 2048.txt 2> 10_2048p.txt
+

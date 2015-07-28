@@ -1,0 +1,17 @@
+﻿Build started 12/14/2014 9:11:15 AM.
+     1>Project "C:\Users\Carl\Dropbox\School\Current_Classes\EECS 587 - Parallel Computing\termProject\2dVisualizer\proj1\proj1.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "Release\proj1.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+       Link:
+         All outputs are up-to-date.
+         proj1.vcxproj -> C:\Users\Carl\Dropbox\School\Current_Classes\EECS 587 - Parallel Computing\termProject\2dVisualizer\Release\proj1.exe
+       FinalizeBuildStatus:
+         Deleting file "Release\proj1.unsuccessfulbuild".
+         Touching "Release\proj1.lastbuildstate".
+     1>Done Building Project "C:\Users\Carl\Dropbox\School\Current_Classes\EECS 587 - Parallel Computing\termProject\2dVisualizer\proj1\proj1.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.07

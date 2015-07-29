@@ -28,3 +28,15 @@ double Sphere::density()
 {
 	return mass/volume();
 }
+
+double Sphere::boundingSphere()
+{
+	return radius;
+}
+
+// For a sphere this is the same as boundingSphere
+// For a cube this would not be the same
+double Sphere::boundingBox()
+{
+	return radius;
+}

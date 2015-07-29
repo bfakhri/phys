@@ -17,9 +17,15 @@ class Sphere : public Shape		// Is public the right modifier here?
 		// With params
 		Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVel);
 
+		// Drawing
+		void draw();
+		
+		// Physics related methods
 		double volume();	// Returns volume of sphere
 		double moment();	// Returns moment of inertia of sphere
 		double density();	// Returns density of sphere
+		double boundingSphere();// Returns the radius of the bounding sphere of an object
+		double boundingBox();	// Returns the length of the bounding cube of an object
 
 };
 

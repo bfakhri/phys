@@ -30,7 +30,7 @@ double gravForce(double m1, double m2, double dist);
 
 // Influence by gravity - mass1 will influence mass2 by adding a force
 // to its force vector
-void gravInfluenceShape(Shape m1, Shape m2);
+void gravInfluenceShape(Shape* m1, Shape* m2);
 
 // Influence shape by mass at a predefined distance
 void gravInfluenceMass(double uniMass, cart uniMassDist, Shape* s);

@@ -1,7 +1,7 @@
 #include "phys.h"
 
 
-void gravity(double uniMass, cart uniMassDist)
+void gravity(double uniMass, cart uniMassDist, std::vector<Shape> v)
 {
 
 }
@@ -11,7 +11,7 @@ bool collide(Shape s1, Shape s2)
 
 }
 
-void collideAndResolve()
+void collideAndResolve(std::vector<Shape> v)
 {
 
 }
@@ -21,12 +21,12 @@ void resolveCollision(Shape s1, Shape s2, double dampingConst)
 
 }
 
-void updatePosWrap(cart worldLimits)
+void updatePosWrap(cart worldLimits, std::vector<Shape> v)
 {
 
 }
 
-void advanceSim(double t)
+void advanceSim(double t, std::vector<Shape> v)
 {
 	// Update position of all shapes
 

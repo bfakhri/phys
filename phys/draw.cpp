@@ -6,3 +6,9 @@ void drawShape(cart position, double volume) // NOT FINISHED SIGNATURE
 }
 
 
+void drawAllShapes(vector<Shape> v)
+{
+	for(int i=0; i<v.size(); i++){
+		v[i].draw();
+	}
+}

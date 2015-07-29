@@ -2,16 +2,41 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
+// Physics
+#include "phys.h"
+
+// Drawing
+#include "draw.h"
+
+// Shapes
+#include "shape.h"
+#include "sphere.h"
+
+// Vector holding all worldly shapes
+// May not include user-controlled ones
+std::vector<Shape*> worldShapes;
+
 // Dummy main and function just for compiling purposes
 void display()
 {
 }
 
+static void idle()
+{
+	advanceSim(1, worldShapes); 
+}
+
 int main(int argc, char **argv)
 {
-    glutInit(&argc, argv);
-    glutDisplayFunc(display);
-    glutMainLoop();
+	// Init shape vector
+	worldShapes.push_back(new Sphere());
+	
+
+	glutInit(&argc, argv);
+	glutDisplayFunc(display);
+	// Function called when idle  
+	glutIdleFunc(idle); 
+	glutMainLoop();
 }
 /*
 // Launches a frame of the game

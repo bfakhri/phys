@@ -11,19 +11,25 @@
 
 #include "mather.h"
 #include "shape.h"
+#include <math.h>
 #include <vector>
+
+
+// Influence by gravity - mass1 will influence mass2 by adding a force
+// to its force vector
+void gravInfluence(Shape m1, Shape m2);
 
 // Adds gravitational forces acting on all object by all objects
 // Include option for universal gravity source 
 // - uniMass is the mass of the universal gravity source
 // - uniMassDistance is the distance of all object to that mass from each component (same for all objects)
-void gravity(double uniMass, cart uniMassDist, std::vector<Shape> v);
+void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v);
 
 // Detects whether two shapes are colliding or not
 bool collide(Shape s1, Shape s2);
 
 // Detects collisions and resolves them for all objects
-void collideAndResolve(std::vector<Shape> v);
+void collideAndResolve(std::vector<Shape*> v);
 
 // Resolves a collision
 // - Includes option for damping/friction
@@ -32,10 +38,10 @@ void resolveCollision(Shape s1, Shape s2, double dampingConst);
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme
 // MAKE SURE THIS IS MATHEMATICALLY SOUND
-void updatePosWrap(cart worldLimits, std::vector<Shape> v);
+void updatePosWrap(cart worldLimits, std::vector<Shape*> v);
 
 // Advances whole simulation by one time step of length t
-void advanceSim(double t, std::vector<Shape> v);
+void advanceSim(double t, std::vector<Shape*> v);
 
 
 #endif

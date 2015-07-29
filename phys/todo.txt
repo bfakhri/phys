@@ -1,3 +1,5 @@
 ----
 5) Implement physics functions
 6) Implement the rest of the files
+7) Protect certain physics functions from approaching zero and divide by zero conditions
+8) Protect loops from integer overflow by changing all ints to specifically sized ints (uint16_t etc)

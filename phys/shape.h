@@ -19,7 +19,7 @@
 // Shape class (used to be the 'mass' class)
 class Shape
 {
-	protected:
+	public:
 		// Scalar quantities
 		double mass;	// kilograms
 
@@ -34,7 +34,7 @@ class Shape
 		cart r_velocity;	// rad/sec
 		cart r_forces;		// torques - Nm
 
-	public:
+	
 		// Constructors
 		Shape();
 		Shape(double mass, cart tPos, cart tVel, cart rPos, cart rVel);	// Forces are missing because we will init to zero most probably

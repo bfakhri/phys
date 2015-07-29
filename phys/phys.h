@@ -14,10 +14,25 @@
 #include <math.h>
 #include <vector>
 
+// Gravitational Constant
+const double G_CONST = 0.0000000000667384;
+
+// Returns distance between two cartesian coordinates
+double distance(cart c1, cart c2);
+
+// Return distance between two shapes
+double distance(Shape* s1, Shape* s2);
+
+// Returns the force of gravity between two masses seperated by a distance
+double gravForce(double m1, double m2, double dist);
+
 
 // Influence by gravity - mass1 will influence mass2 by adding a force
 // to its force vector
-void gravInfluence(Shape m1, Shape m2);
+void gravInfluenceShape(Shape m1, Shape m2);
+
+// Influence shape by mass at a predefined distance
+void gravInfluenceMass(double uniMass, cart uniMassDist, Shape* s);
 
 // Adds gravitational forces acting on all object by all objects
 // Include option for universal gravity source 
@@ -26,10 +41,17 @@ void gravInfluence(Shape m1, Shape m2);
 void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v);
 
 // Detects whether two shapes are colliding or not
-bool collide(Shape s1, Shape s2);
+// for any shape combinations
+bool collide(Shape* s1, Shape* s2);
+
+// Detects whether two Spheres are colliding or not
+bool collide(Sphere* s1, Sphere* s2);
 
 // Detects collisions and resolves them for all objects
 void collideAndResolve(std::vector<Shape*> v);
+
+// Detects collisions and resolves them for spheres
+void collideAndResolve(std::vector<Sphere*> v);
 
 // Resolves a collision
 // - Includes option for damping/friction

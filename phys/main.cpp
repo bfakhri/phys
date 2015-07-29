@@ -2,6 +2,9 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
+// I/O
+#include <iostream>
+
 // Physics
 #include "phys.h"
 
@@ -28,6 +31,8 @@ static void idle()
 
 int main(int argc, char **argv)
 {
+	// Just for testing
+	std::cout<< G_CONST << std::endl;
 	// Init shape vector
 	worldShapes.push_back(new Sphere());
 	

@@ -9,10 +9,9 @@
 
 class Sphere : public Shape		// Is public the right modifier here? 
 {
-	private:
+	public:
 		double radius;		// The radius of the sphere
 	
-	public:
 		// Default
 		Sphere();
 		// With params

@@ -11,6 +11,7 @@
 
 #include "mather.h"
 #include "shape.h"
+#include "sphere.h"
 #include <math.h>
 #include <vector>
 
@@ -55,7 +56,7 @@ void collideAndResolve(std::vector<Sphere*> v);
 
 // Resolves a collision
 // - Includes option for damping/friction
-void resolveCollision(Shape s1, Shape s2, double dampingConst);
+void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
 
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme

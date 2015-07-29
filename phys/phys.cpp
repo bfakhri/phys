@@ -68,14 +68,14 @@ void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 			gravInfluenceMass(uniMass, uniMassDist, v[i]);
 			// Affect by all other elements except itself
 			for(int j=0; j<v.size(); j++){
-				graveInfluenceShape(v[j], v[i]);
+				gravInfluenceShape(v[j], v[i]);
 			}
 		}
 	}else{
 		for(int i=0; i<v.size(); i++){
 			// Affect by all other elements except itself
 			for(int j=0; j<v.size(); j++){
-				graveInfluenceShape(v[j], v[i]);
+				gravInfluenceShape(v[j], v[i]);
 			}
 		}
 	}
@@ -105,12 +105,12 @@ void collideAndResolve(std::vector<Sphere*> v)
 	for(int i=0; i<v.size(); i++){
 		for(int j=i; j<v.size(); j++){
 			if(collide(v[i], v[j])){
-				resolveCollision(v[i], v[j], 0)
+				resolveCollision(v[i], v[j], 0);
 			}
 		}
 	}
 }
-void resolveCollision(Shape s1, Shape s2, double dampingConst)
+void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 {
 	// Rule 1 - conserve momentum
 	// Rule 2 - conserve KE with respect to dampingConst

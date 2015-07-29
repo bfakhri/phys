@@ -1,28 +1,28 @@
 #include "phys.h"
 
 
-double distance(Shape s1, Shape s2)
+double distance(Shape* s1, Shape* s2)
 {	
-	cart s2tos1 = {s1->t_pos.x - s2->t_pos.x, 
-			s1->t_pos.y - s2->t_pos.y, 
-			s1->t_pos.z - s2->t_pos.z};
-	return sqrt(s;
+	cart s2tos1 = {s1->t_position.x - s2->t_position.x, 
+			s1->t_position.y - s2->t_position.y, 
+			s1->t_position.z - s2->t_position.z};
+	return sqrt(s2tos1.x*s2tos1.x + s2tos1.y*s2tos1.y + s2tos1.z*s2tos1.z);
 }
 
-double gravForce(double m1, double m2)
+double gravForce(double m1, double m2, double dist)
 {
-	return ;
+	return G_CONST*m1*m2/(dist*dist);
 }
 
-void gravInfluence(Shape m1, Shape m2)
+void gravInfluence(Shape* m1, Shape* m2)
 {
 	// Get direction vector
-	cart m2tom1 = {m1->t_pos.x - m2->t_pos.x, 
-			m1->t_pos.y - m2->t_pos.y, 
-			m1->t_pos.z - m2->t_pos.z};
+	cart m2tom1 = {m1->t_position.x - m2->t_position.x, 
+			m1->t_position.y - m2->t_position.y, 
+			m1->t_position.z - m2->t_position.z};
 
 	// Get magnitude of the gravitational force
-	double forceMag = gravForce(m1.mass(), m2.mass());
+	double forceMag = gravForce(m1.mass(), m2.mass(), distance(m1, m2));
 
 	// Influence m2 by that force 
 	m2tom1.x *= forceMag;
@@ -40,6 +40,7 @@ void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 	{
 		for(int i=0; i<v.size(); i++){
 			// Affect by universal mass
+			//v[i]
 			// Affect by all other elements except itself
 		}
 	}else{

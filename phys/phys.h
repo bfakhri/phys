@@ -18,28 +18,46 @@
 // Gravitational Constant
 const double G_CONST = 0.0000000000667384;
 
+
+///////////////////
+// Helper Functions 
+///////////////////
+
 // Returns distance between two cartesian coordinates
 double distance(cart c1, cart c2);
 
 // Return distance between two shapes
 double distance(Shape* s1, Shape* s2);
 
+
+
+////////////////////
+// Gravity Functions 
+////////////////////
+
 // Returns the force of gravity between two masses seperated by a distance
 double gravForce(double m1, double m2, double dist);
 
-
 // Influence by gravity - mass1 will influence mass2 by adding a force
 // to its force vector
-void gravInfluenceShape(Shape* m1, Shape* m2);
+void gravPull(Shape* m1, Shape* m2);
 
 // Influence shape by mass at a predefined distance
-void gravInfluenceMass(double uniMass, cart uniMassDist, Shape* s);
+void gravPull(double uniMass, cart uniMassDist, Shape* s);
 
 // Adds gravitational forces acting on all object by all objects
-// Include option for universal gravity source 
+void gravAllShapes(std::vector<Shape*> v);
+
+// Adds grav force to all object in vector by a universal mass/gravity source
 // - uniMass is the mass of the universal gravity source
-// - uniMassDistance is the distance of all object to that mass from each component (same for all objects)
-void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v);
+// - uniMassDistance is the distance of all object to that mass from each component 
+//	(same for all objects)
+void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
+
+
+//////////////////////
+// Collision functions
+//////////////////////
 
 // Detects whether two shapes are colliding or not
 // for any shape combinations
@@ -58,6 +76,12 @@ void collideAndResolve(std::vector<Sphere*> v);
 // - Includes option for damping/friction
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
 
+
+
+///////////////////////
+// Simulation Functions 
+///////////////////////
+
 // Move one timestep using the translational forces on all the objects
 void t_advancePos(double t, std::vector<Shape*> v);
 
@@ -67,13 +91,12 @@ void r_advancePos(double t, std::vector<Shape*> v);
 // Move one timestep both translational and rotational positions 
 void advancePos(double t, std::vector<Shape*> v);
 
-
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme
 // MAKE SURE THIS IS MATHEMATICALLY SOUND
-void updatePosWrap(cart worldLimits, std::vector<Shape*> v);
+void wrapWorld(cart worldLimits, std::vector<Shape*> v);
 
-// Advances whole simulation by one time step of length t
+// Advances vector by one time step of length t
 void advanceSim(double t, std::vector<Shape*> v);
 
 

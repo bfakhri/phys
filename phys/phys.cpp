@@ -11,10 +11,9 @@ double distance(cart c1, cart c2)
 
 double distance(Shape* s1, Shape* s2)
 {	
-	cart c2toc1 = {s1->t_position.x - s2->t_position.x, 
-			s1->t_position.y - s2->t_position.y, 
-			s1->t_position.z - s2->t_position.z};
-	return sqrt(c2toc1.x*c2toc1.x + c2toc1.y*c2toc1.y + c2toc1.z*c2toc1.z);
+	cart c1 = s1->t_position;
+	cart c2 = s2->t_position;
+	return distance(c1, c2);  
 }
 
 double gravForce(double m1, double m2, double dist)
@@ -22,7 +21,7 @@ double gravForce(double m1, double m2, double dist)
 	return G_CONST*m1*m2/(dist*dist);
 }
 
-void gravInfluenceShape(Shape* m1, Shape* m2)
+void gravPull(Shape* m1, Shape* m2)
 {
 	// Get direction vector
 	cart m2tom1 = {m1->t_position.x - m2->t_position.x, 
@@ -40,7 +39,7 @@ void gravInfluenceShape(Shape* m1, Shape* m2)
 	
 }
 
-void gravInfluenceMass(double uniMass, cart uniMassDist, Shape* s)
+void gravPull(double uniMass, cart uniMassDist, Shape* s)
 {
 	// Get direction vector
 	cart shapeToMass = {	uniMassDist.x - s->t_position.x, 
@@ -57,30 +56,27 @@ void gravInfluenceMass(double uniMass, cart uniMassDist, Shape* s)
 	s->t_addForce(shapeToMass);
 }
 
-void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v)
+void gravAllShapes(std::vector<Shape*> v)
 {
-	// Check if universal mass exists
-	// Affect all masses by this one if exists
-	if(uniMass > 0)
-	{
-		for(int i=0; i<v.size(); i++){
-			// Affect by universal mass
-			gravInfluenceMass(uniMass, uniMassDist, v[i]);
-			// Affect by all other elements except itself
-			for(int j=0; j<v.size(); j++){
+	for(int i=0; i<v.size(); i++){
+		// Affect by all other elements except itself
+		for(int j=0; j<v.size(); j++){
+			if(i != j)
 				gravInfluenceShape(v[j], v[i]);
-			}
-		}
-	}else{
-		for(int i=0; i<v.size(); i++){
-			// Affect by all other elements except itself
-			for(int j=0; j<v.size(); j++){
-				gravInfluenceShape(v[j], v[i]);
-			}
 		}
 	}
 }
 
+void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
+{
+	for(int i=0; i<v.size(); i++){
+		// Affect by universal mass
+		gravPull(uniMass, uniMassDist, v[i]);
+	}
+}
+
+// We may want to make this function more general by adding a criteria
+// parameter to determine how we decide a collision has occured (sphere/bounding box/etc)
 bool collide(Shape* s1, Shape* s2)
 {
 	// All shapes are treated as spheres for collisions as of now
@@ -90,16 +86,6 @@ bool collide(Shape* s1, Shape* s2)
 		return false; 
 }
 
-// May need to delete this to keep things somewhat general
-/*
-bool collide(Sphere* s1, Sphere* s2)
-{
-	if(distance(s1, s2) < (s1->radius + s2->radius))
-		return true; 
-	else
-		return false; 
-}
-*/
 
 void collideAndResolve(std::vector<Shape*> v)
 {
@@ -145,8 +131,36 @@ void advancePos(double t, std::vector<Shape*> v)
 	r_advancePos(t, v);
 }
 
-void updatePosWrap(cart worldLimits, std::vector<Shape*> v)
+void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 {
+	for(int i=0; i<v.size(); i++)
+	{
+		// Positive world limit breaches
+		if(v[i]->t_pos.x > worldLimits.x){
+			// Original math
+			//v[i]->t_pos.x = -worldLimits.x + (v[i]->t_pos.x - worldLimits.x);
+			// Simplified math
+			v[i]->t_pos.x = -2*worldLimits.x + v[i]->t_pos.x;
+		}
+		// Negative world limit breaches
+		else if(v[i]->t_pos.x < -worldLimits.x)	
+			v[i]->t_pos.x = 2*worldLimits.x + v[i]->t_pos.x;
+		}
+
+		if(v[i]->t_pos.y > worldLimits.y){
+			v[i]->t_pos.y = -2*worldLimits.y + v[i]->t_pos.y;
+		}
+		else if(v[i]->t_pos.y < -worldLimits.y)	
+			v[i]->t_pos.y = 2*worldLimits.y + v[i]->t_pos.y;
+		}
+
+		if(v[i]->t_pos.z > worldLimits.z){
+			v[i]->t_pos.z = -2*worldLimits.z + v[i]->t_pos.z;
+		}
+		else if(v[i]->t_pos.z < -worldLimits.z)	
+			v[i]->t_pos.z = 2*worldLimits.z + v[i]->t_pos.z;
+		}
+
 
 }
 

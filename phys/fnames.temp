@@ -1,0 +1,30 @@
+// Helper functions
+distance(carts) - d between two points/objects
+distance(shapes)
+gravForce - force of gravity
+
+// Gravity
+- influence shapes by other shape or mass
+gravInfluenceShape
+gravInfluenceMass
+- all shapes influence each other
+gravity()
+
+// Collisions
+- detecet collision b/t two shapes
+collide()
+- detect collision and resolve it (with forces/etc) for ALL shapes
+collideAndResolve()
+- Resolve collision between two shapes
+resolveCollision()
+
+
+// simulation/object forward/backward ticks
+t_advancePos()
+r_advancePos()
+advancePos()
+updatePosWrap()
+advanceSim()
+
+
+

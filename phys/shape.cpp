@@ -1,14 +1,5 @@
 #include "shape.h"
 
-#include <vector>	// For vector to hold all shapes
-
-
-void populateShapeVector()
-{
-	// write this
-}
-
-
 Shape::Shape()
 {
 	// Scalar quantities
@@ -115,8 +106,4 @@ void Shape::updatePosResetForces(double t)
 	resetForces();
 };
 
-void Shape::draw()
-{
-	// Call drawing function from draw.cpp with elements from this shape
-}
 

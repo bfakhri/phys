@@ -83,9 +83,15 @@ void gravity(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 
 bool collide(Shape* s1, Shape* s2)
 {
-	// Need to figure out for all shape combos
+	// All shapes are treated as spheres for collisions as of now
+	if(distance(s1, s2) < (s1->boundingSphere() + s2->boundingSphere()))
+		return true; 
+	else
+		return false; 
 }
 
+// May need to delete this to keep things somewhat general
+/*
 bool collide(Sphere* s1, Sphere* s2)
 {
 	if(distance(s1, s2) < (s1->radius + s2->radius))
@@ -93,13 +99,9 @@ bool collide(Sphere* s1, Sphere* s2)
 	else
 		return false; 
 }
+*/
 
 void collideAndResolve(std::vector<Shape*> v)
-{
-
-}
-
-void collideAndResolve(std::vector<Sphere*> v)
 {
 	// Make sure this cycles through ALL pairs
 	for(int i=0; i<v.size(); i++){
@@ -109,11 +111,38 @@ void collideAndResolve(std::vector<Sphere*> v)
 			}
 		}
 	}
+
 }
+
+// May need to delete this to keep things somewhat general
+/*
+void collideAndResolve(std::vector<Sphere*> v)
+{
+}
+*/
+
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 {
 	// Rule 1 - conserve momentum
 	// Rule 2 - conserve KE with respect to dampingConst
+}
+
+void t_advancePos(double t, std::vector<Shape*> v)
+{
+
+}
+
+// Move one timestep using the rotational forces (torques)  on all the objects
+void r_advancePos(double t, std::vector<Shape*> v)
+{
+
+}
+
+// Move one timestep both translational and rotational positions 
+void advancePos(double t, std::vector<Shape*> v)
+{
+	t_advancePos(t, v);
+	r_advancePos(t, v);
 }
 
 void updatePosWrap(cart worldLimits, std::vector<Shape*> v)
@@ -124,7 +153,8 @@ void updatePosWrap(cart worldLimits, std::vector<Shape*> v)
 void advanceSim(double t, std::vector<Shape*> v)
 {
 	// Update position of all shapes
-
+	cart blankCart;
+	gravity(0, blankCart, v);
 	// Detect and resolve all collisions
 
 	// If worldwrap is on, worldwrap all objects

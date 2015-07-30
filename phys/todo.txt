@@ -4,3 +4,10 @@
 7) Protect certain physics functions from approaching zero and divide by zero conditions
 8) Protect loops from integer overflow by changing all ints to specifically sized ints (uint16_t etc)
 9) Check math of physics functions
+
+Longer Term
+- Maybe add sound? 3D sound of collisions? 
+- Make a wiki/better documentation page
+- Add inputs to the world by the user: I was thinking an object with accelerometer/magnetometer/orientationMeter 
+	could act as an input and a "virtual" version of the object in the engine which can interact with the 
+	world's objects

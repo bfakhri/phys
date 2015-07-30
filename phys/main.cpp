@@ -14,6 +14,7 @@
 // Shapes
 #include "shape.h"
 #include "sphere.h"
+#include "commonFunctions.h"
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones
@@ -26,7 +27,10 @@ void display()
 
 static void idle()
 {
-	advanceSim(1, worldShapes); 
+	advanceSim(1, worldShapes);
+
+	// Calls the display function 
+	display();
 }
 
 int main(int argc, char **argv)
@@ -34,7 +38,8 @@ int main(int argc, char **argv)
 	// Just for testing
 	std::cout<< G_CONST << std::endl;
 	// Init shape vector
-	worldShapes.push_back(new Sphere());
+	for(int i=0; i<10; i++)
+		worldShapes.push_back(randomShape());
 	
 
 	glutInit(&argc, argv);

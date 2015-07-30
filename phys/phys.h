@@ -58,6 +58,16 @@ void collideAndResolve(std::vector<Sphere*> v);
 // - Includes option for damping/friction
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
 
+// Move one timestep using the translational forces on all the objects
+void t_advancePos(double t, std::vector<Shape*> v);
+
+// Move one timestep using the rotational forces (torques)  on all the objects
+void r_advancePos(double t, std::vector<Shape*> v);
+
+// Move one timestep both translational and rotational positions 
+void advancePos(double t, std::vector<Shape*> v);
+
+
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme
 // MAKE SURE THIS IS MATHEMATICALLY SOUND

@@ -45,6 +45,9 @@ class Shape
 
 		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
 
+		// Drawing stuff
+		virtual void draw()=0;
+
 		// Abstract methods that other shapes MUST define
 		virtual double volume()=0;	// Returns volume of sphere
 		virtual double moment()=0;	// Returns moment of inertia of sphere

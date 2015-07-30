@@ -17,8 +17,6 @@ class Sphere : public Shape		// Is public the right modifier here?
 		// With params
 		Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVel);
 
-		// Drawing
-		void draw();
 		
 		// Physics related methods
 		double volume();	// Returns volume of sphere

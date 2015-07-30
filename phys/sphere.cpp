@@ -21,7 +21,10 @@ double Sphere::volume()
 double Sphere::moment()
 {
 	// For a solid sphere: I = 2/5MR^2
-	return (0.4)*mass*radius*radius;
+	cart mmnt = {	(0.4)*mass*radius*radius,
+			(0.4)*mass*radius*radius,
+			(0.4)*mass*radius*radius};
+	return mmnt
 }
 
 double Sphere::density()
@@ -38,5 +41,5 @@ double Sphere::boundingSphere()
 // For a cube this would not be the same
 double Sphere::boundingBox()
 {
-	return radius;
+	return 2*radius;
 }

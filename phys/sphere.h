@@ -20,7 +20,7 @@ class Sphere : public Shape		// Is public the right modifier here?
 		
 		// Physics related methods
 		double volume();	// Returns volume of sphere
-		double moment();	// Returns moment of inertia of sphere
+		cart moment();		// Returns moment of inertia of sphere
 		double density();	// Returns density of sphere
 		double boundingSphere();// Returns the radius of the bounding sphere of an object
 		double boundingBox();	// Returns the length of the bounding cube of an object

@@ -47,7 +47,7 @@ class Shape
 
 		// Abstract methods that other shapes MUST define
 		virtual double volume()=0;	// Returns volume of sphere
-		virtual double moment()=0;	// Returns moment of inertia of sphere
+		virtual cart moment()=0;	// Returns moment of inertia of sphere
 		virtual double density()=0;	// Returns density of sphere
 		virtual double boundingSphere()=0;// Returns the radius of the bounding sphere of an object
 		virtual double boundingBox()=0;	// Returns the length of the bounding cube of an object

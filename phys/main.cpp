@@ -23,11 +23,12 @@ std::vector<Shape*> worldShapes;
 // Dummy main and function just for compiling purposes
 void display()
 {
+	std::cout << worldShapes[0]->t_position.x << std::endl;
 }
 
 static void idle()
 {
-	advanceSim(1, worldShapes);
+	advanceSim(10000000, worldShapes);
 
 	// Calls the display function 
 	display();
@@ -37,13 +38,25 @@ int main(int argc, char **argv)
 {
 	// Just for testing
 	std::cout<< G_CONST << std::endl;
+
 	// Init shape vector
+	Sphere* bigSphere = (Sphere*)randomShape();
+	bigSphere->mass = 99999999999999999999999999990.0;
 	for(int i=0; i<10; i++)
 		worldShapes.push_back(randomShape());
+	worldShapes.push_back(bigSphere);
 	
 
 	glutInit(&argc, argv);
+	
+	// From original
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+	glutInitWindowSize(1000, 1000);
+	glutInitWindowPosition(200, 200);
+	glutCreateWindow("Project One: Breakout");
 	glutDisplayFunc(display);
+	// End from original
+
 	// Function called when idle  
 	glutIdleFunc(idle); 
 	glutMainLoop();

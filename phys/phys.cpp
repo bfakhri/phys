@@ -100,28 +100,59 @@ void collideAndResolve(std::vector<Shape*> v)
 
 }
 
-// May need to delete this to keep things somewhat general
-/*
-void collideAndResolve(std::vector<Sphere*> v)
-{
-}
-*/
 
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 {
+	// We can either assume collision already happened and move the objects
+	// to their correct spots, correcting their velocity vectors OR we can 
+	// set up an impulse in the correct direction that will have that effect
+
+
 	// Rule 1 - conserve momentum
 	// Rule 2 - conserve KE with respect to dampingConst
 }
 
 void t_advancePos(double t, std::vector<Shape*> v)
 {
+	for(int i=0; i<v.size(); i++){
+		double mass = v[i]->mass;
 
+		cart vel = {	v[i]->t_velocity.x,
+				v[i]->t_velocity.y,
+				v[i]->t_velocity.z};
+
+		cart accel = {	v[i]->t_forces.x/mass,
+                                v[i]->t_forces.y/mass,
+                                v[i]->t_forces.z/mass};
+
+		// Using parabolic motion df = d0 + vt + 0.5at^2
+		v[i]->t_position.x += vel.x*t + 0.5*accel.x*t*t; 
+		v[i]->t_position.y += vel.y*t + 0.5*accel.y*t*t; 
+		v[i]->t_position.z += vel.z*t + 0.5*accel.z*t*t; 
+	}
+	
 }
 
 // Move one timestep using the rotational forces (torques)  on all the objects
 void r_advancePos(double t, std::vector<Shape*> v)
 {
+	for(int i=0; i<v.size(); i++){
+		double mass = v[i]->mass;
 
+		cart rVel = {	v[i]->r_velocity.x,
+				v[i]->r_velocity.y,
+				v[i]->r_velocity.z};
+
+		cart rAccel = {	v[i]->r_forces.x/v[i]->moment.x,
+                                v[i]->r_forces.y/v[i]->moment.y,,
+                                v[i]->r_forces.z/v[i]->moment.z,};
+
+		// Using parabolic motion thetaf = theta0 + omega*t + 0.5*alpha*t^2
+		v[i]->r_position.x += rVel.x*t + 0.5*rAccel.x*t*t; 
+		v[i]->r_position.y += rVel.y*t + 0.5*rAccel.y*t*t; 
+		v[i]->r_position.z += rVel.z*t + 0.5*rAccel.z*t*t; 
+	}
+	
 }
 
 // Move one timestep both translational and rotational positions 
@@ -166,10 +197,18 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 
 void advanceSim(double t, std::vector<Shape*> v)
 {
+	// MAKE SURE THIS IS THE LEAST ERROR-PRONE ORDER
+
+	// Physicall influences (gravity/magnetism etc)
+	gravAllShapes(v);
+
 	// Update position of all shapes
-	cart blankCart;
-	gravity(0, blankCart, v);
+	advancePos(t, v);
+
 	// Detect and resolve all collisions
+	collideAndResolve(v);
 
 	// If worldwrap is on, worldwrap all objects
+	cart lims = {100, 100, 100};
+	wrapWorld(lims, v);
 }

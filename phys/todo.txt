@@ -1,6 +1,8 @@
 ----
 5) Implement physics functions
-6) Make moment a cartesian type (moment can vary depending on axis)
+6) Figure out a way to toggle settings like worldWrap elegantly 
+	- maybe have each file have an interface function to toggle 
+	static global variables that turn those things on/off
 7) Implement draw file
 7) Protect certain physics functions from approaching zero and divide by zero conditions
 8) Protect loops from integer overflow by changing all ints to specifically sized ints (uint16_t etc)

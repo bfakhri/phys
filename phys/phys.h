@@ -69,9 +69,6 @@ bool collide(Sphere* s1, Sphere* s2);
 // Detects collisions and resolves them for all objects
 void collideAndResolve(std::vector<Shape*> v);
 
-// Detects collisions and resolves them for spheres
-void collideAndResolve(std::vector<Sphere*> v);
-
 // Resolves a collision
 // - Includes option for damping/friction
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst);

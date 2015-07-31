@@ -2,7 +2,10 @@
 #define SHAPE_H
 
 #include "mather.h"	// For cart type	
-#include <stdlib.h>	// For rand()
+
+#include <GL/glut.h>	// For draw() function
+#include <GL/gl.h>		// For draw() function
+#include <stdlib.h>		// For rand()
 
 // scalar quantities are preceded by nothing
 // vector quantities are preceded by either a "t_" for translational or
@@ -45,8 +48,12 @@ class Shape
 
 		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
 
+		// Drawing stuff
+		void draw();				// Sets up the drawing scheme by moving to the right 
+									//	place and rotating. Then calls drawShape()
 		
 		// Abstract methods that other shapes MUST define
+		virtual void drawShape()=0;	// Does the part of draw that is specific to the shape
 		virtual double volume()=0;	// Returns volume of sphere
 		virtual cart momentCM()=0;	// Returns moment of inertia of shape through center of mass
 		cart moment(cart d);		// Returns moment of inertia of shape through a parallel 

@@ -115,4 +115,18 @@ cart Shape::moment(cart d)
 	return mmnt;
 }
 
+void Shape::draw()
+{
+	// Setup the draw
+	glPushMatrix(); 
+	glTranslatef(t_position.x, t_position.y, t_position.z); 
+	glRotatef(r_position.x, 1, 0 , 0); 
+	glRotatef(r_position.y, 0, 1 , 0); 
+	glRotatef(r_position.z, 0, 0 , 1); 
 
+	// Actually draw it
+	drawShape();
+
+	// Reset the matrix
+	glPopMatrix(); 
+}

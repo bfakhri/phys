@@ -8,8 +8,6 @@
 // Physics
 #include "phys.h"
 
-// Drawing
-#include "draw.h"
 
 // Shapes
 #include "shape.h"

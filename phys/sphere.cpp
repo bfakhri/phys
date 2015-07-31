@@ -13,6 +13,13 @@ Sphere::Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVe
 	radius = r; 
 }
 
+
+void Sphere::drawShape()
+{
+	// Nothing here yet
+}
+
+
 double Sphere::volume()
 {
 	return M_PI*radius*radius;

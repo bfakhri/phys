@@ -18,13 +18,13 @@ double Sphere::volume()
 	return M_PI*radius*radius;
 }
 
-double Sphere::moment()
+cart Sphere::momentCM()
 {
 	// For a solid sphere: I = 2/5MR^2
 	cart mmnt = {	(0.4)*mass*radius*radius,
 			(0.4)*mass*radius*radius,
 			(0.4)*mass*radius*radius};
-	return mmnt
+	return mmnt;
 }
 
 double Sphere::density()

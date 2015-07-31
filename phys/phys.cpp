@@ -62,12 +62,12 @@ void gravAllShapes(std::vector<Shape*> v)
 		// Affect by all other elements except itself
 		for(int j=0; j<v.size(); j++){
 			if(i != j)
-				gravInfluenceShape(v[j], v[i]);
+				gravPull(v[j], v[i]);
 		}
 	}
 }
 
-void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
+void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 {
 	for(int i=0; i<v.size(); i++){
 		// Affect by universal mass
@@ -143,9 +143,9 @@ void r_advancePos(double t, std::vector<Shape*> v)
 				v[i]->r_velocity.y,
 				v[i]->r_velocity.z};
 
-		cart rAccel = {	v[i]->r_forces.x/v[i]->moment.x,
-                                v[i]->r_forces.y/v[i]->moment.y,,
-                                v[i]->r_forces.z/v[i]->moment.z,};
+		cart rAccel = {	v[i]->r_forces.x/v[i]->momentCM().x,
+                                v[i]->r_forces.y/v[i]->momentCM().y,
+                                v[i]->r_forces.z/v[i]->momentCM().z,};
 
 		// Using parabolic motion thetaf = theta0 + omega*t + 0.5*alpha*t^2
 		v[i]->r_position.x += rVel.x*t + 0.5*rAccel.x*t*t; 
@@ -167,31 +167,31 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 	for(int i=0; i<v.size(); i++)
 	{
 		// Positive world limit breaches
-		if(v[i]->t_pos.x > worldLimits.x){
+		if(v[i]->t_position.x > worldLimits.x){
 			// Original math
 			//v[i]->t_pos.x = -worldLimits.x + (v[i]->t_pos.x - worldLimits.x);
 			// Simplified math
-			v[i]->t_pos.x = -2*worldLimits.x + v[i]->t_pos.x;
+			v[i]->t_position.x = -2*worldLimits.x + v[i]->t_position.x;
 		}
 		// Negative world limit breaches
-		else if(v[i]->t_pos.x < -worldLimits.x)	
-			v[i]->t_pos.x = 2*worldLimits.x + v[i]->t_pos.x;
+		else if(v[i]->t_position.x < -worldLimits.x){
+			v[i]->t_position.x = 2*worldLimits.x + v[i]->t_position.x;
 		}
 
-		if(v[i]->t_pos.y > worldLimits.y){
-			v[i]->t_pos.y = -2*worldLimits.y + v[i]->t_pos.y;
+		if(v[i]->t_position.y > worldLimits.y){
+			v[i]->t_position.y = -2*worldLimits.y + v[i]->t_position.y;
 		}
-		else if(v[i]->t_pos.y < -worldLimits.y)	
-			v[i]->t_pos.y = 2*worldLimits.y + v[i]->t_pos.y;
-		}
-
-		if(v[i]->t_pos.z > worldLimits.z){
-			v[i]->t_pos.z = -2*worldLimits.z + v[i]->t_pos.z;
-		}
-		else if(v[i]->t_pos.z < -worldLimits.z)	
-			v[i]->t_pos.z = 2*worldLimits.z + v[i]->t_pos.z;
+		else if(v[i]->t_position.y < -worldLimits.y){
+			v[i]->t_position.y = 2*worldLimits.y + v[i]->t_position.y;
 		}
 
+		if(v[i]->t_position.z > worldLimits.z){
+			v[i]->t_position.z = -2*worldLimits.z + v[i]->t_position.z;
+		}
+		else if(v[i]->t_position.z < -worldLimits.z){	
+			v[i]->t_position.z = 2*worldLimits.z + v[i]->t_position.z;
+		}
+	}
 
 }
 

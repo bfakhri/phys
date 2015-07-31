@@ -18,7 +18,7 @@ class Cube : public Shape		// Is public the right modifier here?
 		
 		// Physics related methods
 		double volume();	// Returns volume of Cube
-		cart moment();		// Returns moment of inertia of Cube
+		cart momentCM();	// Returns moment of inertia of Cube
 		double density();	// Returns density of Cube
 		double boundingCube();// Returns the radius of the bounding Cube of an object
 		double boundingBox();	// Returns the length of the bounding cube of an object

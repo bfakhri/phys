@@ -1,4 +1,4 @@
-#include "Cube.h"
+#include "cube.h"
 #include "math.h"
 
 // Default
@@ -18,12 +18,12 @@ double Cube::volume()
 	return sideLength*sideLength*sideLength;
 }
 
-cart Cube::moment()
+cart Cube::momentCM()
 {
 	cart mmnt = {	mass*sideLength*sideLength/6,
-			mass*sideLength*sideLength/6,
-			mass*sideLength*sideLength/6}
-	return cart;
+					mass*sideLength*sideLength/6,
+					mass*sideLength*sideLength/6};
+	return mmnt;
 }
 
 double Cube::density()

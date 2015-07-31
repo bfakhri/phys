@@ -21,12 +21,26 @@ std::vector<Shape*> worldShapes;
 // Dummy main and function just for compiling purposes
 void display()
 {
+	// Clear screen
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	
+	// Green for shapes
+	glColor3f(0.0, 1.0, 0.05);
+
+	// Draws shapes in vector
+	for(int i=0; i<worldShapes.size(); i++)	
+		worldShapes[i]->draw();
+
+	// Sends buffered commands to run
+	glutSwapBuffers();
+
+	// Debugging
 	std::cout << worldShapes[0]->t_position.x << std::endl;
 }
 
 static void idle()
 {
-	advanceSim(10000000, worldShapes);
+	advanceSim(1, worldShapes);
 
 	// Calls the display function 
 	display();
@@ -38,12 +52,19 @@ int main(int argc, char **argv)
 	std::cout<< G_CONST << std::endl;
 
 	// Init shape vector
-	Sphere* bigSphere = (Sphere*)randomShape();
-	bigSphere->mass = 99999999999999999999999999990.0;
+	/*
+	cart tMaxPos = {10, 10, 10};
+	cart tMaxVel = {1, 1, 1};
+	cart rMaxPos = {3, 3, 3};
+	cart rMaxVel = {1, 1, 1};
+	Sphere* bigSphere = (Sphere*)randomShape(10, 100, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel, rMaxPos, rMaxVel);
 	for(int i=0; i<10; i++)
-		worldShapes.push_back(randomShape());
+		worldShapes.push_back((Sphere*)randomShape(10, 100, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel, rMaxPos, rMaxVel));
 	worldShapes.push_back(bigSphere);
-	
+	*/
+	cart pos = {0, 0, 0};
+	cart pos1 = {0, 0, -3};
+	worldShapes.push_back(new Sphere(0.1, 1, pos1, pos, pos, pos));
 
 	glutInit(&argc, argv);
 	
@@ -51,12 +72,48 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
 	glutInitWindowSize(1000, 1000);
 	glutInitWindowPosition(200, 200);
-	glutCreateWindow("Project One: Breakout");
+	glutCreateWindow("Phys");
 	glutDisplayFunc(display);
 	// End from original
 
 	// Function called when idle  
 	glutIdleFunc(idle); 
+
+
+
+	// set background clear color to black 
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	// set current color to white 
+	glColor3f(1.0, 1.0, 1.0);
+
+	// For Depth 
+	glEnable(GL_DEPTH_TEST);
+
+	// For Lighting 
+	glEnable(GL_LIGHTING);	
+	glEnable(GL_LIGHT0);
+	float ambientSettings[4] = {0.7, 0.7, 0.7, 1}; 
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings); 
+
+	// identify the projection matrix that we would like to alter 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();   
+	// Set up perspective projection 
+	gluPerspective(90, 1.0, 0.01, 120.0); 
+	//gluLookAt(1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+
+	// identify the modeling and viewing matrix that can be modified from here on 
+	// we leave the routine in this mode in case we want to move the object around 
+	// or specify the camera 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+
+
+
+
+
 	glutMainLoop();
 }
 /*

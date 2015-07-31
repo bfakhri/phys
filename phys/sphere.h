@@ -7,6 +7,11 @@
 
 #include "shape.h"
 
+// Glut files
+#include <GL/glut.h>
+#include <GL/gl.h>
+
+
 class Sphere : public Shape		// Is public the right modifier here? 
 {
 	public:

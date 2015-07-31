@@ -16,7 +16,9 @@ Sphere::Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVe
 
 void Sphere::drawShape()
 {
-	// Nothing here yet
+	GLUquadric* quad = gluNewQuadric();					// make a quadric
+	//gluQuadricOrientation();							// This may be useful soon
+	gluSphere(quad, radius, DEF_SLICES, DEF_STACKS);	// Draws the sphere
 }
 
 

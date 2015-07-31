@@ -3,10 +3,11 @@
 	- Maybe use the parallel axis theorem to calculate different types of moments
 5) Implement physics functions
 6) Figure out a way to toggle settings like worldWrap elegantly 
-	- maybe have each file have an interface function to toggle 
-	static global variables that turn those things on/off
-7) Implement draw file
+	- Make advanceSim() function have a ton of parameters for everything. 
+		That will be our gateway to the simulator parameters
 7) Protect certain physics functions from approaching zero and divide by zero conditions
+7) Add color/texture properties to the Shape class, which will be reflected when they are drawn
+8) Add a timing scheme to coordinate the physics engine with the rendering engine
 8) Protect loops from integer overflow by changing all ints to specifically sized ints (uint16_t etc)
 9) Check math of physics functions
 

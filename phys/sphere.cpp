@@ -16,8 +16,10 @@ Sphere::Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVe
 
 void Sphere::drawShape()
 {
+	// Mem-leak!?!?!?
 	GLUquadric* quad = gluNewQuadric();					// make a quadric
-	//gluQuadricOrientation();							// This may be useful soon
+	gluQuadricDrawStyle(quad, GLU_POINT);							// This may be useful soon
+		
 	gluSphere(quad, radius, DEF_SLICES, DEF_STACKS);	// Draws the sphere
 }
 

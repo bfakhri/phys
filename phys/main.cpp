@@ -55,13 +55,14 @@ int main(int argc, char **argv)
 	
 	cart tMaxPos = {10, 10, 30};
 	cart tMaxVel = {0.1, 0.1, 0.1};
-	for(int i=0; i<10; i++)
+	for(int i=0; i<100; i++)
+	{
 		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel));
+		worldShapes[i]->r_velocity.x = i*3.14/100;
+		worldShapes[i]->r_velocity.y = i*3.14/100;
+		worldShapes[i]->r_velocity.z = i*3.14/100;
+	}
 	
-	cart pos = {0, 0, 0};
-	cart pos1 = {0, 0, -0.2};
-	worldShapes.push_back(new Sphere(2, 1, pos1, pos1, pos, pos));
-
 	glutInit(&argc, argv);
 	
 	// From original
@@ -88,7 +89,7 @@ int main(int argc, char **argv)
 	// For Lighting 
 	glEnable(GL_LIGHTING);	
 	glEnable(GL_LIGHT0);
-	float ambientSettings[4] = {0.7, 0.7, 0.7, 1}; 
+	float ambientSettings[4] = {0.0, 0.7, 0.2, 1}; 
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings); 
 
 	// identify the projection matrix that we would like to alter 

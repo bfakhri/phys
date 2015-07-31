@@ -45,9 +45,13 @@ class Shape
 
 		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
 
+		
 		// Abstract methods that other shapes MUST define
 		virtual double volume()=0;	// Returns volume of sphere
-		virtual cart moment()=0;	// Returns moment of inertia of sphere
+		virtual cart momentCM()=0;	// Returns moment of inertia of shape through center of mass
+		cart moment(cart d);		// Returns moment of inertia of shape through a parallel 
+						//	axis a distance 'd' from the axis at center of mass
+						// 	Not virtual because it will be the same for all subclasses
 		virtual double density()=0;	// Returns density of sphere
 		virtual double boundingSphere()=0;// Returns the radius of the bounding sphere of an object
 		virtual double boundingBox()=0;	// Returns the length of the bounding cube of an object

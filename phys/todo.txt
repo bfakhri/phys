@@ -1,4 +1,6 @@
 ----
+4) Maybe we're using the wrong moments of inertia. We may need the moments for the shape about an axis other than its own
+	- Maybe use the parallel axis theorem to calculate different types of moments
 5) Implement physics functions
 6) Figure out a way to toggle settings like worldWrap elegantly 
 	- maybe have each file have an interface function to toggle 

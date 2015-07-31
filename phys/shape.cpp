@@ -106,4 +106,13 @@ void Shape::updatePosResetForces(double t)
 	resetForces();
 };
 
+cart Shape::moment(cart d)
+{
+	cart mmnt = {	momentCM().x + mass*(d.x*d.x),
+			momentCM().y + mass*(d.y*d.y),
+			momentCM().z + mass*(d.z*d.z)};
+
+	return mmnt;
+}
+
 

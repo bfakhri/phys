@@ -42,13 +42,8 @@ class Shape
 		// Mutators
 		void t_addForce(cart force);	// Adds a translational force
 		void r_addForce(cart force);	// Addes a rotational force
-		void resetForces();		// Resets ALL forces to zero
+		void resetForces();				// Resets ALL forces to zero
 		
-		void t_updatePos(double t);	// Updates translational position
-		void r_updatePos(double t);	// Updates rotational position
-
-		void updatePosResetForces(double t);	// Updates both trans and rot positions and resets forces
-
 		// Drawing stuff
 		void draw();				// Sets up the drawing scheme by moving to the right 
 									//	place and rotating. Then calls drawShape()

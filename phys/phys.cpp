@@ -16,6 +16,21 @@ double distance(Shape* s1, Shape* s2)
 	return distance(c1, c2);  
 }
 
+
+
+void resetForces(std::vector<Shape*> v)
+{
+	for(int i=0; i<v.size(); i++)
+	{
+		v[i]->t_forces.x = 0;
+		v[i]->t_forces.y = 0;
+		v[i]->t_forces.z = 0;
+		v[i]->r_forces.x = 0;
+		v[i]->r_forces.y = 0;
+		v[i]->r_forces.z = 0;
+	}
+}
+
 double gravForce(double m1, double m2, double dist)
 {
 	return G_CONST*m1*m2/(dist*dist);
@@ -130,7 +145,6 @@ void t_advancePos(double t, std::vector<Shape*> v)
 		v[i]->t_position.y += vel.y*t + 0.5*accel.y*t*t; 
 		v[i]->t_position.z += vel.z*t + 0.5*accel.z*t*t; 
 	}
-	
 }
 
 // Move one timestep using the rotational forces (torques)  on all the objects
@@ -152,14 +166,15 @@ void r_advancePos(double t, std::vector<Shape*> v)
 		v[i]->r_position.y += rVel.y*t + 0.5*rAccel.y*t*t; 
 		v[i]->r_position.z += rVel.z*t + 0.5*rAccel.z*t*t; 
 	}
-	
 }
 
-// Move one timestep both translational and rotational positions 
-void advancePos(double t, std::vector<Shape*> v)
+void advancePosAndReset(double t, std::vector<Shape*> v)
 {
 	t_advancePos(t, v);
 	r_advancePos(t, v);
+
+	// Reset force vectors
+	resetForces(v);
 }
 
 void wrapWorld(cart worldLimits, std::vector<Shape*> v)
@@ -200,13 +215,13 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// MAKE SURE THIS IS THE LEAST ERROR-PRONE ORDER
 
 	// Physicall influences (gravity/magnetism etc)
-	gravAllShapes(v);
+	//gravAllShapes(v);
 
 	// Update position of all shapes
-	advancePos(t, v);
+	advancePosAndReset(t, v);
 
 	// Detect and resolve all collisions
-	collideAndResolve(v);
+	//collideAndResolve(v);
 
 	// If worldwrap is on, worldwrap all objects
 	cart lims = {100, 100, 100};

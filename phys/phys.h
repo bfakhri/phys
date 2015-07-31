@@ -29,7 +29,9 @@ double distance(cart c1, cart c2);
 // Return distance between two shapes
 double distance(Shape* s1, Shape* s2);
 
-
+// Resets the force vectors of an object 
+// (both rotational and translational)
+void resetForces(std::vector<Shape*> v);
 
 ////////////////////
 // Gravity Functions 
@@ -86,7 +88,7 @@ void t_advancePos(double t, std::vector<Shape*> v);
 void r_advancePos(double t, std::vector<Shape*> v);
 
 // Move one timestep both translational and rotational positions 
-void advancePos(double t, std::vector<Shape*> v);
+void advancePosAndReset(double t, std::vector<Shape*> v);
 
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme

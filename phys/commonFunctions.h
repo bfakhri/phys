@@ -11,7 +11,8 @@
 Shape* randomShape();
 
 // Make random shape with param constraints
-Shape* randomShape(double radMin, double radMax, double minMass, double maxMass, cart tMaxPos,cart tMaxVel, cart rMaxPos, cart rMaxVel);
+Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tMaxVel);
+
 
 // Maybe makes this flexible - can take in shapes from files or random shapes
 // depending on the inputs to the function

@@ -60,7 +60,7 @@ void Shape::t_addForce(cart force)
 {
 	t_forces.x += force.x;
 	t_forces.y += force.y;
-        t_forces.z += force.z;
+	t_forces.z += force.z;
 };
 
 
@@ -76,35 +76,13 @@ void Shape::resetForces()
 {
 	t_forces.x = 0;
 	t_forces.y = 0;
-        t_forces.z = 0;
+	t_forces.z = 0;
 	r_forces.x = 0;
 	r_forces.y = 0;
-        r_forces.z = 0;
+    r_forces.z = 0;
 
 };
 
-// Updates the shape by moving forward in time by t seconds
-void Shape::t_updatePos(double t)
-{
-	t_position.x += t_velocity.x*t;
-	t_position.y += t_velocity.y*t;
-	t_position.z += t_velocity.z*t;
-};
-
-// Updates the shape by moving forward in time by t seconds
-void Shape::r_updatePos(double t)
-{
-	r_position.x += r_velocity.x*t;
-	r_position.y += r_velocity.y*t;
-	r_position.z += r_velocity.z*t;
-};
-
-void Shape::updatePosResetForces(double t)
-{
-	t_updatePos(t);
-	r_updatePos(t);
-	resetForces();
-};
 
 cart Shape::moment(cart d)
 {
@@ -119,6 +97,8 @@ void Shape::draw()
 {
 	// Setup the draw
 	glPushMatrix(); 
+	// Push everything forward so origin in not in the camera	
+	glTranslatef(0, 0, ORIGIN_DIST); 
 	glTranslatef(t_position.x, t_position.y, t_position.z); 
 	glRotatef(r_position.x, 1, 0 , 0); 
 	glRotatef(r_position.y, 0, 1 , 0); 

@@ -6,6 +6,7 @@
 #define DEF_SLICES 50
 #define DEF_STACKS 50
 
-
+// Distance of origin from camera
+#define ORIGIN_DIST -5
 
 #endif

@@ -35,7 +35,7 @@ void display()
 	glutSwapBuffers();
 
 	// Debugging
-	std::cout << worldShapes[0]->t_position.x << std::endl;
+	std::cout << worldShapes[0]->t_position.z << std::endl;
 }
 
 static void idle()
@@ -52,19 +52,15 @@ int main(int argc, char **argv)
 	std::cout<< G_CONST << std::endl;
 
 	// Init shape vector
-	/*
-	cart tMaxPos = {10, 10, 10};
-	cart tMaxVel = {1, 1, 1};
-	cart rMaxPos = {3, 3, 3};
-	cart rMaxVel = {1, 1, 1};
-	Sphere* bigSphere = (Sphere*)randomShape(10, 100, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel, rMaxPos, rMaxVel);
+	
+	cart tMaxPos = {10, 10, 30};
+	cart tMaxVel = {0.1, 0.1, 0.1};
 	for(int i=0; i<10; i++)
-		worldShapes.push_back((Sphere*)randomShape(10, 100, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel, rMaxPos, rMaxVel));
-	worldShapes.push_back(bigSphere);
-	*/
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel));
+	
 	cart pos = {0, 0, 0};
-	cart pos1 = {0, 0, -3};
-	worldShapes.push_back(new Sphere(0.1, 1, pos1, pos, pos, pos));
+	cart pos1 = {0, 0, -0.2};
+	worldShapes.push_back(new Sphere(2, 1, pos1, pos1, pos, pos));
 
 	glutInit(&argc, argv);
 	

@@ -12,24 +12,31 @@
 #include <GL/gl.h>
 
 
-class Sphere : public Shape		// Is public the right modifier here? 
+class Sphere : public Shape 
 {
 	public:
-		double radius;		// The radius of the sphere
+		double radius;	
 	
-		// Default
+		///////////////
+		// Constructors
+		///////////////
+
 		Sphere();
-		// With params
 		Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVel);
 
+		/////////////////
+		// Drawing Functs
+		/////////////////
 
-		// Drawing
 		void drawShape();
 		
-		// Physics related methods
-		double volume();	// Returns volume of sphere
-		cart momentCM();	// Returns moment of inertia of sphere
-		double density();	// Returns density of sphere
+		/////////////////
+		// Physics Functs
+		/////////////////
+
+		double volume();		// Returns volume of sphere
+		cart momentCM();		// Returns moment of inertia of sphere
+		double density();		// Returns density of sphere
 		double boundingSphere();// Returns the radius of the bounding sphere of an object
 		double boundingBox();	// Returns the length of the bounding cube of an object
 

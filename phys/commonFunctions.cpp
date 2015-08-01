@@ -1,6 +1,6 @@
 #include "commonFunctions.h"
 
-void populateShapeVector()
+void populateShapeVector(std::vector<Shape*> v)
 {
 	// write this
 }

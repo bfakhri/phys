@@ -35,18 +35,30 @@ class Shape
 		cart r_forces;		// torques - Nm
 
 	
+		///////////////
 		// Constructors
-		Shape();
-		Shape(double mass, cart tPos, cart tVel, cart rPos, cart rVel);	// Forces are missing because we will init to zero most probably
+		///////////////
 		
-		// Mutators
+		Shape();
+		Shape(double mass, cart tPos, cart tVel, cart rPos, cart rVel);	
+		
+		///////////
+		// Mutators 
+		///////////
+
 		void t_addForce(cart force);	// Adds a translational force
 		void r_addForce(cart force);	// Addes a rotational force
 		void resetForces();				// Resets ALL forces to zero
 		
-		// Drawing stuff
+		/////////////////
+		// Drawing Functs
+		/////////////////
 		void draw();				// Sets up the drawing scheme by moving to the right 
 									//	place and rotating. Then calls drawShape()
+		
+		/////////////////
+		// Physics Functs
+		/////////////////
 		
 		// Abstract methods that other shapes MUST define
 		virtual void drawShape()=0;	// Does the part of draw that is specific to the shape

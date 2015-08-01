@@ -33,6 +33,8 @@ double distance(Shape* s1, Shape* s2);
 // (both rotational and translational)
 void resetForces(std::vector<Shape*> v);
 
+
+
 ////////////////////
 // Gravity Functions 
 ////////////////////
@@ -57,6 +59,7 @@ void gravAllShapes(std::vector<Shape*> v);
 void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
 
 
+
 //////////////////////
 // Collision functions
 //////////////////////
@@ -64,9 +67,6 @@ void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
 // Detects whether two shapes are colliding or not
 // for any shape combinations
 bool collide(Shape* s1, Shape* s2);
-
-// Detects whether two Spheres are colliding or not
-bool collide(Sphere* s1, Sphere* s2);
 
 // Detects collisions and resolves them for all objects
 void collideAndResolve(std::vector<Shape*> v);

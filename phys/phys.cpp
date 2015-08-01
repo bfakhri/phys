@@ -1,6 +1,10 @@
 #include "phys.h"
 
 
+///////////////////
+// Helper Functions 
+///////////////////
+
 double distance(cart c1, cart c2)
 {	
 	cart c2toc1 = {	c1.x - c2.x, 
@@ -30,6 +34,11 @@ void resetForces(std::vector<Shape*> v)
 		v[i]->r_forces.z = 0;
 	}
 }
+
+
+////////////////////
+// Gravity Functions 
+////////////////////
 
 double gravForce(double m1, double m2, double dist)
 {
@@ -90,6 +99,11 @@ void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 	}
 }
 
+
+//////////////////////
+// Collision functions
+//////////////////////
+
 // We may want to make this function more general by adding a criteria
 // parameter to determine how we decide a collision has occured (sphere/bounding box/etc)
 bool collide(Shape* s1, Shape* s2)
@@ -115,30 +129,42 @@ void collideAndResolve(std::vector<Shape*> v)
 
 }
 
-
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 {
 	// We can either assume collision already happened and move the objects
 	// to their correct spots, correcting their velocity vectors OR we can 
 	// set up an impulse in the correct direction that will have that effect
-
-
 	// Rule 1 - conserve momentum
 	// Rule 2 - conserve KE with respect to dampingConst
+
+	// Get distance b/t shapes
+	// Compute I of each shape using distance
+	
+	// Get tangent vector(s?)
+	// Compute angular velocities using tangent vectors
+	// Find angular momentums using the angular vel of each shape
+		// Remember to add 
+	
+	
 }
+
+
+///////////////////////
+// Simulation Functions 
+///////////////////////
 
 void t_advancePos(double t, std::vector<Shape*> v)
 {
 	for(int i=0; i<v.size(); i++){
 		double mass = v[i]->mass;
 
-		cart vel = {	v[i]->t_velocity.x,
-				v[i]->t_velocity.y,
-				v[i]->t_velocity.z};
+		cart vel = {v[i]->t_velocity.x,
+					v[i]->t_velocity.y,
+					v[i]->t_velocity.z};
 
 		cart accel = {	v[i]->t_forces.x/mass,
-                                v[i]->t_forces.y/mass,
-                                v[i]->t_forces.z/mass};
+						v[i]->t_forces.y/mass,
+						v[i]->t_forces.z/mass};
 
 		// Using parabolic motion df = d0 + vt + 0.5at^2
 		v[i]->t_position.x += vel.x*t + 0.5*accel.x*t*t; 
@@ -154,12 +180,12 @@ void r_advancePos(double t, std::vector<Shape*> v)
 		double mass = v[i]->mass;
 
 		cart rVel = {	v[i]->r_velocity.x,
-				v[i]->r_velocity.y,
-				v[i]->r_velocity.z};
+						v[i]->r_velocity.y,
+						v[i]->r_velocity.z};
 
 		cart rAccel = {	v[i]->r_forces.x/v[i]->momentCM().x,
-                                v[i]->r_forces.y/v[i]->momentCM().y,
-                                v[i]->r_forces.z/v[i]->momentCM().z,};
+                        v[i]->r_forces.y/v[i]->momentCM().y,
+                        v[i]->r_forces.z/v[i]->momentCM().z,};
 
 		// Using parabolic motion thetaf = theta0 + omega*t + 0.5*alpha*t^2
 		v[i]->r_position.x += rVel.x*t + 0.5*rAccel.x*t*t; 

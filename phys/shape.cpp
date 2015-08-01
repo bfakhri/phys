@@ -1,5 +1,10 @@
 #include "shape.h"
 
+
+///////////////
+// Constructors
+///////////////
+
 Shape::Shape()
 {
 	// Scalar quantities
@@ -40,21 +45,27 @@ Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
 	t_position.z = tPos.z;
 	t_velocity.x = tVel.x;
 	t_velocity.y = tVel.y;
-        t_velocity.z = tVel.z;
+    t_velocity.z = tVel.z;
 	t_forces.x = 0;
 	t_forces.y = 0;
-        t_forces.z = 0;
+    t_forces.z = 0;
 	//	Rotational
 	r_position.x = rPos.x;
 	r_position.y = rPos.y;
 	r_position.z = rPos.z;
 	r_velocity.x = rVel.x;
 	r_velocity.y = rVel.y;
-        r_velocity.z = rVel.z;
+    r_velocity.z = rVel.z;
 	r_forces.x = 0;
 	r_forces.y = 0;
-        r_forces.z = 0;
+    r_forces.z = 0;
 };
+
+
+
+///////////
+// Mutators 
+///////////
 
 void Shape::t_addForce(cart force)
 {
@@ -84,14 +95,10 @@ void Shape::resetForces()
 };
 
 
-cart Shape::moment(cart d)
-{
-	cart mmnt = {	momentCM().x + mass*(d.x*d.x),
-			momentCM().y + mass*(d.y*d.y),
-			momentCM().z + mass*(d.z*d.z)};
 
-	return mmnt;
-}
+/////////////////
+// Drawing Functs
+/////////////////
 
 void Shape::draw()
 {
@@ -110,3 +117,18 @@ void Shape::draw()
 	// Reset the matrix
 	glPopMatrix(); 
 }
+
+
+/////////////////
+// Physics Functs
+/////////////////
+
+cart Shape::moment(cart d)
+{
+	cart mmnt = {	momentCM().x + mass*(d.x*d.x),
+			momentCM().y + mass*(d.y*d.y),
+			momentCM().z + mass*(d.z*d.z)};
+
+	return mmnt;
+}
+

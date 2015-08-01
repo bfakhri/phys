@@ -1,28 +1,38 @@
 #include "sphere.h"
 #include "math.h"
 
-// Default
+
+///////////////
+// Constructors
+///////////////
+
 Sphere::Sphere()
 {
 	radius = 1;
 }
 
-// Calls parent non-default constructor and passes args to it
 Sphere::Sphere(double r, double sMass, cart tPos, cart tVel, cart rPos, cart rVel): Shape(sMass, tPos, tVel, rPos, rVel)
 {
 	radius = r; 
 }
 
 
+/////////////////
+// Drawing Functs
+/////////////////
+
 void Sphere::drawShape()
 {
 	// Mem-leak!?!?!?
 	GLUquadric* quad = gluNewQuadric();					// make a quadric
-	gluQuadricDrawStyle(quad, GLU_POINT);							// This may be useful soon
-		
+	gluQuadricDrawStyle(quad, GLU_POINT);				// This changes the drawing style
 	gluSphere(quad, radius, DEF_SLICES, DEF_STACKS);	// Draws the sphere
 }
 
+
+/////////////////
+// Physics Functs
+/////////////////
 
 double Sphere::volume()
 {

@@ -23,52 +23,49 @@ Cube::Cube(double l, double sMass, cart tPos, cart tVel, cart rPos, cart rVel): 
 
 void Cube::drawShape()
 {
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// This is just to make the rest more concise
 	double off = sideLength/2;
-	cart p = t_position; 
 	// Draws a cube
 	//	Front
 	glBegin(GL_QUADS);
 	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(p.x+off, p.y+off, p.z+off); 
-	glVertex3f(p.x-off, p.y+off, p.z+off); 
-	glVertex3f(p.x-off, p.y-off, p.z+off); 
-	glVertex3f(p.x+off, p.y-off, p.z+off); 
+	glVertex3f( off,  off,  off); 
+	glVertex3f(-off,  off,  off); 
+	glVertex3f(-off, -off,  off); 
+	glVertex3f( off, -off,  off); 
 	//	Right
 	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(p.x+off, p.y+off, p.z-off); 
-	glVertex3f(p.x+off, p.y+off, p.z+off); 
-	glVertex3f(p.x+off, p.y-off, p.z+off); 
-	glVertex3f(p.x+off, p.y-off, p.z-off); 
+	glVertex3f( off,  off, -off); 
+	glVertex3f( off,  off,  off); 
+	glVertex3f( off, -off,  off); 
+	glVertex3f( off, -off, -off); 
 	//	Back	
 	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(p.x+off, p.y-off, p.z-off); 
-	glVertex3f(p.x-off, p.y-off, p.z-off); 
-	glVertex3f(p.x-off, p.y+off, p.z-off); 
-	glVertex3f(p.x+off, p.y+off, p.z-off); 
+	glVertex3f( off, -off, -off); 
+	glVertex3f(-off, -off, -off); 
+	glVertex3f(-off,  off, -off); 
+	glVertex3f( off,  off, -off); 
 	//	Top
 	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(p.x+off, p.y+off, p.z-off); 
-	glVertex3f(p.x-off, p.y+off, p.z-off); 
-	glVertex3f(p.x-off, p.y+off, p.z+off); 
-	glVertex3f(p.x+off, p.y+off, p.z+off); 
+	glVertex3f( off,  off, -off); 
+	glVertex3f(-off,  off, -off); 
+	glVertex3f(-off,  off,  off); 
+	glVertex3f( off,  off,  off); 
 	//	Left
 	glColor3f(0.0, 1.0, 0.0);
-	glVertex3f(p.x-off, p.y+off, p.z+off); 
-	glVertex3f(p.x-off, p.y+off, p.z-off); 
-	glVertex3f(p.x-off, p.y-off, p.z-off); 
-	glVertex3f(p.x-off, p.y-off, p.z+off); 
+	glVertex3f(-off,  off,  off); 
+	glVertex3f(-off,  off, -off); 
+	glVertex3f(-off, -off, -off); 
+	glVertex3f(-off, -off,  off); 
 	//	Bottom
 	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(p.x+off, p.y-off, p.z+off); 
-	glVertex3f(p.x-off, p.y-off, p.z+off); 
-	glVertex3f(p.x-off, p.y-off, p.z-off); 
-	glVertex3f(p.x+off, p.y-off, p.z-off); 
+	glVertex3f( off, -off,  off); 
+	glVertex3f(-off, -off,  off); 
+	glVertex3f(-off, -off, -off); 
+	glVertex3f( off, -off, -off); 
 
 	glEnd();
-	glFlush();
-	glutSwapBuffers();
 }
 
 

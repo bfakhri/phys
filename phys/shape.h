@@ -53,7 +53,7 @@ class Shape
 		/////////////////
 		// Drawing Functs
 		/////////////////
-		void draw();				// Sets up the drawing scheme by moving to the right 
+		void draw(cart origin);		// Sets up the drawing scheme by moving to the right 
 									//	place and rotating. Then calls drawShape()
 		
 		/////////////////

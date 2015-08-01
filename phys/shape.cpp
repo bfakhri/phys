@@ -100,12 +100,12 @@ void Shape::resetForces()
 // Drawing Functs
 /////////////////
 
-void Shape::draw()
+void Shape::draw(cart origin)
 {
 	// Setup the draw
 	glPushMatrix(); 
 	// Push everything forward so origin in not in the camera	
-	glTranslatef(0, 0, ORIGIN_DIST); 
+	glTranslatef(origin.x, origin.y, origin.z); 
 	glTranslatef(t_position.x, t_position.y, t_position.z); 
 	glRotatef(r_position.x, 1, 0 , 0); 
 	glRotatef(r_position.y, 0, 1 , 0); 

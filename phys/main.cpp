@@ -13,11 +13,16 @@
 #include "shape.h"
 #include "sphere.h"
 #include "cube.h"
+#include "world.h"
 #include "commonFunctions.h"
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones
 std::vector<Shape*> worldShapes;
+	
+cart org = {0, 0, -20};
+cart max = {10, 10, 10};
+cart min = {-10, -10, -10};
 
 // Dummy main and function just for compiling purposes
 void display()
@@ -28,21 +33,22 @@ void display()
 	// Green for shapes
 	glColor3f(0.0, 1.0, 0.05);
 
+	// Draw boundaries
+	drawBoundaries(org, min, max);
+
 	// Draws shapes in vector
 	for(int i=0; i<worldShapes.size(); i++)	
-		worldShapes[i]->draw();
+		worldShapes[i]->draw(org);
 
 	// Sends buffered commands to run
 	glutSwapBuffers();
 
-	// Debugging
-	std::cout << worldShapes[0]->t_position.z << std::endl;
 }
 
 static void idle()
 {
 	advanceSim(1, worldShapes);
-
+	enforceBoundaries(worldShapes, min, max);
 	// Calls the display function 
 	display();
 }
@@ -59,7 +65,7 @@ int main(int argc, char **argv)
 	for(int i=0; i<100; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, max, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;
@@ -84,7 +90,10 @@ int main(int argc, char **argv)
 	// Function called when idle  
 	glutIdleFunc(idle); 
 
-
+	// Enable CULLING
+	// Ensures faces of objects facing away from the camera are not rendered
+	// Back facing faces will not obscure the front faces consequently
+	glEnable(GL_CULL_FACE);
 
 	// set background clear color to black 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -93,7 +102,7 @@ int main(int argc, char **argv)
 	// For Depth 
 	glEnable(GL_DEPTH_TEST);
 	// More Depth
-	glDepthFunc(GL_LESS);
+	//glDepthFunc(GL_LESS);
 
 	// For Lighting 
 	//glEnable(GL_LIGHTING);	

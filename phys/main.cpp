@@ -54,19 +54,19 @@ int main(int argc, char **argv)
 
 	// Init shape vector
 	
-	//cart tMaxPos = {10, 10, 30};
-	//cart tMaxVel = {0.1, 0.1, 0.1};
+	cart tMaxPos = {10, 10, 30};
+	cart tMaxVel = {0.1, 0.1, 0.1};
 	for(int i=0; i<100; i++)
 	{
-		/*
+		
 		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, tMaxPos, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;
-		*/
+		
 	}
-	cart pos = {0, 0, -3};
-	cart rot = {0.1, 0.1, 0.1};
+	cart pos = {0, 0, -2};
+	cart rot = {01, 01, 01};
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
 	
@@ -74,8 +74,8 @@ int main(int argc, char **argv)
 	
 	// From original
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
-	//glutInitWindowSize(1000, 1000);
-	glutInitWindowSize(200, 200);
+	glutInitWindowSize(1000, 1000);
+	//glutInitWindowSize(200, 200);
 	glutInitWindowPosition(200, 200);
 	glutCreateWindow("Phys");
 	glutDisplayFunc(display);

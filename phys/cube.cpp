@@ -23,6 +23,7 @@ Cube::Cube(double l, double sMass, cart tPos, cart tVel, cart rPos, cart rVel): 
 
 void Cube::drawShape()
 {
+	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// This is just to make the rest more concise
 	double off = sideLength/2;
 	cart p = t_position; 
@@ -36,34 +37,34 @@ void Cube::drawShape()
 	glVertex3f(p.x+off, p.y-off, p.z+off); 
 	//	Right
 	glColor3f(0.0, 1.0, 0.0);
+	glVertex3f(p.x+off, p.y+off, p.z-off); 
 	glVertex3f(p.x+off, p.y+off, p.z+off); 
 	glVertex3f(p.x+off, p.y-off, p.z+off); 
-	glVertex3f(p.x+off, p.y+off, p.z-off); 
 	glVertex3f(p.x+off, p.y-off, p.z-off); 
 	//	Back	
 	glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(p.x+off, p.y+off, p.z-off); 
-	glVertex3f(p.x-off, p.y+off, p.z-off); 
-	glVertex3f(p.x-off, p.y-off, p.z-off); 
 	glVertex3f(p.x+off, p.y-off, p.z-off); 
+	glVertex3f(p.x-off, p.y-off, p.z-off); 
+	glVertex3f(p.x-off, p.y+off, p.z-off); 
+	glVertex3f(p.x+off, p.y+off, p.z-off); 
 	//	Top
 	glColor3f(1.0, 0.0, 0.0);
-	glVertex3f(p.x+off, p.y+off, p.z+off); 
-	glVertex3f(p.x-off, p.y+off, p.z+off); 
 	glVertex3f(p.x+off, p.y+off, p.z-off); 
 	glVertex3f(p.x-off, p.y+off, p.z-off); 
+	glVertex3f(p.x-off, p.y+off, p.z+off); 
+	glVertex3f(p.x+off, p.y+off, p.z+off); 
 	//	Left
 	glColor3f(0.0, 1.0, 0.0);
 	glVertex3f(p.x-off, p.y+off, p.z+off); 
-	glVertex3f(p.x-off, p.y-off, p.z+off); 
 	glVertex3f(p.x-off, p.y+off, p.z-off); 
 	glVertex3f(p.x-off, p.y-off, p.z-off); 
+	glVertex3f(p.x-off, p.y-off, p.z+off); 
 	//	Bottom
 	glColor3f(1.0, 0.0, 0.0);
 	glVertex3f(p.x+off, p.y-off, p.z+off); 
 	glVertex3f(p.x-off, p.y-off, p.z+off); 
-	glVertex3f(p.x+off, p.y-off, p.z-off); 
 	glVertex3f(p.x-off, p.y-off, p.z-off); 
+	glVertex3f(p.x+off, p.y-off, p.z-off); 
 
 	glEnd();
 	glFlush();

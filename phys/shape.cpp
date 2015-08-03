@@ -1,61 +1,6 @@
 #include "shape.h"
 
 
-////////////////
-// Helper Functs
-////////////////
-
-void populateShapeVector(std::vector<Shape*> v)
-{
-	// write this
-}
-
-Shape* randomShape()
-{
-	// This function might need to scale the values to make sure 
-	// we don't get false ceilings for when we need values larger
-	// than RAND_MAX
-	double radius = ((double)(rand()%10));
-	double mass = ((double)rand());
-	cart tPos = {	(double)(rand()%100),
-					(double)(rand()%100),
-					(double)(rand()%100)};
-	cart tVel = {	(double)(rand()%10),
-					(double)(rand()%10),
-					(double)(rand()%10)};
-	cart rPos = {	(double)(rand()%100),
-					(double)(rand()%100),
-					(double)(rand()%100)};
-	cart rVel = {	(double)(rand()%10),
-					(double)(rand()%10),
-					(double)(rand()%10)};
-
-	// This must be generalized so that any shape type is
-	// possible. Not just Sphere
-	return new Sphere(radius, mass, tPos, tVel, tPos, rVel); 
-}
-
-Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos,cart tMaxVel)
-{
-	cart zeroes = {0, 0, 0}; 	
-
-	double radius = (rand()*(radMax+radMin)/RAND_MAX + radMin);
-	double mass = (rand()*(massMax+massMin)/RAND_MAX + massMin);
-
-	cart tPos = {	(rand()*(2*tMaxPos.x)/RAND_MAX - tMaxPos.x), 
-					(rand()*(2*tMaxPos.y)/RAND_MAX - tMaxPos.y), 
-					(rand()*(2*tMaxPos.z)/RAND_MAX - tMaxPos.z)};
-
-	cart tVel = {	(rand()*(2*tMaxVel.x)/RAND_MAX - tMaxVel.x), 
-					(rand()*(2*tMaxVel.y)/RAND_MAX - tMaxVel.y), 
-					(rand()*(2*tMaxVel.z)/RAND_MAX - tMaxVel.z)};
-
-
-	// This must be generalized so that any shape type is
-	// possible. Not just Sphere
-	return new Sphere(radius, mass, tPos, tVel, zeroes, zeroes);  
-}
-
 
 ///////////////
 // Constructors
@@ -188,3 +133,70 @@ cart Shape::moment(cart d)
 	return mmnt;
 }
 
+
+////////////////
+// Helper Functs
+////////////////
+
+
+void populateShapeVector(std::vector<Shape*> v)
+{
+	// write this
+}
+
+
+void drawBoundaries(cart origin, cart min, cart max)
+{
+	glPushMatrix(); 
+	// Go to physics origin
+	glTranslatef(origin.x, origin.y, origin.z); 
+	
+	glBegin(GL_QUADS);
+	
+	//	Back	
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, max.y, min.z); 
+	glVertex3f(min.x, max.y, min.z); 
+	glVertex3f(min.x, min.y, min.z); 
+	glVertex3f(max.x, min.y, min.z); 
+	//	Right
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(max.x, max.y, max.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, max.y, min.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(max.x, min.y, max.z); 
+	//	Top
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(max.x, max.y, max.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(min.x, max.y, max.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, max.y, min.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, max.y, min.z); 
+	//	Left
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, max.y, min.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(min.x, max.y, max.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(min.x, min.y, max.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, min.y, min.z); 
+	//	Bottom
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, min.y, min.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(min.x, min.y, max.z); 
+	glColor3f(0.7, 0.7, 0.7);
+	glVertex3f(max.x, min.y, max.z); 
+
+	glEnd();
+
+	glPopMatrix();
+}

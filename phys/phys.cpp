@@ -261,12 +261,31 @@ void advanceSim(double t, std::vector<Shape*> v)
 	wrapWorld(lims, v);
 }
 
+void enforceBoundaries(std::vector<Shape*> s, cart min, cart max)
+{
+	for(int i=0; i<s.size(); i++)
+	{
+		// One for each boundary 
+		if((s[i]->t_position.x + s[i]->boundingSphere()) > max.x)
+			s[i]->t_velocity.x *= -1.0;
+		if((s[i]->t_position.y + s[i]->boundingSphere()) > max.x)
+			s[i]->t_velocity.y *= -1.0;
+		if((s[i]->t_position.z - s[i]->boundingSphere()) < max.x)
+			s[i]->t_velocity.z *= -1.0;
+		if((s[i]->t_position.x + s[i]->boundingSphere()) < min.x)
+			s[i]->t_velocity.x *= -1.0;
+		if((s[i]->t_position.y + s[i]->boundingSphere()) < min.x)
+			s[i]->t_velocity.y *= -1.0;
+		if((s[i]->t_position.z - s[i]->boundingSphere()) > min.x)
+			s[i]->t_velocity.z *= -1.0;
+	}
+}
 
 void physicsThread(std::vector<Shape*> v)
 {
 	while(1)
 	{
-		advanceSim(SIM_T, v);
-		enforceBoundaries(v, physBoundaryMin, physBoundaryMin);
+		//advanceSim(SIM_T, v);
+		//enforceBoundaries(v, physBoundaryMin, physBoundaryMin);
 	}
 }

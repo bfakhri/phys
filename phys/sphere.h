@@ -42,4 +42,13 @@ class Sphere : public Shape
 
 };
 
+////////////////
+// Helper Functs
+////////////////
+
+// Make random shape with param constraints
+Shape* randomShape();
+
+// Make random shape with param constraints
+Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tMaxVel);
 #endif

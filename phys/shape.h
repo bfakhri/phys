@@ -7,6 +7,7 @@
 #include <GL/glut.h>	// For draw() function
 #include <GL/gl.h>		// For draw() function
 #include <stdlib.h>		// For rand()
+#include <vector>
 
 // scalar quantities are preceded by nothing
 // vector quantities are preceded by either a "t_" for translational or
@@ -17,21 +18,11 @@
 // All units should adhere to SI standards
 
 
-////////////////
-// Helper Functs
-////////////////
+// Drawing parameters 
+// For drawing 3D objects
+#define DEF_SLICES 50
+#define DEF_STACKS 50
 
-// Maybe makes this flexible - can take in shapes from files or random shapes
-// depending on the inputs to the function
-void populateShapeVector(std::vector<Shape*> v);
-
-
-// Make random shape with param constraints
-Shape* randomShape();
-
-
-// Make random shape with param constraints
-Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tMaxVel);
 
 ///////////////////
 // Class Definition 
@@ -95,4 +86,16 @@ class Shape
 
 };
 				
+////////////////
+// Helper Functs
+////////////////
+
+// Maybe makes this flexible - can take in shapes from files or random shapes
+// depending on the inputs to the function
+void populateShapeVector(std::vector<Shape*> v);
+
+
+// Draws the walls of the simulation
+void drawBoundaries(cart origin, cart min, cart max);
+
 #endif

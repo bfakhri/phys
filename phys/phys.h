@@ -19,7 +19,7 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_T = 0.01;						// Default timestep size (seconds)
+const double SIM_T = 0.11;						// Default timestep size (seconds)
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const cart physOrigin = {0, 0, -20};			// Origin of sim relative to drawing coords
 const cart physBoundaryMax = {10, 10, 10};		// Maximum coordinates of physics sim
@@ -103,6 +103,9 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v);
 
 // Advances vector by one time step of length t
 void advanceSim(double t, std::vector<Shape*> v);
+
+// Makes shapes bounce off of the walls of the sim-world
+void enforceBoundaries(std::vector<Shape*> s, cart min, cart max);
 
 // The function that will have its own thread to run the
 // simulation parallel to the rendering engine

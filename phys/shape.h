@@ -16,6 +16,27 @@
 
 // All units should adhere to SI standards
 
+
+////////////////
+// Helper Functs
+////////////////
+
+// Maybe makes this flexible - can take in shapes from files or random shapes
+// depending on the inputs to the function
+void populateShapeVector(std::vector<Shape*> v);
+
+
+// Make random shape with param constraints
+Shape* randomShape();
+
+
+// Make random shape with param constraints
+Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tMaxVel);
+
+///////////////////
+// Class Definition 
+///////////////////
+
 // Shape class (used to be the 'mass' class)
 class Shape
 {

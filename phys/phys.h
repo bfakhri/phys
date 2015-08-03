@@ -17,9 +17,13 @@
 #include <omp.h>	// For multithreading
 
 
-// Gravitational Constant
-const double G_CONST = 0.0000000000667384;
-
+// Simulation parameters
+// Default period for each step (seconds)
+const double SIM_T = 0.01;						// Default timestep size (seconds)
+const double G_CONST = 0.0000000000667384;		// Gravitational constant G
+const cart physOrigin = {0, 0, -20};			// Origin of sim relative to drawing coords
+const cart physBoundaryMax = {10, 10, 10};		// Maximum coordinates of physics sim
+const cart physBoundaryMin = {-10, -10, -10};	// Minimum coordinates of physics sim
 
 ///////////////////
 // Helper Functions 
@@ -100,5 +104,7 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v);
 // Advances vector by one time step of length t
 void advanceSim(double t, std::vector<Shape*> v);
 
-
+// The function that will have its own thread to run the
+// simulation parallel to the rendering engine
+void physicsThread(std::vector<Shape*> v);
 #endif

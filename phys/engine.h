@@ -24,15 +24,9 @@
 // Physics
 //////////
 
-// Default period for each step (seconds)
-#define SIM_T 0.01
 
 // Global variables
-const cart physOrigin = {0, 0, -20};			// Origin of the physics sim
-const cart physBoundaryMax = {10, 10, 10};		// Maximum coordinates of physics sim
-const cart physBoundaryMin = {-10, -10, -10};	// Minimum coordinates of physics sim
 
-void physicsThread(std::vector<Shape*> v);
 
 
 #endif

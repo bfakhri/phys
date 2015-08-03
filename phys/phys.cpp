@@ -260,3 +260,13 @@ void advanceSim(double t, std::vector<Shape*> v)
 	cart lims = {100, 100, 100};
 	wrapWorld(lims, v);
 }
+
+
+void physicsThread(std::vector<Shape*> v)
+{
+	while(1)
+	{
+		advanceSim(SIM_T, v);
+		enforceBoundaries(v, physBoundaryMin, physBoundaryMin);
+	}
+}

@@ -1,8 +1,8 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#include "drawingParams.h"	// For drawing params
-#include "mather.h"			// For cart type	
+//#include "engine.h"		// For drawing params
+#include "mather.h"		// For cart type	
 
 #include <GL/glut.h>	// For draw() function
 #include <GL/gl.h>		// For draw() function

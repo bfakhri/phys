@@ -10,20 +10,20 @@ Shape* randomShape()
 	// This function might need to scale the values to make sure 
 	// we don't get false ceilings for when we need values larger
 	// than RAND_MAX
-	double radius = (rand()%10);
-	double mass = (rand());
-	cart tPos = {	rand()%100,
-			rand()%100,
-			rand()%100};
-	cart tVel = {	rand()%10,
-			rand()%10,
-			rand()%10};
-	cart rPos = {	rand()%100,
-			rand()%100,
-			rand()%100};
-	cart rVel = {	rand()%10,
-			rand()%10,
-			rand()%10};
+	double radius = ((double)(rand()%10));
+	double mass = ((double)rand());
+	cart tPos = {	(double)(rand()%100),
+					(double)(rand()%100),
+					(double)(rand()%100)};
+	cart tVel = {	(double)(rand()%10),
+					(double)(rand()%10),
+					(double)(rand()%10)};
+	cart rPos = {	(double)(rand()%100),
+					(double)(rand()%100),
+					(double)(rand()%100)};
+	cart rVel = {	(double)(rand()%10),
+					(double)(rand()%10),
+					(double)(rand()%10)};
 
 	// This must be generalized so that any shape type is
 	// possible. Not just Sphere

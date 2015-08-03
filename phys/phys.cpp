@@ -24,6 +24,7 @@ double distance(Shape* s1, Shape* s2)
 
 void resetForces(std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
 	{
 		v[i]->t_forces.x = 0;
@@ -82,6 +83,7 @@ void gravPull(double uniMass, cart uniMassDist, Shape* s)
 
 void gravAllShapes(std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		// Affect by all other elements except itself
 		for(int j=0; j<v.size(); j++){
@@ -93,6 +95,7 @@ void gravAllShapes(std::vector<Shape*> v)
 
 void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		// Affect by universal mass
 		gravPull(uniMass, uniMassDist, v[i]);
@@ -119,6 +122,7 @@ bool collide(Shape* s1, Shape* s2)
 void collideAndResolve(std::vector<Shape*> v)
 {
 	// Make sure this cycles through ALL pairs
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		for(int j=i; j<v.size(); j++){
 			if(collide(v[i], v[j])){
@@ -155,6 +159,7 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 
 void t_advancePos(double t, std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		double mass = v[i]->mass;
 
@@ -176,6 +181,7 @@ void t_advancePos(double t, std::vector<Shape*> v)
 // Move one timestep using the rotational forces (torques)  on all the objects
 void r_advancePos(double t, std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		double mass = v[i]->mass;
 
@@ -205,6 +211,7 @@ void advancePosAndReset(double t, std::vector<Shape*> v)
 
 void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 {
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
 	{
 		// Positive world limit breaches

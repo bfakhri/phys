@@ -14,6 +14,8 @@
 #include "sphere.h"
 #include <math.h>
 #include <vector>
+#include <omp.h>	// For multithreading
+
 
 // Gravitational Constant
 const double G_CONST = 0.0000000000667384;

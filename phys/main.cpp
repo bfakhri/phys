@@ -5,6 +5,9 @@
 // I/O
 #include <iostream>
 
+// Multithreading
+#include <thread>
+
 // Physics
 #include "phys.h"
 
@@ -13,6 +16,7 @@
 #include "shape.h"
 #include "sphere.h"
 #include "cube.h"
+
 #include "world.h"
 #include "commonFunctions.h"
 
@@ -20,9 +24,6 @@
 // May not include user-controlled ones
 std::vector<Shape*> worldShapes;
 	
-cart org = {0, 0, -20};
-cart max = {10, 10, 10};
-cart min = {-10, -10, -10};
 
 // Dummy main and function just for compiling purposes
 void display()
@@ -30,15 +31,12 @@ void display()
 	// Clear screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
-	// Green for shapes
-	glColor3f(0.0, 1.0, 0.05);
-
 	// Draw boundaries
-	drawBoundaries(org, min, max);
+	drawBoundaries(physOrigin, physBoundaryMin, physBoundaryMax);
 
 	// Draws shapes in vector
 	for(int i=0; i<worldShapes.size(); i++)	
-		worldShapes[i]->draw(org);
+		worldShapes[i]->draw(physOrigin);
 
 	// Sends buffered commands to run
 	glutSwapBuffers();
@@ -47,25 +45,18 @@ void display()
 
 static void idle()
 {
-	advanceSim(1, worldShapes);
-	enforceBoundaries(worldShapes, min, max);
-	// Calls the display function 
+	// if(time > time...asdfa;sldkfj)
 	display();
 }
 
 int main(int argc, char **argv)
 {
-	// Just for testing
-	std::cout<< G_CONST << std::endl;
-
-	// Init shape vector
-	
-	cart tMaxPos = {10, 10, 30};
-	cart tMaxVel = {0.1, 0.1, 0.1};
-	for(int i=0; i<100; i++)
+	// Init shape vector	
+	cart tMaxVel = {0.8, 0.8, 0.8};
+	for(int i=0; i<4; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, max, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9999999999999999999999.0, 99999999999999999999999.0, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;
@@ -125,8 +116,8 @@ int main(int argc, char **argv)
 	glLoadIdentity();
 
 
-
-
+	// Start the physics engine:
+	std::thread peThread(physicsThread(worldShapes));
 
 
 	glutMainLoop();

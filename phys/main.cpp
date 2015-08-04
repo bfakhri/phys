@@ -88,6 +88,9 @@ void initOGL(int argc, char **argv)
 	// For Depth 
 	glEnable(GL_DEPTH_TEST);
 
+	// For Antialiasing - test this 
+	//glEnable(GL_MULTISAMPLE);
+
 	// identify the projection matrix that we would like to alter 
 	glMatrixMode(GL_PROJECTION);
 
@@ -105,7 +108,7 @@ void initSim(int numShapes)
 	for(int i=0; i<numShapes; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9000000000.0, 90000000000000.0, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 90000000000.0, 9000000000000.0, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;

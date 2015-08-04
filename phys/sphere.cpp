@@ -25,7 +25,7 @@ void Sphere::drawShape()
 {
 	// Mem-leak!?!?!?
 	GLUquadric* quad = gluNewQuadric();					// make a quadric
-	gluQuadricDrawStyle(quad, GLU_POINT);				// This changes the drawing style
+	//gluQuadricDrawStyle(quad, GLU_POINT);				// This changes the drawing style
 	gluSphere(quad, radius, DEF_SLICES, DEF_STACKS);	// Draws the sphere
 }
 

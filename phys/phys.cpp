@@ -68,8 +68,8 @@ void gravPull(double uniMass, cart uniMassDist, Shape* s)
 {
 	// Get direction vector
 	cart shapeToMass = {	uniMassDist.x - s->t_position.x, 
-				uniMassDist.y - s->t_position.y, 
-				uniMassDist.z - s->t_position.z};
+							uniMassDist.y - s->t_position.y, 
+							uniMassDist.z - s->t_position.z};
 
 	// Get magnitude of the gravitational force
 	double forceMag = gravForce(uniMass, s->mass, distance(s->t_position, uniMassDist));
@@ -149,6 +149,8 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 	// Find angular momentums using the angular vel of each shape
 		// Remember to add 
 	
+	// This first trial is without rotational things into account
+		
 	
 }
 
@@ -157,7 +159,40 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 // Simulation Functions 
 ///////////////////////
 
-void t_advancePos(double t, std::vector<Shape*> v)
+
+void t_updateVel(double t, std::vector<Shape*> v)
+{
+	#pragma omp parallel for schedule(static)
+	for(int i=0; i<v.size(); i++){
+		double mass = v[i]->mass;
+
+		cart accel = {	v[i]->t_forces.x/mass,
+						v[i]->t_forces.y/mass,
+						v[i]->t_forces.z/mass};
+
+		v[i]->t_velocity.x += accel.x*t; 
+		v[i]->t_velocity.y += accel.y*t; 
+		v[i]->t_velocity.z += accel.z*t; 
+	}
+}
+
+void r_updateVel(double t, std::vector<Shape*> v)
+{
+	#pragma omp parallel for schedule(static)
+	for(int i=0; i<v.size(); i++){
+		double mass = v[i]->mass;
+
+		cart accel = {	v[i]->r_forces.x/mass,
+						v[i]->r_forces.y/mass,
+						v[i]->r_forces.z/mass};
+
+		v[i]->r_velocity.x += accel.x*t; 
+		v[i]->r_velocity.y += accel.y*t; 
+		v[i]->r_velocity.z += accel.z*t; 
+	}
+}
+
+void t_updatePos(double t, std::vector<Shape*> v)
 {
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
@@ -179,7 +214,7 @@ void t_advancePos(double t, std::vector<Shape*> v)
 }
 
 // Move one timestep using the rotational forces (torques)  on all the objects
-void r_advancePos(double t, std::vector<Shape*> v)
+void r_updatePos(double t, std::vector<Shape*> v)
 {
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
@@ -202,8 +237,10 @@ void r_advancePos(double t, std::vector<Shape*> v)
 
 void advancePosAndReset(double t, std::vector<Shape*> v)
 {
-	t_advancePos(t, v);
-	r_advancePos(t, v);
+	t_updateVel(t, v);
+	r_updateVel(t, v); 
+	t_updatePos(t, v);
+	r_updatePos(t, v);
 
 	// Reset force vectors
 	resetForces(v);
@@ -254,7 +291,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	advancePosAndReset(t, v);
 
 	// Detect and resolve all collisions
-	//collideAndResolve(v);
+	collideAndResolve(v);
 
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
@@ -295,8 +332,6 @@ void physicsThread(std::vector<Shape*> v)
 		now = high_resolution_clock::now();
 		if(duration_cast<milliseconds>(now - last).count() >= 1000/SIM_FPS)
 		{
-			//std::cout << (*v)[0]->t_position.x << std::endl;
-			//v[0]->t_position.x += 0.010;
 			advanceSim((double)((duration_cast<std::chrono::milliseconds>(now - last).count())/((double)1000)), v);
 			last = high_resolution_clock::now();
 		}

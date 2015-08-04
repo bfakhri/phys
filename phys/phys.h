@@ -91,14 +91,21 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
 // Simulation Functions 
 ///////////////////////
 
+// Updates translational velocities according to the acceleration
+void t_updateVel(double t, std::vector<Shape*> v);
+
+// Updates rotational velocities according to rotational accelerations
+void r_updateVel(double t, std::vector<Shape*> v);
+
+
 // Move one timestep using the translational forces on all the objects
-void t_advancePos(double t, std::vector<Shape*> v);
+void t_updatePos(double t, std::vector<Shape*> v);
 
 // Move one timestep using the rotational forces (torques)  on all the objects
-void r_advancePos(double t, std::vector<Shape*> v);
+void r_updatePos(double t, std::vector<Shape*> v);
 
 // Move one timestep both translational and rotational positions 
-void advancePosAndReset(double t, std::vector<Shape*> v);
+void updateVelPosAndReset(double t, std::vector<Shape*> v);
 
 // Updates positions of shapes to simulate the world wrapping around the edges
 // Like in pacman where if you leave the world on the right extreme you appear on the left extreme

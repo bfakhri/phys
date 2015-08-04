@@ -4,6 +4,7 @@
 
 // I/O
 #include <iostream>
+#include <stdlib.h>	// For atoi()
 
 // Multithreading
 #include <thread>
@@ -20,7 +21,7 @@
 #include "sphere.h"
 #include "cube.h"
 
-const double DRAW_FPS = 1;
+const double DRAW_FPS = 60;
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones
@@ -31,7 +32,7 @@ using namespace std::chrono;
 high_resolution_clock::time_point last = high_resolution_clock::now();
 high_resolution_clock::time_point now = high_resolution_clock::now();
 
-// Dummy main and function just for compiling purposes
+
 void display()
 {
 	// Clear screen
@@ -45,7 +46,6 @@ void display()
 		worldShapes[i]->draw(physOrigin);
 
 	//std::cout << worldShapes[0]->t_position.x << std::endl;
-	std::cout << "Displayed" << std::endl;
 
 	// Sends buffered commands to run
 	glutSwapBuffers();
@@ -98,14 +98,14 @@ void initOGL(int argc, char **argv)
 	glLoadIdentity();
 }
 
-void initSim()
+void initSim(int numShapes)
 {
 	// Init shape vector	
-	cart tMaxVel = {80.8, 80.8, 80.8};
-	for(int i=0; i<3; i++)
+	cart tMaxVel = {8.8, 5.8, 3.8};
+	for(int i=0; i<numShapes; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9.0, 9.0, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 9000000000.0, 90000000000000.0, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;
@@ -123,16 +123,25 @@ void initSim()
 
 int main(int argc, char **argv)
 {
-
+	// Parameters into 
+	int numObjects;
+	if(argc == 2)
+		numObjects = atoi(argv[1]);
+	else
+		numObjects = 10;
+		
 	// Init OpenGL constructs
 	initOGL(argc, argv);	
 
 	// Init world objects
-	initSim();
+	initSim(numObjects);
 
 	// Start the physics engine:
 	std::thread peThread(physicsThread, worldShapes);
 
 	// Enter infinite loop - does not return
 	glutMainLoop();
+	
+	// I don't think this is necessary
+	peThread.join();
 }

@@ -22,8 +22,8 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_FPS = 100;						// FPS of the physics engine
-//const double SIM_T = 1.11;						// Default timestep size (seconds)
+const double SIM_FPS = 250;						// FPS of the physics engine
+//const double SIM_T = 1.11;					// Default timestep size (seconds)
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const cart physOrigin = {0, 0, -20};			// Origin of sim relative to drawing coords
 const cart physBoundaryMax = {10, 10, 10};		// Maximum coordinates of physics sim

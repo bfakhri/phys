@@ -24,7 +24,7 @@ double distance(Shape* s1, Shape* s2)
 
 void resetForces(std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
 	{
 		v[i]->t_forces.x = 0;
@@ -83,7 +83,7 @@ void gravPull(double uniMass, cart uniMassDist, Shape* s)
 
 void gravAllShapes(std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		// Affect by all other elements except itself
 		for(int j=0; j<v.size(); j++){
@@ -95,7 +95,7 @@ void gravAllShapes(std::vector<Shape*> v)
 
 void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		// Affect by universal mass
 		gravPull(uniMass, uniMassDist, v[i]);
@@ -122,7 +122,7 @@ bool collide(Shape* s1, Shape* s2)
 void collideAndResolve(std::vector<Shape*> v)
 {
 	// Make sure this cycles through ALL pairs
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		for(int j=i; j<v.size(); j++){
 			if(collide(v[i], v[j])){
@@ -159,7 +159,7 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 
 void t_advancePos(double t, std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		double mass = v[i]->mass;
 
@@ -181,7 +181,7 @@ void t_advancePos(double t, std::vector<Shape*> v)
 // Move one timestep using the rotational forces (torques)  on all the objects
 void r_advancePos(double t, std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		double mass = v[i]->mass;
 
@@ -211,7 +211,7 @@ void advancePosAndReset(double t, std::vector<Shape*> v)
 
 void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 {
-	#pragma omp parallel for schedule(static)
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
 	{
 		// Positive world limit breaches
@@ -245,6 +245,7 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 
 void advanceSim(double t, std::vector<Shape*> v)
 {
+	//std::cout << "Advancing sim by " << t << " seconds" << std::endl;
 	// MAKE SURE THIS IS THE LEAST ERROR-PRONE ORDER
 
 	// Physicall influences (gravity/magnetism etc)
@@ -257,12 +258,14 @@ void advanceSim(double t, std::vector<Shape*> v)
 	//collideAndResolve(v);
 
 	// If worldwrap is on, worldwrap all objects
-	cart lims = {100, 100, 100};
-	wrapWorld(lims, v);
+	//cart lims = {100, 100, 100};
+	//wrapWorld(lims, v);
+	//enforceBoundaries(v, physBoundaryMin, physBoundaryMax);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max)
 {
+	//#pragma omp parallel for schedule(static)
 	for(int i=0; i<s.size(); i++)
 	{
 		// One for each boundary 
@@ -283,9 +286,23 @@ void enforceBoundaries(std::vector<Shape*> s, cart min, cart max)
 
 void physicsThread(std::vector<Shape*> v)
 {
+	using namespace std::chrono;
+	milliseconds sleepDur((unsigned int)(1/(SIM_FPS*2)));
+	high_resolution_clock::time_point last = high_resolution_clock::now();
+	high_resolution_clock::time_point now = high_resolution_clock::now();
 	while(1)
 	{
-		//advanceSim(SIM_T, v);
-		//enforceBoundaries(v, physBoundaryMin, physBoundaryMin);
+		// check if enough time has passed
+		now = high_resolution_clock::now();
+		if(duration_cast<milliseconds>(now - last).count() >= 1000/SIM_FPS)
+		{
+			//std::cout << (*v)[0]->t_position.x << std::endl;
+			v[0]->t_position.x += 0.010;
+			advanceSim((double)((duration_cast<std::chrono::milliseconds>(now - last).count())/((double)1000)), v);
+			enforceBoundaries(v, physBoundaryMin, physBoundaryMin);
+			last = high_resolution_clock::now();
+		}else{
+			std::this_thread::sleep_for(sleepDur);		
+		}
 	}
 }

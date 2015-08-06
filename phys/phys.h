@@ -22,7 +22,8 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_FPS = 250;						// FPS of the physics engine
+const double SIM_FPS = 20;						// FPS of the physics engine
+const double SIM_T = 0.01;						// Default sim period
 //const double SIM_T = 1.11;					// Default timestep size (seconds)
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const cart physOrigin = {0, 0, -20};			// Origin of sim relative to drawing coords
@@ -32,6 +33,15 @@ const cart physBoundaryMin = {-10, -10, -10};	// Minimum coordinates of physics 
 ///////////////////
 // Helper Functions 
 ///////////////////
+
+// Returns the negative of the vector
+cart negate(cart c);
+
+// Returns length of vector
+double length(cart c);
+
+// Returns dot product of the vectors
+double dotProd(cart c1, cart c2);
 
 // Returns distance between two cartesian coordinates
 double distance(cart c1, cart c2);
@@ -73,6 +83,10 @@ void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v);
 //////////////////////
 // Collision functions
 //////////////////////
+
+// Determines whether two shapes are moving towards each other
+// Usefull to see if we need to resolve a collision
+bool movingTowards(Shape* s1, Shape* s2);
 
 // Detects whether two shapes are colliding or not
 // for any shape combinations

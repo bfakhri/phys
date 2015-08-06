@@ -5,6 +5,31 @@
 // Helper Functions 
 ///////////////////
 
+cart negate(cart c)
+{
+	cart n = {	-c.x, -c.y, -c.z};
+	return n; 
+}
+
+double length(cart c)
+{
+	return sqrt(c.x*c.x + c.y*c.y + c.z*c.z);
+}
+
+cart normalize(cart c)
+{
+	double l = length(c);
+	cart normed = {	c.x/l,
+					c.y/l,
+					c.z/l};
+	return normed;
+}
+
+double dotProd(cart c1, cart c2)
+{
+	return (c1.x*c2.x + c1.y*c2.y + c1.z*c2.z);
+}
+
 double distance(cart c1, cart c2)
 {	
 	cart c2toc1 = {	c1.x - c2.x, 
@@ -49,9 +74,9 @@ double gravForce(double m1, double m2, double dist)
 void gravPull(Shape* m1, Shape* m2)
 {
 	// Get direction vector
-	cart m2tom1 = {m1->t_position.x - m2->t_position.x, 
-			m1->t_position.y - m2->t_position.y, 
-			m1->t_position.z - m2->t_position.z};
+	cart m2tom1 = {	m1->t_position.x - m2->t_position.x, 
+					m1->t_position.y - m2->t_position.y, 
+					m1->t_position.z - m2->t_position.z};
 
 	// Get magnitude of the gravitational force
 	double forceMag = gravForce(m1->mass, m2->mass, distance(m1, m2));
@@ -107,13 +132,22 @@ void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 // Collision functions
 //////////////////////
 
+// Determines whether two shapes are moving towards each other
+bool movingTowards(Shape* s1, Shape* s2)
+{
+	if(dotProd(s1->t_velocity, s2->t_velocity) >= 0)
+		return true;
+	else
+		return false;
+}
+
 // We may want to make this function more general by adding a criteria
 // parameter to determine how we decide a collision has occured (sphere/bounding box/etc)
 bool collide(Shape* s1, Shape* s2)
 {
 	// All shapes are treated as spheres for collisions as of now
 	if(distance(s1, s2) < (s1->boundingSphere() + s2->boundingSphere()))
-		return true; 
+			return true; 
 	else
 		return false; 
 }
@@ -122,11 +156,18 @@ bool collide(Shape* s1, Shape* s2)
 void collideAndResolve(std::vector<Shape*> v)
 {
 	// Make sure this cycles through ALL pairs
-	#pragma omp parallel for schedule(static)
-	for(int i=0; i<v.size(); i++){
-		for(int j=i; j<v.size(); j++){
-			if(collide(v[i], v[j])){
-				resolveCollision(v[i], v[j], 0);
+	//#pragma omp parallel for schedule(static)
+	for(int i=0; i<v.size(); i++)
+	{
+		for(int j=i; j<v.size(); j++)
+		{
+			if(i != j && i < j)
+			{
+				// Checks if they collide AND are moving towards each other
+				if(collide(v[i], v[j]) && movingTowards(v[i], v[j]));
+				{
+					resolveCollision(v[i], v[j], 0);
+				}
 			}
 		}
 	}
@@ -150,7 +191,41 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 		// Remember to add 
 	
 	// This first trial is without rotational things into account
-		
+	// Using impulse-like scheme
+			
+	cart c2toc1 = {	s1->t_position.x - s2->t_position.x, 
+					s1->t_position.y - s2->t_position.y, 
+					s1->t_position.z - s2->t_position.z};
+	
+	
+	cart c1toc2 = negate(c2toc1); 
+
+	c2toc1 = normalize(c2toc1);
+	c1toc2 = normalize(c1toc2);
+
+	// Influence factor of s1 on s2
+	cart t1 = normalize(s1->t_velocity); 
+	double IFs1ons2 = dotProd(c1toc2, normalize(s1->t_velocity));
+	// Influence factor of s2 on s1
+	cart t2 = normalize(s2->t_velocity); 
+	double IFs2ons1 = dotProd(c2toc1, normalize(s2->t_velocity));
+
+	double period = 1/SIM_FPS;	// Period of simulation
+
+	cart inf1 = {	s1->mass*IFs1ons2*s1->t_velocity.x/period,
+					s1->mass*IFs1ons2*s1->t_velocity.y/period,
+					s1->mass*IFs1ons2*s1->t_velocity.z/period};
+
+	s1->t_addForce(negate(inf1));
+	s2->t_addForce(inf1);
+
+	cart inf2 = {	s2->mass*IFs2ons1*s2->t_velocity.x/period,
+					s2->mass*IFs2ons1*s2->t_velocity.y/period,
+					s2->mass*IFs2ons1*s2->t_velocity.z/period};
+
+	s2->t_addForce(negate(inf2));
+	s1->t_addForce(inf2);
+
 	
 }
 
@@ -285,7 +360,11 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// MAKE SURE THIS IS THE LEAST ERROR-PRONE ORDER
 
 	// Physicall influences (gravity/magnetism etc)
-	gravAllShapes(v);
+	//gravAllShapes(v);
+
+	// Universal gravity influence (earth etc)
+	//cart c = {0, -100, 0};
+	//gravAllMass(99999999999999, c, v);
 
 	// Update position of all shapes
 	advancePosAndReset(t, v);
@@ -332,7 +411,8 @@ void physicsThread(std::vector<Shape*> v)
 		now = high_resolution_clock::now();
 		if(duration_cast<milliseconds>(now - last).count() >= 1000/SIM_FPS)
 		{
-			advanceSim((double)((duration_cast<std::chrono::milliseconds>(now - last).count())/((double)1000)), v);
+			//advanceSim((double)((duration_cast<std::chrono::milliseconds>(now - last).count())/((double)1000)), v);
+			advanceSim(SIM_T, v);
 			last = high_resolution_clock::now();
 		}
 	}

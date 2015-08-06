@@ -135,7 +135,7 @@ void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
 // Determines whether two shapes are moving towards each other
 bool movingTowards(Shape* s1, Shape* s2)
 {
-	if(dotProd(s1->t_velocity, s2->t_velocity) >= 0)
+	if(dotProd(s1->t_velocity, s2->t_velocity) < 0)
 		return true;
 	else
 		return false;
@@ -156,7 +156,7 @@ bool collide(Shape* s1, Shape* s2)
 void collideAndResolve(std::vector<Shape*> v)
 {
 	// Make sure this cycles through ALL pairs
-	//#pragma omp parallel for schedule(static)
+	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
 	{
 		for(int j=i; j<v.size(); j++)
@@ -164,7 +164,7 @@ void collideAndResolve(std::vector<Shape*> v)
 			if(i != j && i < j)
 			{
 				// Checks if they collide AND are moving towards each other
-				if(collide(v[i], v[j]) && movingTowards(v[i], v[j]));
+				if(collide(v[i], v[j]) && movingTowards(v[i], v[j]))
 				{
 					resolveCollision(v[i], v[j], 0);
 				}
@@ -210,7 +210,7 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 	cart t2 = normalize(s2->t_velocity); 
 	double IFs2ons1 = dotProd(c2toc1, normalize(s2->t_velocity));
 
-	double period = 1/SIM_FPS;	// Period of simulation
+	double period = SIM_T;	// Period of simulation
 
 	cart inf1 = {	s1->mass*IFs1ons2*s1->t_velocity.x/period,
 					s1->mass*IFs1ons2*s1->t_velocity.y/period,
@@ -363,8 +363,8 @@ void advanceSim(double t, std::vector<Shape*> v)
 	//gravAllShapes(v);
 
 	// Universal gravity influence (earth etc)
-	//cart c = {0, -100, 0};
-	//gravAllMass(99999999999999, c, v);
+	cart c = {0, -100, 0};
+	gravAllMass(99999999999999, c, v);
 
 	// Update position of all shapes
 	advancePosAndReset(t, v);

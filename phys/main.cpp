@@ -47,7 +47,7 @@ void display()
 	for(int i=0; i<worldShapes.size(); i++)	
 		worldShapes[i]->draw(physOrigin);
 
-	std::cout << worldShapes[0]->t_position.x << std::endl;
+	//std::cout << worldShapes[0]->t_velocity.x << std::endl;
 
 	// Sends buffered commands to run
 	glutSwapBuffers();
@@ -106,11 +106,11 @@ void initOGL(int argc, char **argv)
 void initSim(int numShapes)
 {
 	// Init shape vector	
-	/*cart tMaxVel = {8.8, 5.8, 3.8};
+	cart tMaxVel = {0.8, 0.8, 0.8};
 	for(int i=0; i<numShapes; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 90000000000.0, 9000000000000.0, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 1, 2, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/100;
 		worldShapes[i]->r_velocity.y = i*3.14/100;
 		worldShapes[i]->r_velocity.z = i*3.14/100;
@@ -120,7 +120,8 @@ void initSim(int numShapes)
 	cart rot = {01, 01, 01};
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
-	*/
+	
+	/*
 	cart p1 = {-2, 0, 0};
 	cart p2 = {2, 0, 0}; 
 	cart vel1 = {1, 0, 0};
@@ -128,7 +129,7 @@ void initSim(int numShapes)
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Sphere(1, 1, p1, vel1, zer, zer));
 	worldShapes.push_back(new Sphere(1, 1, p2, vel2, zer, zer));
-	
+	*/
 }
 
 

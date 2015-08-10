@@ -43,6 +43,9 @@ double length(cart c);
 // Returns dot product of the vectors
 double dotProd(cart c1, cart c2);
 
+// Returns a vector of quotients 
+cart divComponents(cart dividend, cart divisor);
+
 // Returns distance between two cartesian coordinates
 double distance(cart c1, cart c2);
 

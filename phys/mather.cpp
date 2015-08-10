@@ -9,6 +9,14 @@ cart operator+(cart lhs, cart rhs)
 	return ret; 
 }
 
+cart operator-(cart lhs, cart rhs)
+{
+	cart diffVect = {	lhs.x - rhs.x, 
+						lhs.y - rhs.y, 
+						lhs.z - rhs.z};
+	return diffVect;
+}
+
 cart operator*(double scalar, cart rhs)
 {
 	cart ret;

@@ -13,6 +13,8 @@ typedef struct cart{
 
 // Add two vectors
 cart operator+(cart lhs, cart rhs);
+// Subtract one vector from another
+cart operator-(cart lhs, cart rhs);
 
 // Multiply vectors by a scalar
 cart operator*(double scalar, cart rhs);

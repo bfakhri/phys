@@ -11,4 +11,14 @@ typedef struct cart{
 	double z;
 }cart;
 
+// Add two vectors
+cart operator+(cart lhs, cart rhs);
+
+// Multiply vectors by a scalar
+cart operator*(double scalar, cart rhs);
+cart operator*(cart lhs, double scalar);
+// Divide vector by a scalar
+cart operator/(cart lhs, double scalar);
+
+
 #endif

@@ -40,13 +40,14 @@ class Shape
 		cart t_position;	// meters from origin
 		cart t_velocity;	// m/s
 		cart t_forces;		// newtons
+		cart t_pInf;		// kg*m/s
 
 		//	Rotational
 		cart r_position;	// radians from origin
 		cart r_velocity;	// rad/sec
 		cart r_forces;		// torques - Nm
-
-	
+		cart r_pInf;		// kg*(m^2)*rad/sec
+			
 		///////////////
 		// Constructors
 		///////////////
@@ -60,7 +61,10 @@ class Shape
 
 		void t_addForce(cart force);	// Adds a translational force
 		void r_addForce(cart force);	// Addes a rotational force
+		void t_addMomentum(cart p);		// Adds a translational force
+		void r_addMomentum(cart p);		// Addes a rotational momentum
 		void resetForces();				// Resets ALL forces to zero
+		void resetMomentum();			// Resets ALL momentum to zero
 		
 		/////////////////
 		// Drawing Functs

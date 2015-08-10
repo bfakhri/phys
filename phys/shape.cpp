@@ -18,20 +18,27 @@ Shape::Shape()
 	t_position.z = 0;
 	t_velocity.x = 0;
 	t_velocity.y = 0;
-        t_velocity.z = 0;
+    t_velocity.z = 0;
 	t_forces.x = 0;
 	t_forces.y = 0;
-        t_forces.z = 0;
+    t_forces.z = 0;
+	t_pInf.x = 0;
+	t_pInf.y = 0;
+	t_pInf.z = 0;
+
 	//	Rotational
 	r_position.x = 0;
 	r_position.y = 0;
 	r_position.z = 0;
 	r_velocity.x = 0;
 	r_velocity.y = 0;
-        r_velocity.z = 0;
+    r_velocity.z = 0;
 	r_forces.x = 0;
 	r_forces.y = 0;
-        r_forces.z = 0;
+    r_forces.z = 0;
+	r_pInf.x = 0;
+	r_pInf.y = 0;
+	r_pInf.z = 0;
 };
 
 Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
@@ -50,6 +57,9 @@ Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
 	t_forces.x = 0;
 	t_forces.y = 0;
     t_forces.z = 0;
+	t_pInf.x = 0;
+	t_pInf.y = 0;
+	t_pInf.z = 0;
 	//	Rotational
 	r_position.x = rPos.x;
 	r_position.y = rPos.y;
@@ -60,6 +70,9 @@ Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
 	r_forces.x = 0;
 	r_forces.y = 0;
     r_forces.z = 0;
+	r_pInf.x = 0;
+	r_pInf.y = 0;
+	r_pInf.z = 0;
 };
 
 
@@ -80,8 +93,24 @@ void Shape::r_addForce(cart force)
 {
 	r_forces.x += force.x;
 	r_forces.y += force.y;
-        r_forces.z += force.z;
+    r_forces.z += force.z;
 };
+
+void Shape::t_addMomentum(cart p)
+{
+	t_pInf.x += p.x;
+	t_pInf.y += p.y;
+	t_pInf.z += p.z;
+}		
+
+void Shape::r_addMomentum(cart p)
+{
+	r_pInf.x += p.x;
+	r_pInf.y += p.y;
+	r_pInf.z += p.z;
+}		
+
+void Shape::r_addMomentum(cart p);		
 
 // Resets all forces to zero
 void Shape::resetForces()
@@ -96,6 +125,17 @@ void Shape::resetForces()
 };
 
 
+// Resets all forces to zero
+void Shape::resetMomentum()
+{
+	t_pInf.x = 0;
+	t_pInf.y = 0;
+	t_pInf.z = 0;
+	r_pInf.x = 0;
+	r_pInf.y = 0;
+	r_pInf.z = 0;
+
+};
 
 /////////////////
 // Drawing Functs
@@ -127,8 +167,8 @@ void Shape::draw(cart origin)
 cart Shape::moment(cart d)
 {
 	cart mmnt = {	momentCM().x + mass*(d.x*d.x),
-			momentCM().y + mass*(d.y*d.y),
-			momentCM().z + mass*(d.z*d.z)};
+					momentCM().y + mass*(d.y*d.y),
+					momentCM().z + mass*(d.z*d.z)};
 
 	return mmnt;
 }

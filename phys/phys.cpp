@@ -19,9 +19,7 @@ double length(cart c)
 cart normalize(cart c)
 {
 	double l = length(c);
-	cart normed = {	c.x/l,
-					c.y/l,
-					c.z/l};
+	cart normed = c/l;
 	return normed;
 }
 
@@ -175,24 +173,7 @@ void collideAndResolve(std::vector<Shape*> v)
 }
 
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
-{
-	// We can either assume collision already happened and move the objects
-	// to their correct spots, correcting their velocity vectors OR we can 
-	// set up an impulse in the correct direction that will have that effect
-	// Rule 1 - conserve momentum
-	// Rule 2 - conserve KE with respect to dampingConst
-
-	// Get distance b/t shapes
-	// Compute I of each shape using distance
-	
-	// Get tangent vector(s?)
-	// Compute angular velocities using tangent vectors
-	// Find angular momentums using the angular vel of each shape
-		// Remember to add 
-	
-	// This first trial is without rotational things into account
-	// Using impulse-like scheme
-			
+{	
 	cart c2toc1 = {	s1->t_position.x - s2->t_position.x, 
 					s1->t_position.y - s2->t_position.y, 
 					s1->t_position.z - s2->t_position.z};
@@ -212,19 +193,19 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 
 	double period = SIM_T;	// Period of simulation
 
-	cart inf1 = {	s1->mass*IFs1ons2*s1->t_velocity.x/period,
-					s1->mass*IFs1ons2*s1->t_velocity.y/period,
-					s1->mass*IFs1ons2*s1->t_velocity.z/period};
+	cart inf1 = {	s1->mass*IFs1ons2*s1->t_velocity.x,
+					s1->mass*IFs1ons2*s1->t_velocity.y,
+					s1->mass*IFs1ons2*s1->t_velocity.z};
 
-	s1->t_addForce(negate(inf1));
-	s2->t_addForce(inf1);
+	s1->t_addMomentum(negate(inf1));
+	s2->t_addMomentum(inf1);
 
-	cart inf2 = {	s2->mass*IFs2ons1*s2->t_velocity.x/period,
-					s2->mass*IFs2ons1*s2->t_velocity.y/period,
-					s2->mass*IFs2ons1*s2->t_velocity.z/period};
+	cart inf2 = {	s2->mass*IFs2ons1*s2->t_velocity.x,
+					s2->mass*IFs2ons1*s2->t_velocity.y,
+					s2->mass*IFs2ons1*s2->t_velocity.z};
 
-	s2->t_addForce(negate(inf2));
-	s1->t_addForce(inf2);
+	s2->t_addMomentum(negate(inf2));
+	s1->t_addMomentum(inf2);
 
 	
 }

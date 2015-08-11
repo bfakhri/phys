@@ -22,8 +22,8 @@
 #include "cube.h"
 
 const double DRAW_FPS = 30;
-const unsigned int RES_X = 1000;
-const unsigned int RES_Y = 1000;
+const unsigned int RES_X = 200;
+const unsigned int RES_Y = 200;
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones

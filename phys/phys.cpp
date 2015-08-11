@@ -343,7 +343,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
-	//enforceBoundaries(v, physBoundaryMin, physBoundaryMax);
+	enforceBoundaries(v, physBoundaryMin, physBoundaryMax);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max)

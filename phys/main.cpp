@@ -22,8 +22,8 @@
 #include "cube.h"
 
 const double DRAW_FPS = 30;
-const unsigned int RES_X = 1000;
-const unsigned int RES_Y = 1000;
+const unsigned int RES_X = 100;
+const unsigned int RES_Y = 100;
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones
@@ -106,7 +106,7 @@ void initOGL(int argc, char **argv)
 void initSim(int numShapes)
 {
 	// Init shape vector	
-	cart tMaxVel = {0.8, 0.8, 0.8};
+	/*cart tMaxVel = {0.8, 0.8, 0.8};
 	for(int i=0; i<numShapes; i++)
 	{
 		
@@ -120,8 +120,8 @@ void initSim(int numShapes)
 	cart rot = {01, 01, 01};
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
+	*/
 	
-	/*
 	cart p1 = {-2, 0, 0};
 	cart p2 = {2, 0, 0}; 
 	cart vel1 = {1, 0, 0};
@@ -129,7 +129,7 @@ void initSim(int numShapes)
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Sphere(1, 1, p1, vel1, zer, zer));
 	worldShapes.push_back(new Sphere(1, 1, p2, vel2, zer, zer));
-	*/
+	
 }
 
 

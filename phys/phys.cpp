@@ -49,7 +49,7 @@ double distance(Shape* s1, Shape* s2)
 	return distance(c1, c2);  
 }
 
-void resetForces(std::vector<Shape*> v)
+void resetForcesAndMomentums(std::vector<Shape*> v)
 {
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++)
@@ -60,6 +60,13 @@ void resetForces(std::vector<Shape*> v)
 		v[i]->r_forces.x = 0;
 		v[i]->r_forces.y = 0;
 		v[i]->r_forces.z = 0;
+		v[i]->t_pInf.x = 0;
+		v[i]->t_pInf.y = 0;
+		v[i]->t_pInf.z = 0;
+		v[i]->r_pInf.x = 0;
+		v[i]->r_pInf.y = 0;
+		v[i]->r_pInf.z = 0;
+		
 	}
 }
 
@@ -279,7 +286,7 @@ void advancePosAndReset(double t, std::vector<Shape*> v)
 	r_updatePos(t, v);
 
 	// Reset force vectors
-	resetForces(v);
+	resetForcesAndMomentums(v);
 }
 
 void wrapWorld(cart worldLimits, std::vector<Shape*> v)
@@ -324,8 +331,8 @@ void advanceSim(double t, std::vector<Shape*> v)
 	//gravAllShapes(v);
 
 	// Universal gravity influence (earth etc)
-	cart c = {0, -100, 0};
-	gravAllMass(99999999999999, c, v);
+	//cart c = {0, -100, 0};
+	//gravAllMass(99999999999999, c, v);
 
 	// Update position of all shapes
 	advancePosAndReset(t, v);
@@ -336,7 +343,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
-	enforceBoundaries(v, physBoundaryMin, physBoundaryMax);
+	//enforceBoundaries(v, physBoundaryMin, physBoundaryMax);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max)

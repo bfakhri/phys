@@ -163,10 +163,14 @@ void collideAndResolve(std::vector<Shape*> v)
 	for(int i=0; i<v.size(); i++){
 		for(int j=i; j<v.size(); j++){
 			if(i != j && i < j){
-				// Checks if they collide AND are moving towards each other
-				if(collide(v[i], v[j]) && movingTowards(v[i], v[j])){
+				// Checks if they collide are moving towards each other
+				/*if(collide(v[i], v[j]) && movingTowards(v[i], v[j])){
 					resolveCollision(v[i], v[j], 0.9);
+				}*/
+				if(collide(v[i], v[j])){
+					resolveCollisionSpring(v[i], v[j]);
 				}
+
 			}
 		}
 	}
@@ -194,6 +198,20 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 	s1->t_addMomentum(inf2*dampingConst);
 }
 
+void resolveCollisionSpring(Shape* s1, Shape* s2)
+{
+	// Find intrusion of s1 on s2
+	double intrusion = s2->boundingSphere() - (distance(s1, s2) + s1->radius);
+	// Force from the spring 
+	double force = SPRING_CONST*intrusion; 
+	// Direction of force
+	cart c2toc1 = s1->t_position - s2->t_position;	
+	c2toc1 = normalize(c2toc1);
+	// Adding the two forces to the shapes
+	s1->addForce(force*c2toc1);
+	s2->addForce(force*negate(c2toc1));
+}
+
 void bounce(Shape* s, cart wall, double dampingConst)
 {
 	cart momentum = s->t_velocity*s->mass;
@@ -201,7 +219,6 @@ void bounce(Shape* s, cart wall, double dampingConst)
 	s->t_addMomentum(momentumInf*2*dampingConst);
 }
 	 	
-
 
 ///////////////////////
 // Simulation Functions 

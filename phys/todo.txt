@@ -1,14 +1,8 @@
 ----
-2) Add function for making walls better
-3) Add normal force for collisions
-4) Maybe we're using the wrong moments of inertia. We may need the moments for the shape about an axis other than its own
-	- Maybe use the parallel axis theorem to calculate different types of moments
-5) Implement physics functions
+3) Add normal force for collisions hopefully this will fix weird bounce problem
 6) Figure out a way to toggle settings like worldWrap elegantly 
 	- Make advanceSim() function have a ton of parameters for everything. 
 		That will be our gateway to the simulator parameters
-7) Protect certain physics functions from approaching zero and divide by zero conditions
-8) Add color/texture properties to the Shape class, which will be reflected when they are drawn
 
 Longer Term
 - Maybe add sound? 3D sound of collisions? 

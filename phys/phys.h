@@ -24,11 +24,11 @@
 // Default period for each step (seconds)
 const double SIM_FPS = 50;						// FPS of the physics engine
 const double SIM_T = 0.01;						// Default sim period
-//const double SIM_T = 1.11;					// Default timestep size (seconds)
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
+const double SPRING_CONST = 1;				// Need to tweak this
 // World stuff
 // Directions
-const cart DIR_UP =		{ 0,  1,  0};
+const cart DIR_UP =	{ 0,  1,  0};
 const cart DIR_DOWN =	{ 0, -1,  0};
 const cart DIR_RIGHT =	{ 1,  0,  0};
 const cart DIR_LEFT =	{-1,  0,  0};
@@ -112,6 +112,10 @@ void collideAndResolve(std::vector<Shape*> v);
 // Resolves a collision
 // - Includes option for damping/friction
 void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
+
+// Resolve a spring-like collision
+// Shapes are treated like rubber/spring masses
+void resolveCollisionSpring(Shape* s1, Shape* s2);
 
 // Bounces shape off of a wall
 void bounce(Shape* s, cart wall);

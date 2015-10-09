@@ -201,22 +201,22 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 void resolveCollisionSpring(Shape* s1, Shape* s2)
 {
 	// Find intrusion of s1 on s2
-	double intrusion = s2->boundingSphere() - (distance(s1, s2) + s1->radius);
+	double intrusion = s2->boundingSphere() - (distance(s1, s2) + s1->boundingSphere());
 	// Force from the spring 
 	double force = SPRING_CONST*intrusion; 
 	// Direction of force
 	cart c2toc1 = s1->t_position - s2->t_position;	
 	c2toc1 = normalize(c2toc1);
 	// Adding the two forces to the shapes
-	s1->addForce(force*c2toc1);
-	s2->addForce(force*negate(c2toc1));
+	s2->t_addForce(force*c2toc1);
+	s1->t_addForce(force*negate(c2toc1));
 }
 
 void bounce(Shape* s, cart wall, double dampingConst)
 {
 	cart momentum = s->t_velocity*s->mass;
-	cart momentumInf = multComponents(momentum, negate(wall));
-	s->t_addMomentum(momentumInf*2*dampingConst);
+	cart momentumInf = multComponents(momentum, wall);
+	s->t_addMomentum(negate(momentumInf*2*dampingConst));
 }
 	 	
 
@@ -332,7 +332,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 
 	// Universal gravity influence (earth etc)
 	cart c = {0, -100, 0};
-	gravAllMass(99999999999999, c, v);
+	gravAllMass(99999999999, c, v);
 
 	// Update position of all shapes
 	advancePosAndReset(t, v);
@@ -343,7 +343,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
-	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, 0.9);
+	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, 0.999);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double dampingConst)
@@ -351,17 +351,17 @@ void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double damping
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<s.size(); i++){
 		// One for each boundary 
-		if((s[i]->t_position.x + s[i]->boundingSphere()) > max.x)
+		if((s[i]->t_position.x + s[i]->boundingSphere()) > max.x && s[i]->t_velocity.x > 0)
 			bounce(s[i], DIR_RIGHT, dampingConst);
-		if((s[i]->t_position.y + s[i]->boundingSphere()) > max.y)
+		if((s[i]->t_position.y + s[i]->boundingSphere()) > max.y && s[i]->t_velocity.y > 0)
 			bounce(s[i], DIR_UP, dampingConst);
-		if((s[i]->t_position.z - s[i]->boundingSphere()) < max.z)
-			bounce(s[i], DIR_FWRD, dampingConst);
-		if((s[i]->t_position.x + s[i]->boundingSphere()) < min.x)
-			bounce(s[i], DIR_LEFT, dampingConst);
-		if((s[i]->t_position.y + s[i]->boundingSphere()) < min.y)
-			bounce(s[i], DIR_DOWN, dampingConst);
-		if((s[i]->t_position.z - s[i]->boundingSphere()) > min.z)
+		if((s[i]->t_position.z - s[i]->boundingSphere()) < max.z && s[i]->t_velocity.z < 0)
+			bounce(s[i], DIR_BACK, dampingConst);
+		if((s[i]->t_position.x + s[i]->boundingSphere()) < min.x && s[i]->t_velocity.x < 0)
+			bounce(s[i], DIR_RIGHT, dampingConst);
+		if((s[i]->t_position.y + s[i]->boundingSphere()) < min.y && s[i]->t_velocity.y < 0)
+			bounce(s[i], DIR_UP, dampingConst);
+		if((s[i]->t_position.z - s[i]->boundingSphere()) > min.z && s[i]->t_velocity.z > 0)
 			bounce(s[i], DIR_BACK, dampingConst);
 	}
 }

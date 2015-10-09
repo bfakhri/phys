@@ -22,10 +22,10 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_FPS = 50;						// FPS of the physics engine
+const double SIM_FPS = 100;						// FPS of the physics engine
 const double SIM_T = 0.01;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
-const double SPRING_CONST = 1;				// Need to tweak this
+const double SPRING_CONST = 5;				// Need to tweak this
 // World stuff
 // Directions
 const cart DIR_UP =	{ 0,  1,  0};

@@ -200,43 +200,52 @@ void drawBoundaries(cart origin, cart min, cart max)
 	glVertex3f(min.x, min.y, min.z); 
 	glVertex3f(max.x, min.y, min.z); 
 	//	Right
-	glColor3f(0.7, 0.7, 0.7);
-	glVertex3f(max.x, max.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, max.y, min.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(max.x, max.y, max.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(max.x, min.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, min.y, min.z); 
-	glColor3f(0.7, 0.7, 0.7);
-	glVertex3f(max.x, min.y, max.z); 
 	//	Top
-	glColor3f(0.7, 0.7, 0.7);
-	glVertex3f(max.x, max.y, max.z); 
-	glColor3f(0.7, 0.7, 0.7);
+	glColor3f(0.1, 0.1, 0.3);
 	glVertex3f(min.x, max.y, max.z); 
-	glColor3f(0.0, 0.0, 0.0);
-	glVertex3f(min.x, max.y, min.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(max.x, max.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, max.y, min.z); 
-	//	Left
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, max.y, min.z); 
-	glColor3f(0.7, 0.7, 0.7);
+	//	Left
+	glColor3f(0.1, 0.1, 0.3);
 	glVertex3f(min.x, max.y, max.z); 
-	glColor3f(0.7, 0.7, 0.7);
-	glVertex3f(min.x, min.y, max.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, max.y, min.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(min.x, min.y, max.z); 
 	//	Bottom
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(max.x, min.y, max.z); 
+	glColor3f(0.1, 0.1, 0.3);
+	glVertex3f(min.x, min.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, min.y, min.z); 
-	glColor3f(0.7, 0.7, 0.7);
+	
+	/*//	Bottom
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.3);
 	glVertex3f(min.x, min.y, max.z); 
-	glColor3f(0.7, 0.7, 0.7);
+	glColor3f(0.1, 0.1, 0.3);
 	glVertex3f(max.x, min.y, max.z); 
-
+*/
 	glEnd();
-
 	glPopMatrix();
 }

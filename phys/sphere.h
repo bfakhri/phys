@@ -11,6 +11,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 
+#define SPHERE_COLOR 1.0, 1.0, 1.0
 
 class Sphere : public Shape 
 {

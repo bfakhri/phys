@@ -121,13 +121,19 @@ void gravAllShapes(std::vector<Shape*> v)
 	}
 }
 
-void gravAllMass(double uniMass, cart uniMassDist, std::vector<Shape*> v)
+void gravAllMass(cart uniMassDir, std::vector<Shape*> v)
 {
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
 		// Affect by universal mass
-		gravPull(uniMass, uniMassDist, v[i]);
+		v[i]->t_addForce(v[i]->mass*GRAV_ACCEL*uniMassDir);
 	}
+/*
+	#pragma omp parallel for schedule(static)
+	for(int i=0; i<v.size(); i++){
+		// Affect by universal mass
+		gravPull(uniMass, uniMassDist, v[i]);
+	}*/
 }
 
 
@@ -331,8 +337,8 @@ void advanceSim(double t, std::vector<Shape*> v)
 	//gravAllShapes(v);
 
 	// Universal gravity influence (earth etc)
-	cart c = {0, -100, 0};
-	gravAllMass(99999999999, c, v);
+	cart c = {0, -1, 0};
+	gravAllMass(c, v);
 
 	// Update position of all shapes
 	advancePosAndReset(t, v);
@@ -343,7 +349,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
-	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, 0.999);
+	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, 0.90);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double dampingConst)
@@ -351,18 +357,30 @@ void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double damping
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<s.size(); i++){
 		// One for each boundary 
-		if((s[i]->t_position.x + s[i]->boundingSphere()) > max.x && s[i]->t_velocity.x > 0)
+		if((s[i]->t_position.x + s[i]->boundingSphere()) > max.x && s[i]->t_velocity.x > 0){
 			bounce(s[i], DIR_RIGHT, dampingConst);
-		if((s[i]->t_position.y + s[i]->boundingSphere()) > max.y && s[i]->t_velocity.y > 0)
+			s[i]->t_position.x = max.x - s[i]->boundingSphere();
+		}
+		if((s[i]->t_position.y + s[i]->boundingSphere()) > max.y && s[i]->t_velocity.y > 0){
 			bounce(s[i], DIR_UP, dampingConst);
-		if((s[i]->t_position.z - s[i]->boundingSphere()) < max.z && s[i]->t_velocity.z < 0)
+			s[i]->t_position.y = max.y - s[i]->boundingSphere();
+		}
+		if((s[i]->t_position.z + s[i]->boundingSphere()) > max.z && s[i]->t_velocity.z > 0){
 			bounce(s[i], DIR_BACK, dampingConst);
-		if((s[i]->t_position.x + s[i]->boundingSphere()) < min.x && s[i]->t_velocity.x < 0)
+			s[i]->t_position.z = max.z - s[i]->boundingSphere();
+		}
+		if((s[i]->t_position.x - s[i]->boundingSphere()) < min.x && s[i]->t_velocity.x < 0){
 			bounce(s[i], DIR_RIGHT, dampingConst);
-		if((s[i]->t_position.y + s[i]->boundingSphere()) < min.y && s[i]->t_velocity.y < 0)
+			s[i]->t_position.x = min.x + s[i]->boundingSphere();
+		}
+		if((s[i]->t_position.y - s[i]->boundingSphere()) < min.y && s[i]->t_velocity.y < 0){
 			bounce(s[i], DIR_UP, dampingConst);
-		if((s[i]->t_position.z - s[i]->boundingSphere()) > min.z && s[i]->t_velocity.z > 0)
+			s[i]->t_position.y = min.y + s[i]->boundingSphere();
+		}
+		if((s[i]->t_position.z - s[i]->boundingSphere()) < min.z && s[i]->t_velocity.z < 0){
 			bounce(s[i], DIR_BACK, dampingConst);
+			s[i]->t_position.z = min.z + s[i]->boundingSphere();
+		}
 	}
 }
 

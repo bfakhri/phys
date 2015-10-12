@@ -90,6 +90,12 @@ void initOGL(int argc, char **argv)
 	// For Depth 
 	glEnable(GL_DEPTH_TEST);
 
+	// Lighting Settings
+	glEnable(GL_LIGHTING); 
+	glEnable(GL_LIGHT0);
+	//float ambientSettings[4] = {0.7, 0.7, 0.7, 1};
+	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings);
+
 	// For Antialiasing - test this 
 	//glEnable(GL_MULTISAMPLE);
 
@@ -107,24 +113,25 @@ void initSim(int numShapes)
 {
 	// Init shape vector	
 	cart zer = {0, 0, 0};
-	cart tMaxVel = {0.8, 0.8, 0.8};
+	//cart tMaxVel = {2.8, 2.8, 2.8};
+	cart tMaxVel = {0, 0, 0};
 	for(int i=0; i<numShapes; i++)
 	{
 		
-		worldShapes.push_back((Sphere*)randomShape(0.1, 2, 1, 2, physBoundaryMax, tMaxVel));
-		worldShapes[i]->r_velocity.x = i*3.14/100;
-		worldShapes[i]->r_velocity.y = i*3.14/100;
-		worldShapes[i]->r_velocity.z = i*3.14/100;
+		worldShapes.push_back((Sphere*)randomShape(1, 1, 1, 2, physBoundaryMax, tMaxVel));
+		worldShapes[i]->r_velocity.x = i*3.14/10;
+		worldShapes[i]->r_velocity.y = i*3.14/10;
+		worldShapes[i]->r_velocity.z = i*3.14/10;
 		
 	}
 	cart pos = {0, 0, -2};
 	cart rot = {01, 01, 01};
-	worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
-		
+	//worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
+	
 /*	
 	cart p1 = {-3, 0, 0};
 	cart p2 = {3, 0, 0}; 
-	cart vel1 = {5, 0, 0};
+	cart vel1 = {20, 0, 0};
 	cart vel2 = {0, 0, 0};
 	worldShapes.push_back(new Sphere(2, 1, p1, vel1, zer, zer));
 	worldShapes.push_back(new Sphere(2, 1, p2, vel2, zer, zer));

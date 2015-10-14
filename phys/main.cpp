@@ -69,7 +69,7 @@ void initOGL(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 	
-	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(RES_X, RES_Y);
 	glutInitWindowPosition(200, 200);
 	glutCreateWindow("Phys");
@@ -78,10 +78,16 @@ void initOGL(int argc, char **argv)
 	// Function called when idle  
 	glutIdleFunc(idle); 
 
+	// identify the projection matrix that we would like to alter 
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
 	// Enable CULLING
 	// Ensures faces of objects facing away from the camera are not rendered
 	// Back facing faces will not obscure the front faces consequently
 	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	// set background clear color to black 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -92,17 +98,15 @@ void initOGL(int argc, char **argv)
 	// Lighting Settings
 	glEnable(GL_LIGHTING); 
 	glEnable(GL_LIGHT0);
-	//float ambientSettings[4] = {0.7, 0.7, 0.7, 1};
-	//glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings);
+	float ambientSettings[4] = {0.7, 0.7, 0.7, 1};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings);
 
 	// For Antialiasing - test this 
 	//glEnable(GL_MULTISAMPLE);
 
-	// identify the projection matrix that we would like to alter 
-	glMatrixMode(GL_PROJECTION);
 
 	// Set up perspective projection 
-	gluPerspective(90, 1.0, 0.01, 120.0); 
+	gluPerspective(90, 1.0, 10.0, 40.0); 
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -128,13 +132,13 @@ void initSim(int numShapes)
 	//worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
 	
 /*	
-	cart p1 = {-3, 0, 0};
-	cart p2 = {3, 0, 0}; 
-	cart vel1 = {20, 0, 0};
+	cart p1 = {-1, 0, 0};
+	cart p2 = {1, 0, -4}; 
+	cart vel1 = {0, 0, 0};
 	cart vel2 = {0, 0, 0};
 	worldShapes.push_back(new Sphere(2, 1, p1, vel1, zer, zer));
 	worldShapes.push_back(new Sphere(2, 1, p2, vel2, zer, zer));
-*/	
+*/
 }
 
 

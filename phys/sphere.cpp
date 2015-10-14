@@ -101,8 +101,17 @@ Shape* randomShape(double radMin, double radMax, double massMin, double massMax,
 {
 	cart zeroes = {0, 0, 0}; 	
 
-	double radius = (rand()*(radMax+radMin)/RAND_MAX + radMin);
-	double mass = (rand()*(massMax+massMin)/RAND_MAX + massMin);
+	double radius; 
+	if(radMax == radMin)
+		radius = radMax;
+	else
+		radius = (rand()*(radMax+radMin)/RAND_MAX + radMin);
+
+	double mass;
+	if(massMax == massMin)
+		mass = massMax;
+	else
+		mass = (rand()*(massMax+massMin)/RAND_MAX + massMin);
 
 	cart tPos = {	(rand()*(2*tMaxPos.x)/RAND_MAX - tMaxPos.x), 
 					(rand()*(2*tMaxPos.y)/RAND_MAX - tMaxPos.y), 

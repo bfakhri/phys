@@ -23,10 +23,11 @@
 // Simulation parameters
 // Default period for each step (seconds)
 const double SIM_FPS = 100;						// FPS of the physics engine
-const double SIM_T = 0.01;						// Default sim period
+const double SIM_T = 0.0001;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
 const double SPRING_CONST = 50;				// Need to tweak this
+const double DRAG_COEFF = 0.62;				// Drag coefficient * density of air
 // World stuff
 // Directions
 const cart DIR_UP =	{ 0,  1,  0};
@@ -35,9 +36,9 @@ const cart DIR_RIGHT =	{ 1,  0,  0};
 const cart DIR_LEFT =	{-1,  0,  0};
 const cart DIR_FWRD =	{ 0,  0, -1};
 const cart DIR_BACK =	{ 0,  0,  1};
-const cart physOrigin = {0, 0, -25};			// Origin of sim relative to drawing coords
-const cart physBoundaryMax = {10, 10, 10};		// Maximum coordinates of physics sim
-const cart physBoundaryMin = {-10, -10, -10};	// Minimum coordinates of physics sim
+const cart PHYS_ORIG = {0, 0, -2.5};			// Origin of sim relative to drawing coords
+const cart physBoundaryMax = {1, 1, 1};		// Maximum coordinates of physics sim
+const cart physBoundaryMin = {-1, -1, -1};	// Minimum coordinates of physics sim
 
 ///////////////////
 // Helper Functions 

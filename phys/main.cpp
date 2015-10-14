@@ -40,11 +40,11 @@ void display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	
 	// Draw boundaries
-	drawBoundaries(physOrigin, physBoundaryMin, physBoundaryMax);
+	drawBoundaries(PHYS_ORIG, physBoundaryMin, physBoundaryMax);
 
 	// Draws shapes in vector
 	for(int i=0; i<worldShapes.size(); i++)	
-		worldShapes[i]->draw(physOrigin);
+		worldShapes[i]->draw(PHYS_ORIG);
 
 	//std::cout << worldShapes[0]->t_velocity.x << std::endl;
 
@@ -106,7 +106,7 @@ void initOGL(int argc, char **argv)
 
 
 	// Set up perspective projection 
-	gluPerspective(90, 1.0, 10.0, 40.0); 
+	gluPerspective(90, 1.0, 1.0, 10.0); 
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -117,11 +117,11 @@ void initSim(int numShapes)
 	// Init shape vector	
 	cart zer = {0, 0, 0};
 	//cart tMaxVel = {2.8, 2.8, 2.8};
-	cart tMaxVel = {0, 0, 0};
+	cart tMaxVel = {5, 5, 5};
 	for(int i=0; i<numShapes; i++)
 	{
-		
-		worldShapes.push_back((Sphere*)randomShape(1, 1, 1, 2, physBoundaryMax, tMaxVel));
+		// This is essentially a tennis ball shape/size/mass
+		worldShapes.push_back((Sphere*)randomShape(0.07, 0.07, 0.058, 0.059, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/10;
 		worldShapes[i]->r_velocity.y = i*3.14/10;
 		worldShapes[i]->r_velocity.z = i*3.14/10;

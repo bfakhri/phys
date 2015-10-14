@@ -292,12 +292,13 @@ void r_updatePos(double t, std::vector<Shape*> v)
 	}
 }
 
+// ROTATION HAS BEEN DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void advancePosAndReset(double t, std::vector<Shape*> v)
 {
 	t_updateVel(t, v);
-	r_updateVel(t, v); 
+	//r_updateVel(t, v); 
 	t_updatePos(t, v);
-	r_updatePos(t, v);
+	//r_updatePos(t, v);
 	// Reset force vectors
 	resetForcesAndMomentums(v);
 }

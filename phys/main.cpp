@@ -34,7 +34,6 @@ using namespace std::chrono;
 high_resolution_clock::time_point last = high_resolution_clock::now();
 high_resolution_clock::time_point now = high_resolution_clock::now();
 
-
 void display()
 {
 	// Clear screen

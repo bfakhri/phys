@@ -39,6 +39,12 @@ Shape::Shape()
 	r_pInf.x = 0;
 	r_pInf.y = 0;
 	r_pInf.z = 0;
+
+	// Visual
+	collides = false;
+	color.x = 0.5;
+	color.y = 0.5;
+	color.z = 0.5;
 };
 
 Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
@@ -73,6 +79,12 @@ Shape::Shape(double sMass, cart tPos, cart tVel, cart rPos, cart rVel)
 	r_pInf.x = 0;
 	r_pInf.y = 0;
 	r_pInf.z = 0;
+
+	// Visual
+	collides = false;
+	color.x = 0.5;
+	color.y = 0.5;
+	color.z = 0.5;
 };
 
 
@@ -152,6 +164,12 @@ void Shape::draw(cart origin)
 	glRotatef(r_position.y, 0, 1 , 0); 
 	glRotatef(r_position.z, 0, 0 , 1); 
 
+	// Set color to color of shape
+	if(collides)
+		glColor3f(1.0, 0, 0);
+	else
+		glColor3f(color.x, color.y, color.z);
+	
 	// Actually draw it
 	drawShape();
 

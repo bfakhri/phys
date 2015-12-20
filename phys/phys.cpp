@@ -174,7 +174,12 @@ void collideAndResolve(std::vector<Shape*> v)
 					resolveCollision(v[i], v[j], 0.9);
 				}*/
 				if(collide(v[i], v[j])){
+					v[i]->collides = true;
+					v[j]->collides = true;
 					resolveCollisionSpring(v[i], v[j]);
+				}else{
+					v[i]->collides = false;
+					v[j]->collides = false;
 				}
 
 			}

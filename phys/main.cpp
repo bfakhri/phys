@@ -103,6 +103,7 @@ void initOGL(int argc, char **argv)
 
 	// For Antialiasing - test this 
 	//glEnable(GL_MULTISAMPLE);
+	glEnable(GL_COLOR_MATERIAL);
 
 
 	// Set up perspective projection 

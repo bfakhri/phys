@@ -47,6 +47,11 @@ class Shape
 		cart r_velocity;	// rad/sec
 		cart r_forces;		// torques - Nm
 		cart r_pInf;		// kg*(m^2)*rad/sec
+
+		// Visual
+		cart color;			// RGB color of shape
+		bool collides;		// Flag for a collision involving this 
+							// shape in an iteration
 			
 		///////////////
 		// Constructors

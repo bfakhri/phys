@@ -21,7 +21,7 @@
 #include "sphere.h"
 #include "cube.h"
 
-const double DRAW_FPS = 30;
+const double DRAW_FPS = 60;
 const unsigned int RES_X = 1000;
 const unsigned int RES_Y = 1000;
 
@@ -115,6 +115,7 @@ void initOGL(int argc, char **argv)
 
 void initSim(int numShapes)
 {
+
 	// Init shape vector	
 	cart zer = {0, 0, 0};
 	//cart tMaxVel = {2.8, 2.8, 2.8};
@@ -122,7 +123,7 @@ void initSim(int numShapes)
 	for(int i=0; i<numShapes; i++)
 	{
 		// This is essentially a tennis ball shape/size/mass
-		worldShapes.push_back((Sphere*)randomShape(0.07, 0.07, 0.058, 0.059, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.12, 0.12, 0.058, 0.059, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/10;
 		worldShapes[i]->r_velocity.y = i*3.14/10;
 		worldShapes[i]->r_velocity.z = i*3.14/10;
@@ -134,11 +135,12 @@ void initSim(int numShapes)
 	
 /*	
 	cart p1 = {-1, 0, 0};
-	cart p2 = {1, 0, -4}; 
-	cart vel1 = {0, 0, 0};
-	cart vel2 = {0, 0, 0};
-	worldShapes.push_back(new Sphere(2, 1, p1, vel1, zer, zer));
-	worldShapes.push_back(new Sphere(2, 1, p2, vel2, zer, zer));
+	cart p2 = {1, 0, 0}; 
+	cart vel1 = {1, 0, 0};
+	cart vel2 = {-1, 0, 0};
+	cart zer = {0, 0, 0};
+	worldShapes.push_back(new Sphere(0.1, 1, p1, vel1, zer, zer));
+	worldShapes.push_back(new Sphere(0.1, 1, p2, vel2, zer, zer));
 */
 }
 

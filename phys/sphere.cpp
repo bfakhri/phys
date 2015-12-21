@@ -26,8 +26,8 @@ void Sphere::drawShape()
 	// Mem-leak!?!?!?
 	GLUquadric* quad = gluNewQuadric();					// make a quadric
 	gluQuadricDrawStyle(quad, GLU_FILL);				// This changes the drawing style
-	float depthColor = (t_position.z+10)/20;
-	glColor3f(depthColor, depthColor, depthColor); 
+	//float depthColor = (t_position.z+10)/20;
+	//glColor3f(1.0, 0, 0); //depthColor, depthColor, depthColor); 
 	gluSphere(quad, radius, DEF_SLICES, DEF_STACKS);	// Draws the sphere
 }
 

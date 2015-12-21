@@ -167,6 +167,7 @@ void collideAndResolve(std::vector<Shape*> v)
 	// Make sure this cycles through ALL pairs
 	#pragma omp parallel for schedule(static)
 	for(int i=0; i<v.size(); i++){
+		v[i]->collides = false;
 		for(int j=i; j<v.size(); j++){
 			if(i != j && i < j){
 				// Checks if they collide are moving towards each other
@@ -177,11 +178,7 @@ void collideAndResolve(std::vector<Shape*> v)
 					v[i]->collides = true;
 					v[j]->collides = true;
 					resolveCollisionSpring(v[i], v[j]);
-				}else{
-					v[i]->collides = false;
-					v[j]->collides = false;
 				}
-
 			}
 		}
 	}

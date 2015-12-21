@@ -26,7 +26,7 @@ const double SIM_FPS = 200;						// FPS of the physics engine
 const double SIM_T = 0.005;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
-const double SPRING_CONST = 50;				// Need to tweak this
+const double SPRING_CONST = 100;				// Need to tweak this
 const double DRAG_COEFF = 0.62;				// Drag coefficient * density of air
 // World stuff
 // Directions

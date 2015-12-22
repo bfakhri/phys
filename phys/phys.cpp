@@ -181,14 +181,13 @@ void collideAndResolve(std::vector<Shape*> v)
 		v[i]->collides = false;
 		for(int j=i; j<v.size(); j++){
 			if(i != j && i < j){
-				// Checks if they collide are moving towards each other
-				/*if(collide(v[i], v[j]) && movingTowards(v[i], v[j])){
-					resolveCollision(v[i], v[j], 0.9);
-				}*/
 				if(collide(v[i], v[j])){
 					//v[i]->collides = true;
 					//v[j]->collides = true;
-					resolveCollisionSpring(v[i], v[j]);
+					if(movingTowards(v[i], v[j]))
+						resolveCollisionSpring(v[i], v[j], 1.0);
+					else
+						resolveCollisionSpring(v[i], v[j], COLL_COEFF);
 				}
 			}
 		}
@@ -217,12 +216,12 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst)
 	s1->t_addMomentum(inf2*dampingConst);
 }
 
-void resolveCollisionSpring(Shape* s1, Shape* s2)
+void resolveCollisionSpring(Shape* s1, Shape* s2, double dampingConst)
 {
 	// Find intrusion of s1 on s2
 	double intrusion = s2->boundingSphere() - (distance(s1, s2) + s1->boundingSphere());
 	// Force from the spring 
-	double force = SPRING_CONST*intrusion; 
+	double force = dampingConst*SPRING_CONST*intrusion; 
 	// Direction of force
 	cart c2toc1 = s1->t_position - s2->t_position;	
 	c2toc1 = normalize(c2toc1);

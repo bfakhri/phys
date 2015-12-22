@@ -1,10 +1,9 @@
-----
-3) Add normal force for collisions hopefully this will fix weird bounce problem
-6) Figure out a way to toggle settings like worldWrap elegantly 
-	- Make advanceSim() function have a ton of parameters for everything. 
-		That will be our gateway to the simulator parameters
+- Video Capture (for playing back non-realtime simulations in realtime)
+- Take all sim parameters out of code an put into a params.txt file so we don't have to recompile every time we change it
+- Scripting type functionality so I can quickly define where/how the objects will start
 
 Longer Term
+- Collision detection for arbitrarily shaped objects (will this be mega hard?)
 - Maybe add sound? 3D sound of collisions? 
 - Make a wiki/better documentation page
 - Add inputs to the world by the user: I was thinking an object with accelerometer/magnetometer/orientationMeter 

@@ -27,8 +27,9 @@ const double SIM_T = 0.005;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
 const double SPRING_CONST = 20;					// Need to tweak this
-const double BOUNCE_COEFF = 1.0;				// Determines how much energy is given back after a bounce
-const double DRAG_COEFF = 0.06;					// Drag coefficient * density of air
+const double BOUNCE_COEFF = 1.0;				// Determines how much energy is given back after a bounce off of a wall
+const double DRAG_COEFF = 0.01;					// Drag coefficient * density of air
+const double COLL_COEFF = 0.90;					// Proportion of force returned while bouncing away from each other
 // World stuff
 // Directions
 const cart DIR_UP =	{ 0,  1,  0};
@@ -121,7 +122,7 @@ void resolveCollision(Shape* s1, Shape* s2, double dampingConst);
 
 // Resolve a spring-like collision
 // Shapes are treated like rubber/spring masses
-void resolveCollisionSpring(Shape* s1, Shape* s2);
+void resolveCollisionSpring(Shape* s1, Shape* s2, double dampingConst);
 
 // Bounces shape off of a wall
 void bounce(Shape* s, cart wall);

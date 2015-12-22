@@ -26,8 +26,9 @@ const double SIM_FPS = 200;						// FPS of the physics engine
 const double SIM_T = 0.005;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
-const double SPRING_CONST = 100;				// Need to tweak this
-const double DRAG_COEFF = 0.62;				// Drag coefficient * density of air
+const double SPRING_CONST = 20;					// Need to tweak this
+const double BOUNCE_COEFF = 1.0;				// Determines how much energy is given back after a bounce
+const double DRAG_COEFF = 0.06;					// Drag coefficient * density of air
 // World stuff
 // Directions
 const cart DIR_UP =	{ 0,  1,  0};
@@ -72,8 +73,11 @@ void resetForces(std::vector<Shape*> v);
 
 
 ////////////////////
-// Gravity Functions 
+// Force Functions		-- Forces like gravity, friction, etc
 ////////////////////
+
+// Imparts force of air friction on all shapes in vector
+void airFoceAll(std::vector<Shape*> v);
 
 // Returns the force of gravity between two masses seperated by a distance
 double gravForce(double m1, double m2, double dist);

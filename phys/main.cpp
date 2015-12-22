@@ -56,7 +56,6 @@ void display()
 void idle()
 {
 	high_resolution_clock::time_point now = high_resolution_clock::now();
-	//std::cout << duration_cast<std::chrono::milliseconds>(now - last).count() << "   " << 1000/DRAW_FPS <<  std::endl;
 	if(duration_cast<std::chrono::milliseconds>(now - last).count() >= 1000/DRAW_FPS)
 	{
 		display();
@@ -101,8 +100,7 @@ void initOGL(int argc, char **argv)
 	float ambientSettings[4] = {0.7, 0.7, 0.7, 1};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientSettings);
 
-	// For Antialiasing - test this 
-	//glEnable(GL_MULTISAMPLE);
+	// Enables color to be determined by glcolor* functions
 	glEnable(GL_COLOR_MATERIAL);
 
 
@@ -132,15 +130,15 @@ void initSim(int numShapes)
 	cart pos = {0, 0, -2};
 	cart rot = {01, 01, 01};
 	//worldShapes.push_back(new Cube(2, 1, pos, zer, zer, rot));
-	
 /*	
+	
 	cart p1 = {-1, 0, 0};
 	cart p2 = {1, 0, 0}; 
 	cart vel1 = {1, 0, 0};
 	cart vel2 = {-1, 0, 0};
 	cart zer = {0, 0, 0};
 	worldShapes.push_back(new Sphere(0.1, 1, p1, vel1, zer, zer));
-	worldShapes.push_back(new Sphere(0.1, 1, p2, vel2, zer, zer));
+	//worldShapes.push_back(new Sphere(0.1, 1, p2, vel2, zer, zer));
 */
 }
 

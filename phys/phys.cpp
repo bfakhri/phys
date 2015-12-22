@@ -76,8 +76,19 @@ void resetForcesAndMomentums(std::vector<Shape*> v)
 
 
 ////////////////////
-// Gravity Functions 
+// Force Functions 
 ////////////////////
+
+// Imparts force of air friction on all shapes in vector
+void airFoceAll(std::vector<Shape*> v)
+{
+	#pragma omp parallel for schedule(static)
+	for(int i=0; i<v.size(); i++){
+		cart negVel = -1*normalize(v[i]->t_velocity);
+		float dragMag = DRAG_COEFF*dotProd(v[i]->t_velocity, v[i]->t_velocity); 
+		v[i]->t_addForce(negVel*dragMag);
+	}
+}
 
 double gravForce(double m1, double m2, double dist)
 {
@@ -175,8 +186,8 @@ void collideAndResolve(std::vector<Shape*> v)
 					resolveCollision(v[i], v[j], 0.9);
 				}*/
 				if(collide(v[i], v[j])){
-					v[i]->collides = true;
-					v[j]->collides = true;
+					//v[i]->collides = true;
+					//v[j]->collides = true;
 					resolveCollisionSpring(v[i], v[j]);
 				}
 			}
@@ -339,6 +350,9 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// Physicall influences (gravity/magnetism etc)
 	//gravAllShapes(v);
 
+	// Imparts drag-like force to all objects
+	airFoceAll(v); 
+
 	// Universal gravity influence (earth etc)
 	cart c = {0, -1, 0};
 	gravAllMass(c, v);
@@ -352,7 +366,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	// If worldwrap is on, worldwrap all objects
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
-	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, 0.90);
+	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, BOUNCE_COEFF);
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double dampingConst)

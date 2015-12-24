@@ -366,6 +366,10 @@ void advanceSim(double t, std::vector<Shape*> v)
 	//cart lims = {100, 100, 100};
 	//wrapWorld(lims, v);
 	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, BOUNCE_COEFF);
+
+	// Capture a frame
+	my_recorder.capture(t);
+	
 }
 
 void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double dampingConst)
@@ -401,7 +405,7 @@ void enforceBoundaries(std::vector<Shape*> s, cart min, cart max, double damping
 }
 
 void physicsThread(std::vector<Shape*> v)
-{
+{	
 	using namespace std::chrono;
 	milliseconds sleepDur((unsigned int)(1/(SIM_FPS*2)));
 	high_resolution_clock::time_point last = high_resolution_clock::now();

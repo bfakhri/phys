@@ -12,6 +12,7 @@
 #include "mather.h"
 #include "shape.h"
 #include "sphere.h"
+#include "capture.h"// For capturing video of sim
 #include <math.h>
 #include <vector>
 #include <thread>	// For multithreading
@@ -22,7 +23,7 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_FPS = 200;						// FPS of the physics engine
+const double SIM_FPS = 100;						// FPS of the physics engine
 const double SIM_T = 0.005;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
@@ -41,6 +42,8 @@ const cart DIR_BACK =	{ 0,  0,  1};
 const cart PHYS_ORIG = {0, 0, -2.5};			// Origin of sim relative to drawing coords
 const cart physBoundaryMax = {1, 1, 1};		// Maximum coordinates of physics sim
 const cart physBoundaryMin = {-1, -1, -1};	// Minimum coordinates of physics sim
+
+static Recorder my_recorder;							// Records frames
 
 ///////////////////
 // Helper Functions 

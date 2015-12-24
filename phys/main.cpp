@@ -21,9 +21,10 @@
 #include "sphere.h"
 #include "cube.h"
 
+// Globals
+#include "globals.h"
+
 const double DRAW_FPS = 60;
-const unsigned int RES_X = 1000;
-const unsigned int RES_Y = 1000;
 
 // Vector holding all worldly shapes
 // May not include user-controlled ones
@@ -69,7 +70,7 @@ void initOGL(int argc, char **argv)
 	glutInit(&argc, argv);
 	
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(RES_X, RES_Y);
+	glutInitWindowSize(SCREEN_RES_X, SCREEN_RES_Y);
 	glutInitWindowPosition(200, 200);
 	glutCreateWindow("Phys");
 	glutDisplayFunc(display);
@@ -121,7 +122,7 @@ void initSim(int numShapes)
 	for(int i=0; i<numShapes; i++)
 	{
 		// This is essentially a tennis ball shape/size/mass
-		worldShapes.push_back((Sphere*)randomShape(0.12, 0.12, 0.058, 0.059, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.02, 0.02, 0.058, 0.059, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/10;
 		worldShapes[i]->r_velocity.y = i*3.14/10;
 		worldShapes[i]->r_velocity.z = i*3.14/10;

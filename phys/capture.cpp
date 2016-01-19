@@ -16,41 +16,15 @@ void Recorder::capture(float period)
 		return;
 	}
 
-	uint8_t ** img_buffer = new uint8_t*[SCREEN_RES_X];
-	for(int y=0; y<SCREEN_RES_Y; y++){
-		img_buffer[y] = new uint8_t[SCREEN_RES_X*3];
-		for(int i=0; i<SCREEN_RES_X*3; i++){ 
-			img_buffer[y][i] = 0xFF; 
-		}
-	}
-
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-	//glReadBuffer(GL_FRONT);
-	// Get image from buffer
-	for(int y=0; y<SCREEN_RES_Y; y++){
-		for(int x=0; x<SCREEN_RES_X; x++){
-			//glReadPixels(x, y, SCREEN_RES_X, SCREEN_RES_Y, GL_RGB, GL_UNSIGNED_BYTE, &img_buffer[SCREEN_RES_Y-y-1][x*3]);
-			glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &img_buffer[SCREEN_RES_Y-y-1][x*3]);
-
-			GLenum error; 
-			if ((error = glGetError()) != GL_NO_ERROR)
-				printf("GL Error: %s (%s)\n", gluErrorString(error));
-			//img_buffer[y][x+0] = 0;
-			//img_buffer[y][x+1] = 0;
-			//img_buffer[y][x+2] = 0;
-		}
-	}
-
-	GLenum error; 
-	if ((error = glGetError()) != GL_NO_ERROR)
-		printf("GL Error: %s (%s)\n", gluErrorString(error));
-
+	uint8_t * img_buffer = new uint8_t[SCREEN_RES_X*SCREEN_RES_Y*3];
 	char filename[40];
 	sprintf (filename, "./images/%d.png", frameCount);	
-	
+	glReadPixels(0, 0, SCREEN_RES_X, SCREEN_RES_Y, GL_RGB, GL_UNSIGNED_BYTE, img_buffer); 	
 	// Write out image to PNG file
-	writeImage(filename, SCREEN_RES_X, SCREEN_RES_Y, img_buffer, "title"); 
+	//writeImage(filename, SCREEN_RES_X, SCREEN_RES_Y, img_buffer, "title"); 
+	//for(int i=0; i<SCREEN_RES_X*SCREEN_RES_Y; i++){
+	//	std::cout << (int)img_buffer[i*3] << std::endl;
+	//}
 }
 
 // --- Ripped From --- 

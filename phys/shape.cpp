@@ -166,7 +166,7 @@ void Shape::draw(cart origin)
 
 	// Set color to color of shape
 	if(collides)
-		glColor3f(1.0, 0, 0);
+		glColor3f(0.0, 0, 0);
 	else
 		glColor3f(color.x, color.y, color.z);
 	
@@ -218,52 +218,52 @@ void drawBoundaries(cart origin, cart min, cart max)
 	glVertex3f(min.x, min.y, min.z); 
 	glVertex3f(max.x, min.y, min.z); 
 	//	Right
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(max.x, max.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, max.y, min.z); 
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(max.x, max.y, max.z); 
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(max.x, min.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(max.x, min.y, max.z); 
 	//	Top
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(min.x, max.y, max.z); 
-	glColor3f(0.1, 0.1, 0.3);
+	glColor3f(0.1, 0.1, 0.8);
 	glVertex3f(max.x, max.y, max.z); 
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(min.x, max.y, max.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, max.y, min.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, max.y, min.z); 
-	glColor3f(0.0, 0.0, 0.0);
-	glVertex3f(min.x, max.y, min.z); 
 	//	Left
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(min.x, max.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, max.y, min.z); 
-	glColor3f(0.0, 0.0, 0.0);
-	glVertex3f(min.x, min.y, min.z); 
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(min.x, min.y, max.z); 
-	//	Bottom
-	glColor3f(0.0, 0.0, 0.0);
-	glVertex3f(max.x, min.y, min.z); 
-	glColor3f(0.1, 0.1, 0.3);
-	glVertex3f(max.x, min.y, max.z); 
-	glColor3f(0.1, 0.1, 0.3);
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(min.x, max.y, max.z); 
+	glColor3f(0.1, 0.1, 0.8);
 	glVertex3f(min.x, min.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, min.y, min.z); 
-	
 	/*//	Bottom
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(max.x, min.y, max.z); 
+	glColor3f(0.1, 0.1, 0.8);
+	glVertex3f(min.x, min.y, max.z); 
 	glColor3f(0.0, 0.0, 0.0);
 	glVertex3f(min.x, min.y, min.z); 
-	glColor3f(0.1, 0.1, 0.3);
+	*/
+	//	Bottom
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(max.x, min.y, min.z); 
+	glColor3f(0.0, 0.0, 0.0);
+	glVertex3f(min.x, min.y, min.z); 
+	glColor3f(0.1, 0.1, 0.8);
 	glVertex3f(min.x, min.y, max.z); 
-	glColor3f(0.1, 0.1, 0.3);
+	glColor3f(0.1, 0.1, 0.8);
 	glVertex3f(max.x, min.y, max.z); 
-*/
+
 	glEnd();
 	glPopMatrix();
 }

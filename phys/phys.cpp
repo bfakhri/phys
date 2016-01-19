@@ -347,7 +347,7 @@ void wrapWorld(cart worldLimits, std::vector<Shape*> v)
 void advanceSim(double t, std::vector<Shape*> v)
 {
 	// Physicall influences (gravity/magnetism etc)
-	//gravAllShapes(v);
+	gravAllShapes(v);
 
 	// Imparts drag-like force to all objects
 	airFoceAll(v); 

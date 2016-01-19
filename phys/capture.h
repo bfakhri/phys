@@ -19,6 +19,9 @@
 // Globals
 #include "globals.h"
 
+// String
+#include <string>
+
 const uint32_t VIDEO_FPS = 30;
 
 // Maybe make this a singleton in the future? 

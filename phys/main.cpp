@@ -122,7 +122,7 @@ void initSim(int numShapes)
 	for(int i=0; i<numShapes; i++)
 	{
 		// This is essentially a tennis ball shape/size/mass
-		worldShapes.push_back((Sphere*)randomShape(0.02, 0.02, 0.058, 0.059, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.1, 0.1, 0.058, 0.059, physBoundaryMax, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/10;
 		worldShapes[i]->r_velocity.y = i*3.14/10;
 		worldShapes[i]->r_velocity.z = i*3.14/10;

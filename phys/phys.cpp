@@ -368,7 +368,7 @@ void advanceSim(double t, std::vector<Shape*> v)
 	enforceBoundaries(v, physBoundaryMin, physBoundaryMax, BOUNCE_COEFF);
 
 	// Capture a frame
-	my_recorder.capture(t);
+	//my_recorder.capture(t); // Breaks so commented out
 	
 }
 

@@ -117,7 +117,7 @@ void initSim(int numShapes)
 
 	// Init shape vector	
 	cart zer = {0, 0, 0};
-	cart cen_ran = {0.01, 0.01, 0.01};
+	cart cen_ran = {0.005, 0.005, 0.1};
 	cart spawn_offset = {0, 0.8, 0.0};
 	//cart tMaxVel = {2.8, 2.8, 2.8};
 	cart tMaxVel = {5, 5, 5};

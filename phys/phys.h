@@ -24,7 +24,7 @@
 // Simulation parameters
 // Default period for each step (seconds)
 const double SIM_FPS = 1000;						// FPS of the physics engine
-const double SIM_T = 0.0001;						// Default sim period
+const double SIM_T = 0.00001;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
 const double SPRING_CONST = 50;					// Need to tweak this

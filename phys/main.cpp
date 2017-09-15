@@ -117,12 +117,14 @@ void initSim(int numShapes)
 
 	// Init shape vector	
 	cart zer = {0, 0, 0};
+	cart cen_ran = {0.01, 0.01, 0.01};
+	cart spawn_offset = {0, 0.8, 0.0};
 	//cart tMaxVel = {2.8, 2.8, 2.8};
 	cart tMaxVel = {5, 5, 5};
 	for(int i=0; i<numShapes; i++)
 	{
 		// This is essentially a tennis ball shape/size/mass
-		worldShapes.push_back((Sphere*)randomShape(0.1, 0.1, 0.058, 0.059, physBoundaryMax, tMaxVel));
+		worldShapes.push_back((Sphere*)randomShape(0.02, 0.02, 0.058, 0.059, cen_ran, spawn_offset, tMaxVel));
 		worldShapes[i]->r_velocity.x = i*3.14/10;
 		worldShapes[i]->r_velocity.y = i*3.14/10;
 		worldShapes[i]->r_velocity.z = i*3.14/10;

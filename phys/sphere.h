@@ -52,4 +52,6 @@ Shape* randomShape();
 
 // Make random shape with param constraints
 Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tMaxVel);
+// Make random shape with param constraints - version with translation offset
+Shape* randomShape(double radMin, double radMax, double massMin, double massMax, cart tMaxPos, cart tOffsetPos, cart tMaxVel);
 #endif

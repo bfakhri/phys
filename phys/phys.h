@@ -23,14 +23,14 @@
 
 // Simulation parameters
 // Default period for each step (seconds)
-const double SIM_FPS = 100;						// FPS of the physics engine
-const double SIM_T = 0.01;						// Default sim period
+const double SIM_FPS = 1000;						// FPS of the physics engine
+const double SIM_T = 0.0001;						// Default sim period
 const double G_CONST = 0.0000000000667384;		// Gravitational constant G
 const double GRAV_ACCEL = 9.81;					// Accel due to gravity in m/s^2
-const double SPRING_CONST = 20;					// Need to tweak this
-const double BOUNCE_COEFF = 1.0;				// Determines how much energy is given back after a bounce off of a wall
+const double SPRING_CONST = 50;					// Need to tweak this
+const double BOUNCE_COEFF = 0.9;				// Determines how much energy is given back after a bounce off of a wall
 const double DRAG_COEFF = 0.01;					// Drag coefficient * density of air
-const double COLL_COEFF = 0.50;					// Proportion of force returned while bouncing away from each other
+const double COLL_COEFF = 0.80;					// Proportion of force returned while bouncing away from each other
 // World stuff
 // Directions
 const cart DIR_UP =	{ 0,  1,  0};

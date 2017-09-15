@@ -10,3 +10,6 @@ Longer Term
 	could act as an input and a "virtual" version of the object in the engine which can interact with the 
 	world's objects
 - Joystick to toggle a vehicle in the "world"? 
+
+- Because OpenGL won't let us use glreadpixels, I'll use this hack instead. Screencapture timelapse:
+https://www.bhalash.com/archives/885403473

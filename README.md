@@ -20,8 +20,11 @@ Syntax -
 
 Where NUM_OBJECTS is the number of objects that spawn in the simulator. Object properties (such as friction, spring coefficients, simulation speed and precision, etc) can be manipulated in phys.h
 
-Inline-style: 
+
+
 ![alt text](https://github.com/bfakhri/phys/blob/master/example.gif "Logo Title Text 1")
+
+
 
 Note - Demonstration runs on Ubuntu 14.04 LTS
 
